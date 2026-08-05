@@ -1,0 +1,65 @@
+import 'package:get_it/get_it.dart';
+import 'package:fosha_app/core/network/dio_client.dart';
+import 'package:fosha_app/features/admin/dashboard/data/datasourece/admin_dashboard_remote_data_source.dart';
+import 'package:fosha_app/features/admin/dashboard/data/repositories/admin_dashboard_stats_repository.dart';
+import 'package:fosha_app/features/admin/dashboard/presentation/cubit/admin_cubit.dart';
+import 'package:fosha_app/features/admin/manage_trips/data/datasource/admin_manage_trips_data_source.dart';
+import 'package:fosha_app/features/admin/manage_trips/data/repositories/admin_manage_trips_repository.dart';
+import 'package:fosha_app/features/admin/manage_trips/presentation/cubit/admin_manage_trips_cubit.dart';
+import 'package:fosha_app/features/categories/data/datasources/categories_remote_data_source.dart';
+import 'package:fosha_app/features/categories/data/repositories/categories_repository.dart';
+import 'package:fosha_app/features/categories/presentation/cubits/categories_cubit.dart';
+import 'package:fosha_app/features/user/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:fosha_app/features/user/auth/data/repositories/auth_repository.dart';
+import 'package:fosha_app/features/user/auth/presentation/cubit/auth_cubit.dart';
+import 'package:fosha_app/features/admin/trips/data/repositories/admin_trips_repository.dart';
+import 'package:fosha_app/features/admin/trips/presentation/cubit/admin_trips_cubit.dart';
+import 'package:fosha_app/features/admin/trips/data/datasource/admin_trips_remote_data_source.dart';
+
+final GetIt getIt = GetIt.instance;
+Future<void> initServiceLocator() async {
+  getIt.registerLazySingleton<DioClient>(() => DioClient());
+  // data sources
+  getIt.registerLazySingleton<AuthRemoteDataSource>(
+    () => AuthRemoteDataSourceImpl(getIt()),
+  );
+  getIt.registerLazySingleton<AdminDashboardRemoteDataSource>(
+    () => AdminDashboardRemoteDataSourceImpl(dioClient: getIt()),
+  );
+  getIt.registerLazySingleton<AdminTripsRemoteDataSource>(
+    () => AdminTripsRemoteDataSourceImpl(getIt()),
+  );
+  getIt.registerLazySingleton<CategoriesRemoteDataSource>(
+    () => CategoriesRemoteDataSourceImpl(getIt()),
+  );
+  getIt.registerLazySingleton<AdminManageTripsDataSource>(
+    () => AdminManageTripsDataSourceImpl(getIt()),
+  );
+  // repositories
+  getIt.registerLazySingleton<AuthRepository>(
+    () => AuthRepository(authRemoteDataSource: getIt()),
+  );
+  getIt.registerLazySingleton<AdminDashboardStatsRepository>(
+    () => AdminDashboardStatsRepository(remoteDataSource: getIt()),
+  );
+
+  getIt.registerLazySingleton<AdminTripsRepository>(
+    () => AdminTripsRepository(dataSource: getIt()),
+  );
+  getIt.registerLazySingleton<CategoriesRepository>(
+    () => CategoriesRepository(getIt()),
+  );
+  getIt.registerLazySingleton<AdminManageTripsRepository>(
+    () => AdminManageTripsRepository(getIt()),
+  );
+  // cubits
+  getIt.registerFactory<AuthCubit>(() => AuthCubit(authRepository: getIt()));
+  getIt.registerFactory<AdminCubit>(
+    () => AdminCubit(adminDashboardStatsRepository: getIt()),
+  );
+  getIt.registerFactory<AdminTripsCubit>(() => AdminTripsCubit(getIt()));
+  getIt.registerFactory<CategoriesCubit>(() => CategoriesCubit(getIt()));
+  getIt.registerFactory<AdminManageTripsCubit>(
+    () => AdminManageTripsCubit(getIt()),
+  );
+}

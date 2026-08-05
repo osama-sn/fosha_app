@@ -1,0 +1,142 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fosha_app/core/constants/app_colors.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
+import 'package:fosha_app/core/extensions/extensions.dart';
+import 'package:fosha_app/core/shared/widgets/app_text_field.dart';
+import 'package:fosha_app/core/theme/app_sizes.dart';
+import 'package:fosha_app/core/theme/app_text_styles.dart';
+import 'package:fosha_app/features/admin/manage_trips/data/models/trip_request_model.dart';
+
+class AddTripStep2PriceDates extends StatefulWidget {
+  final CreateTripRequest formModel;
+
+  const AddTripStep2PriceDates({super.key, required this.formModel});
+
+  @override
+  State<AddTripStep2PriceDates> createState() => _AddTripStep2PriceDatesState();
+}
+
+class _AddTripStep2PriceDatesState extends State<AddTripStep2PriceDates> {
+  late final TextEditingController _priceController;
+  late final TextEditingController _capacityController;
+
+  @override
+  void initState() {
+    super.initState();
+    _priceController = TextEditingController(
+      text: widget.formModel.price > 0
+          ? widget.formModel.price.toStringAsFixed(0)
+          : '',
+    );
+    _capacityController = TextEditingController(
+      text: widget.formModel.capacity > 0
+          ? widget.formModel.capacity.toString()
+          : '',
+    );
+  }
+
+  @override
+  void dispose() {
+    _priceController.dispose();
+    _capacityController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppTextField(
+          controller: _priceController,
+          labelText: AppStrings.adminPriceLabel,
+          hintText: AppStrings.adminPriceHint,
+          type: AppTextFieldType.phone,
+          onChanged: (val) {
+            widget.formModel.price = double.tryParse(val.trim()) ?? 0.0;
+          },
+        ),
+        AppSizes.p16.verticalSpace,
+        AppTextField(
+          controller: _capacityController,
+          labelText: AppStrings.adminCapacityLabel,
+          hintText: AppStrings.adminCapacityHint,
+          type: AppTextFieldType.phone,
+          onChanged: (val) {
+            widget.formModel.capacity = int.tryParse(val.trim()) ?? 0;
+          },
+        ),
+        AppSizes.p16.verticalSpace,
+        Row(
+          children: [
+            _buildDatePicker(
+              context: context,
+              label: AppStrings.adminStartDateLabel,
+              selectedDate: widget.formModel.startDate,
+              onSelect: (date) {
+                setState(() => widget.formModel.startDate = date);
+              },
+            ).expanded(),
+            AppSizes.p12.horizontalSpace,
+            _buildDatePicker(
+              context: context,
+              label: AppStrings.adminEndDateLabel,
+              selectedDate: widget.formModel.endDate,
+              onSelect: (date) {
+                setState(() => widget.formModel.endDate = date);
+              },
+            ).expanded(),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDatePicker({
+    required BuildContext context,
+    required String label,
+    required DateTime? selectedDate,
+    required ValueChanged<DateTime> onSelect,
+  }) {
+    final formattedDate = selectedDate == null
+        ? label
+        : '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}';
+    return InkWell(
+      onTap: () async {
+        final now = DateTime.now();
+        final picked = await showDatePicker(
+          context: context,
+          initialDate: selectedDate ?? now,
+          firstDate: now,
+          lastDate: now.add(const Duration(days: 365)),
+        );
+        if (picked != null) {
+          onSelect(picked);
+        }
+      },
+      child: Container(
+        padding: EdgeInsets.all(AppSizes.p16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppSizes.r8),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              formattedDate,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: selectedDate == null
+                    ? AppColors.textHint
+                    : AppColors.textPrimary,
+              ),
+            ),
+            Icon(Icons.calendar_today, size: 18.r, color: AppColors.primary),
+          ],
+        ),
+      ),
+    );
+  }
+}
