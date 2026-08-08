@@ -1,28 +1,3 @@
-// {
-//     "statusCode": 200,
-//     "success": true,
-//     "code": "LOGIN_SUCCESS",
-//     "message": "تم تسجيل الدخول بنجاح.",
-//     "data": {
-//         "user": {
-//             "_id": "6a5eac193ceabbae017bcd3e",
-//             "fullName": "Osama Essam (Admin)",
-//             "email": "osamaessamkhalifa@gmail.com",
-//             "phone": "01062059515",
-//             "profileImage": "",
-//             "authProvider": "local",
-//             "role": "admin",
-//             "createdAt": "2026-07-20T23:15:37.549Z",
-//             "updatedAt": "2026-07-26T19:27:07.376Z",
-//             "__v": 1,
-//             "fcmTokens": [],
-//             "isProtected": true
-//         },
-//         "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWVhYzE5M2NlYWJiYWUwMTdiY2QzZSIsImlhdCI6MTc4NTA5NDAyNywiZXhwIjoxNzg1MDk0OTI3fQ.OqRpSYzEIbOT5D4qbXYvdBBL7KiZRA8aO0vJDIv6nMo",
-//         "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNWVhYzE5M2NlYWJiYWUwMTdiY2QzZSIsImlhdCI6MTc4NTA5NDAyNywiZXhwIjoxNzg1Njk4ODI3fQ.5LnzDvd_0wHpp_RWmuPorkJ5TvG_bSPz9_ej88Eom0Q"
-//     }
-// }
-
 import 'package:equatable/equatable.dart';
 
 class UserModel {
@@ -33,8 +8,10 @@ class UserModel {
   final String profileImage;
   final String authProvider;
   final String role;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final String? company;
+  final String? governorate;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
   final int v;
   final List<String> fcmTokens;
   final bool isProtected;
@@ -49,8 +26,10 @@ class UserModel {
     required this.profileImage,
     required this.authProvider,
     required this.role,
-    required this.createdAt,
-    required this.updatedAt,
+    this.company,
+    this.governorate,
+    this.createdAt,
+    this.updatedAt,
     required this.v,
     required this.fcmTokens,
     required this.isProtected,
@@ -58,19 +37,38 @@ class UserModel {
     required this.refreshToken,
   });
 
-  bool get isAdmin => role == "admin";
+  bool get isAdmin =>
+      role == "admin" || role == "company_admin" || role == "super_admin";
+  bool get isCompanyAdmin => role == "company_admin";
+  bool get isSuperAdmin => role == "super_admin";
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    String? companyId;
+    if (json['company'] != null) {
+      if (json['company'] is Map) {
+        companyId = (json['company']['_id'] ?? json['company']['id'])
+            ?.toString();
+      } else {
+        companyId = json['company'].toString();
+      }
+    }
+
     return UserModel(
-      id: json['_id'],
-      fullName: json['fullName'],
-      email: json['email'],
-      phone: json['phone'],
+      id: (json['_id'] ?? json['id'] ?? '').toString(),
+      fullName: json['fullName'] ?? '',
+      email: json['email'] ?? '',
+      phone: json['phone'] ?? '',
       profileImage: json['profileImage'] ?? '',
-      authProvider: json['authProvider'],
-      role: json['role'],
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      governorate: json['governorate'] as String?,
+      company: companyId,
+      authProvider: json['authProvider'] ?? 'local',
+      role: json['role'] ?? 'user',
+      createdAt: json['createdAt'] != null
+          ? DateTime.tryParse(json['createdAt'].toString())
+          : null,
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.tryParse(json['updatedAt'].toString())
+          : null,
       v: json['__v'] ?? 0,
       fcmTokens:
           (json['fcmTokens'] as List<dynamic>?)
@@ -90,10 +88,12 @@ class UserModel {
       'email': email,
       'phone': phone,
       'profileImage': profileImage,
+      'governorate': governorate,
+      'company': company,
       'authProvider': authProvider,
       'role': role,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
       '__v': v,
       'fcmTokens': fcmTokens,
       'isProtected': isProtected,
@@ -120,11 +120,11 @@ class AuthResponseModel {
 
   factory AuthResponseModel.fromJson(Map<String, dynamic> json) {
     return AuthResponseModel(
-      statusCode: json['statusCode'],
-      success: json['success'],
-      code: json['code'],
-      message: json['message'],
-      data: AuthUserData.fromJson(json['data']),
+      statusCode: json['statusCode'] ?? 200,
+      success: json['success'] ?? true,
+      code: json['code'] ?? '',
+      message: json['message'] ?? '',
+      data: AuthUserData.fromJson(json['data'] as Map<String, dynamic>),
     );
   }
 
@@ -151,10 +151,16 @@ class AuthUserData {
   });
 
   factory AuthUserData.fromJson(Map<String, dynamic> json) {
+    final userJson = Map<String, dynamic>.from(json['user'] as Map);
+    final accessToken = json['accessToken'] as String? ?? '';
+    final refreshToken = json['refreshToken'] as String? ?? '';
+    userJson['accessToken'] = accessToken;
+    userJson['refreshToken'] = refreshToken;
+
     return AuthUserData(
-      user: UserModel.fromJson(json['user']),
-      accessToken: json['accessToken'],
-      refreshToken: json['refreshToken'],
+      user: UserModel.fromJson(userJson),
+      accessToken: accessToken,
+      refreshToken: refreshToken,
     );
   }
 
@@ -179,10 +185,12 @@ class RefreshTokenResponse extends Equatable {
   factory RefreshTokenResponse.fromJson(Map<String, dynamic> json) {
     final data = json['data'] as Map<String, dynamic>? ?? json;
     return RefreshTokenResponse(
-      accessToken: data['accessToken'] as String? ??
+      accessToken:
+          data['accessToken'] as String? ??
           data['access_token'] as String? ??
           '',
-      refreshToken: data['refreshToken'] as String? ??
+      refreshToken:
+          data['refreshToken'] as String? ??
           data['refresh_token'] as String? ??
           '',
     );

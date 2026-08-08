@@ -14,6 +14,7 @@ import 'package:fosha_app/core/shared/widgets/app_snackbar.dart';
 import 'package:fosha_app/core/shared/widgets/app_text_field.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
+import 'package:fosha_app/core/utils/app_validators.dart';
 import 'package:fosha_app/features/user/auth/presentation/cubit/auth_cubit.dart';
 import 'package:fosha_app/features/user/auth/presentation/cubit/auth_states.dart';
 import 'package:fosha_app/features/user/auth/presentation/widgets/social_auth_buttons.dart';
@@ -95,12 +96,7 @@ class _LoginPageState extends State<LoginPage> {
                             hintText: AppStrings.emailHint,
                             labelText: AppStrings.emailLabel,
                             type: AppTextFieldType.email,
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'الرجاء إدخال البريد الإلكتروني';
-                              }
-                              return null;
-                            },
+                            validator: AppValidators.validateEmail,
                           ),
                           AppSizes.p16.verticalSpace,
                           AppTextField(
@@ -108,12 +104,7 @@ class _LoginPageState extends State<LoginPage> {
                             hintText: AppStrings.passwordHint,
                             labelText: AppStrings.passwordLabel,
                             type: AppTextFieldType.password,
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'الرجاء إدخال كلمة المرور';
-                              }
-                              return null;
-                            },
+                            validator: AppValidators.validatePassword,
                           ),
                           AppSizes.p8.verticalSpace,
                           Align(

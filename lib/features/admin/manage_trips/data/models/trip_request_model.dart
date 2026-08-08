@@ -114,6 +114,8 @@ class CreateTripRequest {
   String cancelPolicy;
   XFile? coverImage;
   List<XFile> gallery;
+  String existingCoverImageUrl;
+  List<String> existingGalleryUrls;
 
   List<XFile> get galleryImages => gallery;
   set galleryImages(List<XFile> val) => gallery = val;
@@ -141,13 +143,16 @@ class CreateTripRequest {
     this.cancelPolicy = '',
     this.coverImage,
     List<XFile>? gallery,
+    this.existingCoverImageUrl = '',
+    List<String>? existingGalleryUrls,
     List<String>? included,
     List<String>? excluded,
     List<TripDayRequest>? days,
-  }) : gallery = gallery ?? [],
-       included = included ?? [],
-       excluded = excluded ?? [],
-       days = days ?? [TripDayRequest(dayNumber: 1)];
+  })  : gallery = gallery ?? [],
+        existingGalleryUrls = existingGalleryUrls ?? [],
+        included = included ?? [],
+        excluded = excluded ?? [],
+        days = days ?? [TripDayRequest(dayNumber: 1)];
 
   factory CreateTripRequest.fromTrip(TripModel trip) {
     return CreateTripRequest(
@@ -171,6 +176,8 @@ class CreateTripRequest {
           : null,
       status: trip.status,
       cancelPolicy: trip.cancelPolicy,
+      existingCoverImageUrl: trip.fullCoverImageUrl,
+      existingGalleryUrls: List<String>.from(trip.galleryWithBaseUrl),
       included: List<String>.from(trip.included),
       excluded: List<String>.from(trip.excluded),
       days: trip.days.map((d) => TripDayRequest.fromModel(d)).toList(),

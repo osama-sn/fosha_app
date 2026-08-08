@@ -4,9 +4,13 @@ class AppSizes {
   AppSizes._();
 
   // Padding & Margin
+  static double get p2 => 2.0.w;
   static double get p4 => 4.0.w;
+  static double get p6 => 6.0.w;
   static double get p8 => 8.0.w;
+  static double get p10 => 10.0.w;
   static double get p12 => 12.0.w;
+  static double get p14 => 14.0.w;
   static double get p16 => 16.0.w;
   static double get p20 => 20.0.w;
   static double get p24 => 24.0.w;
@@ -17,8 +21,10 @@ class AppSizes {
   // Radius
   static double get r4 => 4.0.r;
   static double get r8 => 8.0.r;
+  static double get r10 => 10.0.r;
   static double get r12 => 12.0.r;
   static double get r16 => 16.0.r;
+  static double get r20 => 20.0.r;
   static double get r24 => 24.0.r;
   static double get r32 => 32.0.r;
 

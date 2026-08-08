@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:fosha_app/core/network/api_endpoints.dart';
@@ -24,6 +25,7 @@ abstract class AdminManageTripsDataSource {
 class AdminManageTripsDataSourceImpl implements AdminManageTripsDataSource {
   final DioClient _dioClient;
   AdminManageTripsDataSourceImpl(this._dioClient);
+
   @override
   Future<TripModel> createTrip(
     CreateTripRequest tripRequest, {
@@ -31,37 +33,37 @@ class AdminManageTripsDataSourceImpl implements AdminManageTripsDataSource {
     List<XFile>? galleryImages,
   }) async {
     try {
-      dynamic requestBody;
-      final tripMap = tripRequest.toJson();
-      if (coverImage != null ||
-          (galleryImages != null && galleryImages.isEmpty)) {
-        final formData = FormData.fromMap(tripMap);
-        formData.files.add(
-          MapEntry(
-            'coverImage',
-            await MultipartFile.fromFile(
-              coverImage!.path,
-              filename: coverImage.name,
-            ),
-          ),
-        );
-        if (galleryImages != null && galleryImages.isNotEmpty) {
-          for (var img in galleryImages) {
-            formData.files.add(
-              MapEntry(
-                'gallery',
-                await MultipartFile.fromFile(img.path, filename: img.name),
-              ),
-            );
-          }
-        }
-        requestBody = formData;
-      } else {
-        requestBody = tripMap;
-      }
+      final formData = await _buildFormData(
+        tripRequest,
+        coverImage: coverImage,
+        galleryImages: galleryImages,
+      );
       final response = await _dioClient.dio.post(
         ApiEndpoints.trips,
-        data: requestBody,
+        data: formData,
+      );
+      return TripModel.fromJson(_parseTripData(response.data));
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<TripModel> updateTrip(
+    String tripId,
+    CreateTripRequest tripRequest, {
+    XFile? coverImage,
+    List<XFile>? galleryImages,
+  }) async {
+    try {
+      final formData = await _buildFormData(
+        tripRequest,
+        coverImage: coverImage,
+        galleryImages: galleryImages,
+      );
+      final response = await _dioClient.dio.put(
+        "${ApiEndpoints.trips}/$tripId",
+        data: formData,
       );
       return TripModel.fromJson(_parseTripData(response.data));
     } catch (e) {
@@ -90,50 +92,58 @@ class AdminManageTripsDataSourceImpl implements AdminManageTripsDataSource {
     }
   }
 
-  @override
-  Future<TripModel> updateTrip(
-    String tripId,
+  Future<FormData> _buildFormData(
     CreateTripRequest tripRequest, {
     XFile? coverImage,
     List<XFile>? galleryImages,
   }) async {
-    try {
-      dynamic requestBody;
-      final tripMap = tripRequest.toJson();
-      if (coverImage != null ||
-          (galleryImages != null && galleryImages.isEmpty)) {
-        final formData = FormData.fromMap(tripMap);
+    final Map<String, dynamic> map = {
+      'title': tripRequest.title,
+      'description': tripRequest.description,
+      'origin': tripRequest.origin,
+      'destination': tripRequest.destination,
+      'price': tripRequest.price.toString(),
+      'capacity': tripRequest.capacity.toString(),
+      if (tripRequest.startDate != null)
+        'startDate': tripRequest.startDate!.toIso8601String(),
+      if (tripRequest.endDate != null)
+        'endDate': tripRequest.endDate!.toIso8601String(),
+      if (tripRequest.category.isNotEmpty)
+        'category': tripRequest.category,
+      'status': tripRequest.status,
+      if (tripRequest.cancelPolicy.isNotEmpty)
+        'cancelPolicy': tripRequest.cancelPolicy,
+      'included': jsonEncode(tripRequest.included),
+      'excluded': jsonEncode(tripRequest.excluded),
+      'days': jsonEncode(tripRequest.days.map((e) => e.toJson()).toList()),
+    };
+
+    final formData = FormData.fromMap(map);
+
+    if (coverImage != null) {
+      formData.files.add(
+        MapEntry(
+          'coverImage',
+          await MultipartFile.fromFile(
+            coverImage.path,
+            filename: coverImage.name,
+          ),
+        ),
+      );
+    }
+
+    if (galleryImages != null && galleryImages.isNotEmpty) {
+      for (var img in galleryImages) {
         formData.files.add(
           MapEntry(
-            'coverImage',
-            await MultipartFile.fromFile(
-              coverImage!.path,
-              filename: coverImage.name,
-            ),
+            'gallery',
+            await MultipartFile.fromFile(img.path, filename: img.name),
           ),
         );
-        if (galleryImages != null && galleryImages.isNotEmpty) {
-          for (var img in galleryImages) {
-            formData.files.add(
-              MapEntry(
-                'gallery',
-                await MultipartFile.fromFile(img.path, filename: img.name),
-              ),
-            );
-          }
-        }
-        requestBody = formData;
-      } else {
-        requestBody = tripMap;
       }
-      final response = await _dioClient.dio.put(
-        "${ApiEndpoints.trips}/$tripId",
-        data: requestBody,
-      );
-      return TripModel.fromJson(_parseTripData(response.data));
-    } catch (e) {
-      rethrow;
     }
+
+    return formData;
   }
 
   Map<String, dynamic> _parseTripData(dynamic data) {
@@ -145,3 +155,4 @@ class AdminManageTripsDataSourceImpl implements AdminManageTripsDataSource {
     return {};
   }
 }
+

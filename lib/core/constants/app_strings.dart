@@ -21,8 +21,8 @@ class AppStrings {
   static String get errorServer => 'errors.server'.tr();
   static String get errorUnauthorized => 'errors.unauthorized'.tr();
   static String get errorCancel => 'errors.cancel'.tr();
-  static String get errorOccurred => 'حدث خطأ ما'.tr();
-  static String get retry => 'إعادة المحاولة'.tr();
+  static String get errorOccurred => 'errors.occurred'.tr();
+  static String get retry => 'errors.retry'.tr();
 
   // Validation
   static String get requiredField => 'validation.required'.tr();
@@ -49,6 +49,10 @@ class AppStrings {
   static String get phoneLabel => 'labels.phone'.tr();
   static String get nameLabel => 'labels.name'.tr();
   static String get confirmPasswordLabel => 'labels.confirmPassword'.tr();
+  static String get governorateLabel {
+    final res = 'labels.governorate'.tr();
+    return res == 'labels.governorate' ? 'المحافظة (اختياري)' : res;
+  }
 
   // Hints
   static String get emailHint => 'hints.email'.tr();
@@ -57,6 +61,10 @@ class AppStrings {
   static String get confirmPasswordHint => 'hints.confirmPassword'.tr();
   static String get phoneHint => 'hints.phone'.tr();
   static String get nameHint => 'hints.name'.tr();
+  static String get governorateHint {
+    final res = 'hints.governorate'.tr();
+    return res == 'hints.governorate' ? 'اختر المحافظة' : res;
+  }
 
   // Splash
   static String get splashTitle => 'splash.title'.tr();
@@ -305,25 +313,28 @@ class AppStrings {
   static String get adminBookingPendingDesc => 'admin.bookingPendingDesc'.tr();
 
   // General & Missing
-  static String get currencyEGP => 'ج.م';
-  static String get tripDetailsPriceFrom => 'السعر يبدأ من';
-  static String get settingsTitle => 'الإعدادات';
-  static String get adminFilterAllTrips => 'جميع الرحلات';
-  static String get adminPendingBookings => 'الحجوزات المعلقة';
-  static String get adminTotalRevenue => 'إجمالي الإيرادات';
-  static String get bookingsViewDetails => 'عرض التفاصيل';
-  static String get adminEditTripTitle => 'تعديل الرحلة';
-  static String get adminDeleteTripConfirmTitle => 'حذف الرحلة';
+  static String get currencyEGP => 'currencyEGP'.tr();
+  static String get tripDetailsPriceFrom => 'tripDetails.priceFrom'.tr();
+  static String get settingsTitle => 'settingsTitle'.tr();
+  static String get adminFilterAllTrips => 'admin.filterAllTrips'.tr();
+  static String get adminPendingBookings => 'admin.pendingBookings'.tr();
+  static String get adminTotalRevenue => 'admin.totalRevenue'.tr();
+  static String get bookingsViewDetails => 'bookings.viewDetails'.tr();
+  static String get adminEditTripTitle => 'admin.editTripTitle'.tr();
+  static String get adminDeleteTripConfirmTitle =>
+      'admin.deleteTripConfirmTitle'.tr();
   static String get adminDeleteTripConfirmDesc =>
-      'هل أنت متأكد من رغبتك في حذف هذه الرحلة؟ لا يمكن التراجع عن هذا الإجراء.';
-  static String get adminRepublishTripConfirmTitle => 'إعادة نشر الرحلة';
+      'admin.deleteTripConfirmDesc'.tr();
+  static String get adminRepublishTripConfirmTitle =>
+      'admin.republishTripConfirmTitle'.tr();
   static String get adminRepublishTripConfirmDesc =>
-      'هل تريد إعادة نشر هذه الرحلة لتصبح متاحة للمستخدمين؟';
-  static String get adminTripCreatedSuccess => 'تم إضافة الرحلة بنجاح';
-  static String get adminTripUpdatedSuccess => 'تم تعديل الرحلة بنجاح';
-  static String get adminTripDeletedSuccess => 'تم حذف الرحلة بنجاح';
-  static String get adminTripRepublishedSuccess => 'تم إعادة نشر الرحلة بنجاح';
-  static String get adminSelectCity => 'اختر المدينة من القائمة';
-  static String get adminCustomCityHint => 'أو أدخل اسم مدينة أخرى';
-  static String get confirm => 'تأكيد';
+      'admin.republishTripConfirmDesc'.tr();
+  static String get adminTripCreatedSuccess => 'admin.tripCreatedSuccess'.tr();
+  static String get adminTripUpdatedSuccess => 'admin.tripUpdatedSuccess'.tr();
+  static String get adminTripDeletedSuccess => 'admin.tripDeletedSuccess'.tr();
+  static String get adminTripRepublishedSuccess =>
+      'admin.tripRepublishedSuccess'.tr();
+  static String get adminSelectCity => 'admin.selectCity'.tr();
+  static String get adminCustomCityHint => 'admin.customCityHint'.tr();
+  static String get confirm => 'confirm'.tr();
 }

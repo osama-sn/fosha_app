@@ -4,6 +4,7 @@ import 'package:dartz/dartz.dart';
 import 'package:fosha_app/core/errors/api_error_handler.dart';
 import 'package:fosha_app/core/errors/failures.dart';
 import 'package:fosha_app/features/user/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:fosha_app/features/user/auth/data/models/register_request_model.dart';
 import 'package:fosha_app/features/user/auth/data/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,7 +23,33 @@ class AuthRepository {
         email: email,
         password: password,
       );
-      _cacheAuthData(response.data);
+      await _cacheAuthData(response.data);
+      return Right(response.data.user);
+    } catch (e) {
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
+    }
+  }
+
+  Future<Either<Failure, UserModel>> register(
+    RegisterRequestModel request,
+  ) async {
+    try {
+      final response = await _authRemoteDataSource.register(request);
+      await _cacheAuthData(response.data);
+      return Right(response.data.user);
+    } catch (e) {
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
+    }
+  }
+
+  Future<Either<Failure, UserModel>> loginWithGoogle({
+    required String idToken,
+  }) async {
+    try {
+      final response = await _authRemoteDataSource.loginWithGoogle(
+        idToken: idToken,
+      );
+      await _cacheAuthData(response.data);
       return Right(response.data.user);
     } catch (e) {
       return Left(ServerFailure(ApiErrorHandler.handle(e)));

@@ -10,6 +10,8 @@ import 'package:fosha_app/core/shared/widgets/app_button.dart';
 import 'package:fosha_app/core/shared/widgets/app_loading.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
+import 'package:fosha_app/core/shared/widgets/app_snackbar.dart';
+import 'package:fosha_app/features/user/auth/presentation/cubit/auth_cubit.dart';
 import 'package:fosha_app/features/admin/dashboard/data/models/stats_model.dart';
 import 'package:fosha_app/features/admin/dashboard/presentation/cubit/admin_cubit.dart';
 import 'package:fosha_app/features/admin/dashboard/presentation/cubit/admin_states.dart';
@@ -37,6 +39,11 @@ class AdminDashboardPage extends StatelessWidget {
               icon: const Icon(Icons.swap_horiz, color: AppColors.primary),
               onPressed: () => context.go(RouteNames.home),
             ),
+            IconButton(
+              tooltip: AppStrings.profileLogout,
+              icon: const Icon(Icons.logout, color: Colors.red),
+              onPressed: () => _showLogoutDialog(context),
+            ),
           ],
         ),
         body: SafeArea(
@@ -49,11 +56,23 @@ class AdminDashboardPage extends StatelessWidget {
 
               final stats = state is AdminDashboardSuccess
                   ? state.stats
-                  : AdminDashboardStatsModel(
-                      pendingBookings: 0,
-                      totalRevenue: 0,
-                      totalBookings: 0,
-                      totalTrips: 0,
+                  : const AdminDashboardStatsModel(
+                      trips: TripsStatsModel(
+                        totalTrips: 0,
+                        publishedTrips: 0,
+                        draftTrips: 0,
+                      ),
+                      bookings: BookingsStatsModel(
+                        totalBookings: 0,
+                        pendingBookings: 0,
+                        approvedBookings: 0,
+                        rejectedBookings: 0,
+                      ),
+                      financials: FinancialsStatsModel(
+                        totalGrossRevenue: 0,
+                        totalAdminCommissionPaid: 0,
+                        totalCompanyNetRevenue: 0,
+                      ),
                     );
               return RefreshIndicator(
                 onRefresh: () =>
@@ -63,7 +82,10 @@ class AdminDashboardPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const AdminWelcomeCard(),
+                      AdminWelcomeCard(
+                        companyInfo: stats.company,
+                        companyName: stats.company?.name,
+                      ),
                       AppSizes.p20.verticalSpace,
                       Text(
                         AppStrings.adminOverview,
@@ -82,15 +104,6 @@ class AdminDashboardPage extends StatelessWidget {
                       ),
                       AppSizes.p12.verticalSpace,
                       const AdminManagementSection(),
-                      AppSizes.p24.verticalSpace,
-                      AppButton.outlined(
-                        text: AppStrings.adminSwitchUserMode,
-                        icon: const Icon(
-                          Icons.arrow_back,
-                          color: AppColors.primary,
-                        ),
-                        onPressed: () => context.go(RouteNames.home),
-                      ),
                     ],
                   ),
                 ),
@@ -134,5 +147,40 @@ class AdminDashboardPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _showLogoutDialog(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('تسجيل الخروج'),
+        content: const Text('هل أنت تأكد من رغبتك في تسجيل الخروج؟'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('إلغاء'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text(
+              'تسجيل الخروج',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      final authCubit = getIt<AuthCubit>();
+      await authCubit.logout();
+      if (context.mounted) {
+        AppSnackbar.showSuccess(
+          context: context,
+          message: 'تم تسجيل الخروج بنجاح',
+        );
+        context.go(RouteNames.login);
+      }
+    }
   }
 }

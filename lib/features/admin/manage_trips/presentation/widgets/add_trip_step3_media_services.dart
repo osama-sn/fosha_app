@@ -6,6 +6,7 @@ import 'package:fosha_app/core/constants/app_colors.dart';
 import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/extensions/extensions.dart';
 import 'package:fosha_app/core/shared/widgets/app_button.dart';
+import 'package:fosha_app/core/shared/widgets/app_network_image.dart';
 import 'package:fosha_app/core/shared/widgets/app_text_field.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
@@ -85,6 +86,8 @@ class _AddTripStep3MediaServicesState extends State<AddTripStep3MediaServices> {
   @override
   Widget build(BuildContext context) {
     final form = widget.formModel;
+    final totalGalleryCount =
+        form.existingGalleryUrls.length + form.galleryImages.length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,26 +108,8 @@ class _AddTripStep3MediaServicesState extends State<AddTripStep3MediaServices> {
               borderRadius: BorderRadius.circular(AppSizes.r12),
               border: Border.all(color: AppColors.border, width: 1.5),
             ),
-            child: form.coverImage == null
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.add_a_photo_outlined,
-                        size: 36.r,
-                        color: AppColors.primary,
-                      ),
-                      AppSizes.p8.verticalSpace,
-                      Text(
-                        AppStrings.adminPickCoverImage,
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  )
-                : Stack(
+            child: form.coverImage != null
+                ? Stack(
                     children: [
                       Positioned.fill(
                         child: ClipRRect(
@@ -154,7 +139,55 @@ class _AddTripStep3MediaServicesState extends State<AddTripStep3MediaServices> {
                         ),
                       ),
                     ],
-                  ),
+                  )
+                : (form.existingCoverImageUrl.isNotEmpty
+                    ? Stack(
+                        children: [
+                          Positioned.fill(
+                            child: AppNetworkImage(
+                              imageUrl: form.existingCoverImageUrl,
+                              borderRadius: AppSizes.r12,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Positioned(
+                            top: 8,
+                            right: 8,
+                            child: CircleAvatar(
+                              radius: 16.r,
+                              backgroundColor: Colors.black.withValues(alpha: 0.6),
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.close,
+                                  size: 16.r,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  setState(() => form.existingCoverImageUrl = '');
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.add_a_photo_outlined,
+                            size: 36.r,
+                            color: AppColors.primary,
+                          ),
+                          AppSizes.p8.verticalSpace,
+                          Text(
+                            AppStrings.adminPickCoverImage,
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      )),
           ),
         ),
         AppSizes.p20.verticalSpace,
@@ -163,46 +196,81 @@ class _AddTripStep3MediaServicesState extends State<AddTripStep3MediaServices> {
           style: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.bold),
         ),
         AppSizes.p8.verticalSpace,
-        if (form.galleryImages.isNotEmpty)
+        if (totalGalleryCount > 0)
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: form.galleryImages.length,
+            itemCount: totalGalleryCount,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
               crossAxisSpacing: AppSizes.p8,
               mainAxisSpacing: AppSizes.p8,
             ),
             itemBuilder: (context, index) {
-              final file = form.galleryImages[index];
-              return Stack(
-                children: [
-                  Positioned.fill(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(AppSizes.r8),
-                      child: Image.file(File(file.path), fit: BoxFit.cover),
+              final isExisting = index < form.existingGalleryUrls.length;
+              if (isExisting) {
+                final url = form.existingGalleryUrls[index];
+                return Stack(
+                  children: [
+                    Positioned.fill(
+                      child: AppNetworkImage(
+                        imageUrl: url,
+                        borderRadius: AppSizes.r8,
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  ),
-                  Positioned(
-                    top: 4,
-                    right: 4,
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() => form.galleryImages.removeAt(index));
-                      },
-                      child: CircleAvatar(
-                        radius: 12.r,
-                        backgroundColor: Colors.red,
-                        child: Icon(
-                          Icons.close,
-                          size: 12.r,
-                          color: Colors.white,
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() => form.existingGalleryUrls.removeAt(index));
+                        },
+                        child: CircleAvatar(
+                          radius: 12.r,
+                          backgroundColor: Colors.red,
+                          child: Icon(
+                            Icons.close,
+                            size: 12.r,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              );
+                  ],
+                );
+              } else {
+                final fileIndex = index - form.existingGalleryUrls.length;
+                final file = form.galleryImages[fileIndex];
+                return Stack(
+                  children: [
+                    Positioned.fill(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(AppSizes.r8),
+                        child: Image.file(File(file.path), fit: BoxFit.cover),
+                      ),
+                    ),
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() => form.galleryImages.removeAt(fileIndex));
+                        },
+                        child: CircleAvatar(
+                          radius: 12.r,
+                          backgroundColor: Colors.red,
+                          child: Icon(
+                            Icons.close,
+                            size: 12.r,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }
             },
           ),
         AppSizes.p8.verticalSpace,

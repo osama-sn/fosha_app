@@ -5,16 +5,14 @@ import 'package:fosha_app/core/constants/app_assets.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
 import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/extensions/extensions.dart';
+import 'package:fosha_app/core/shared/widgets/app_network_image.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 
 class AdminBookingDetailsPage extends StatefulWidget {
   final Map<String, dynamic>? bookingData;
 
-  const AdminBookingDetailsPage({
-    super.key,
-    this.bookingData,
-  });
+  const AdminBookingDetailsPage({super.key, this.bookingData});
 
   @override
   State<AdminBookingDetailsPage> createState() =>
@@ -32,30 +30,27 @@ class _AdminBookingDetailsPageState extends State<AdminBookingDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final customerName =
-        widget.bookingData?['customerName'] ?? 'محمد أحمد';
+    final customerName = widget.bookingData?['customerName'] ?? 'محمد أحمد';
     final customerEmail =
         widget.bookingData?['customerEmail'] ?? 'mohamed@example.com';
     final customerPhone =
         widget.bookingData?['customerPhone'] ?? '+20 100 123 4567';
 
     final tripTitle = widget.bookingData?['tripTitle'] ?? 'شرم الشيخ';
-    final tripDates =
-        widget.bookingData?['tripDates'] ?? '20 - 22 يونيو 2025';
+    final tripDates = widget.bookingData?['tripDates'] ?? '20 - 22 يونيو 2025';
     const tripDuration = '3 أيام / 2 ليلة';
-    final tripImage = widget.bookingData?['tripImage'] ?? AppAssets.homeFeatured;
+    final tripImage =
+        widget.bookingData?['tripImage'] ?? AppAssets.homeFeatured;
 
-    final bookingNumber =
-        widget.bookingData?['bookingNumber'] ?? '#TRP-250620';
+    final bookingNumber = widget.bookingData?['bookingNumber'] ?? '#TRP-250620';
     final requestDate =
         widget.bookingData?['requestDate'] ?? '15 يونيو 2025 - 10:30 ص';
-    final passengersCount =
-        widget.bookingData?['passengersCount'] ?? '2 بالغ';
-    final paymentMethod =
-        widget.bookingData?['paymentMethod'] ?? 'بطاقة بنكية';
+    final passengersCount = widget.bookingData?['passengersCount'] ?? '2 بالغ';
+    final paymentMethod = widget.bookingData?['paymentMethod'] ?? 'بطاقة بنكية';
     final totalAmount = widget.bookingData?['totalAmount'] ?? '6,000 ج.م';
 
-    final customerNotes = widget.bookingData?['customerNotes'] ??
+    final customerNotes =
+        widget.bookingData?['customerNotes'] ??
         'أتمنى توفير سيارة خاصة من وإلى المطار، ويفضل أن يكون الفندق في طابق علوي مع إطلالة مباشرة على البحر.';
 
     return Scaffold(
@@ -71,10 +66,7 @@ class _AdminBookingDetailsPageState extends State<AdminBookingDetailsPage> {
         ),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {},
-          ),
+          IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
         ],
       ),
       body: SafeArea(
@@ -212,10 +204,7 @@ class _AdminBookingDetailsPageState extends State<AdminBookingDetailsPage> {
     );
   }
 
-  Widget _buildSectionHeader({
-    required String title,
-    required IconData icon,
-  }) {
+  Widget _buildSectionHeader({required String title, required IconData icon}) {
     return Row(
       children: [
         Icon(icon, size: 18.r, color: AppColors.primary),
@@ -322,62 +311,72 @@ class _AdminBookingDetailsPageState extends State<AdminBookingDetailsPage> {
       ),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(AppSizes.r8),
-            child: Image.asset(
-              imagePath,
-              width: 90.w,
-              height: 75.h,
-              fit: BoxFit.cover,
-            ),
+          AppNetworkImage(
+            imageUrl: imagePath,
+            width: 90.w,
+            height: 75.h,
+            fit: BoxFit.cover,
+            borderRadius: AppSizes.r8,
           ),
           AppSizes.p12.horizontalSpace,
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: AppTextStyles.titleMedium.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: AppTextStyles.titleMedium.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              AppSizes.p4.verticalSpace,
-              Row(
-                children: [
-                  Icon(
-                    Icons.nightlight_round,
-                    size: 14.r,
-                    color: AppColors.textSecondary,
-                  ),
-                  AppSizes.p4.horizontalSpace,
-                  Text(
-                    duration,
-                    style: AppTextStyles.bodySmall.copyWith(
+                AppSizes.p4.verticalSpace,
+                Row(
+                  children: [
+                    Icon(
+                      Icons.nightlight_round,
+                      size: 14.r,
                       color: AppColors.textSecondary,
                     ),
-                  ),
-                ],
-              ),
-              AppSizes.p4.verticalSpace,
-              Row(
-                children: [
-                  Icon(
-                    Icons.calendar_today,
-                    size: 14.r,
-                    color: AppColors.textSecondary,
-                  ),
-                  AppSizes.p4.horizontalSpace,
-                  Text(
-                    dates,
-                    style: AppTextStyles.bodySmall.copyWith(
+                    AppSizes.p4.horizontalSpace,
+                    Expanded(
+                      child: Text(
+                        duration,
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                AppSizes.p4.verticalSpace,
+                Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today,
+                      size: 14.r,
                       color: AppColors.textSecondary,
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ).expanded(),
+                    AppSizes.p4.horizontalSpace,
+                    Expanded(
+                      child: Text(
+                        dates,
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -407,12 +406,18 @@ class _AdminBookingDetailsPageState extends State<AdminBookingDetailsPage> {
       ),
       child: Column(
         children: [
-          _buildDetailRow(AppStrings.adminBookingNumberLabel, bookingNumber,
-              isHighlight: true),
+          _buildDetailRow(
+            AppStrings.adminBookingNumberLabel,
+            bookingNumber,
+            isHighlight: true,
+          ),
           AppSizes.p12.verticalSpace,
           _buildDetailRow(AppStrings.adminRequestDateLabel, requestDate),
           AppSizes.p12.verticalSpace,
-          _buildDetailRow(AppStrings.adminPassengersCountLabel, passengersCount),
+          _buildDetailRow(
+            AppStrings.adminPassengersCountLabel,
+            passengersCount,
+          ),
           AppSizes.p12.verticalSpace,
           _buildDetailRow(AppStrings.adminPaymentMethodLabel, paymentMethod),
           AppSizes.p12.verticalSpace,
@@ -442,8 +447,11 @@ class _AdminBookingDetailsPageState extends State<AdminBookingDetailsPage> {
     );
   }
 
-  Widget _buildDetailRow(String label, String value,
-      {bool isHighlight = false}) {
+  Widget _buildDetailRow(
+    String label,
+    String value, {
+    bool isHighlight = false,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

@@ -1,5 +1,8 @@
 import 'package:get_it/get_it.dart';
 import 'package:fosha_app/core/network/dio_client.dart';
+import 'package:fosha_app/features/admin/bookings/data/datasources/admin_bookings_data_source.dart';
+import 'package:fosha_app/features/admin/bookings/data/repositories/admin_bookings_repository.dart';
+import 'package:fosha_app/features/admin/bookings/presentation/cubit/admin_bookings_cubit.dart';
 import 'package:fosha_app/features/admin/dashboard/data/datasourece/admin_dashboard_remote_data_source.dart';
 import 'package:fosha_app/features/admin/dashboard/data/repositories/admin_dashboard_stats_repository.dart';
 import 'package:fosha_app/features/admin/dashboard/presentation/cubit/admin_cubit.dart';
@@ -35,6 +38,10 @@ Future<void> initServiceLocator() async {
   getIt.registerLazySingleton<AdminManageTripsDataSource>(
     () => AdminManageTripsDataSourceImpl(getIt()),
   );
+  getIt.registerLazySingleton<AdminBookingsDataSource>(
+    () => AdminBookingsDataSourceImpl(getIt()),
+  );
+
   // repositories
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepository(authRemoteDataSource: getIt()),
@@ -52,6 +59,10 @@ Future<void> initServiceLocator() async {
   getIt.registerLazySingleton<AdminManageTripsRepository>(
     () => AdminManageTripsRepository(getIt()),
   );
+  getIt.registerLazySingleton<AdminBookingsRepository>(
+    () => AdminBookingsRepository(dataSource: getIt()),
+  );
+
   // cubits
   getIt.registerFactory<AuthCubit>(() => AuthCubit(authRepository: getIt()));
   getIt.registerFactory<AdminCubit>(
@@ -62,4 +73,8 @@ Future<void> initServiceLocator() async {
   getIt.registerFactory<AdminManageTripsCubit>(
     () => AdminManageTripsCubit(getIt()),
   );
+  getIt.registerFactory<AdminBookingsCubit>(
+    () => AdminBookingsCubit(repository: getIt()),
+  );
 }
+

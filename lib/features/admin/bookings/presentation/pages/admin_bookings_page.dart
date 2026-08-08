@@ -1,24 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:fosha_app/core/constants/app_assets.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
 import 'package:fosha_app/core/constants/app_strings.dart';
-import 'package:fosha_app/core/extensions/extensions.dart';
+import 'package:fosha_app/core/di/service_locator.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
-import 'package:fosha_app/features/admin/bookings/presentation/widgets/admin_booking_card.dart';
+import 'package:fosha_app/features/admin/bookings/data/models/booking_model.dart';
+import 'package:fosha_app/features/admin/bookings/presentation/cubit/admin_bookings_cubit.dart';
+import 'package:fosha_app/features/admin/bookings/presentation/cubit/admin_bookings_state.dart';
+import 'package:fosha_app/features/admin/bookings/presentation/widgets/admin_bookings_filter_tabs.dart';
+import 'package:fosha_app/features/admin/bookings/presentation/widgets/admin_bookings_list.dart';
+import 'package:fosha_app/features/admin/bookings/presentation/widgets/admin_bookings_trip_filter_header.dart';
+import 'package:fosha_app/features/admin/bookings/presentation/widgets/admin_rejection_reason_dialog.dart';
 
-class AdminBookingsPage extends StatefulWidget {
+class AdminBookingsPage extends StatelessWidget {
   final String? initialTripFilter;
 
   const AdminBookingsPage({super.key, this.initialTripFilter});
 
   @override
-  State<AdminBookingsPage> createState() => _AdminBookingsPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => getIt<AdminBookingsCubit>()..fetchBookings(),
+      child: _AdminBookingsView(initialTripFilter: initialTripFilter),
+    );
+  }
 }
 
-class _AdminBookingsPageState extends State<AdminBookingsPage> {
+class _AdminBookingsView extends StatefulWidget {
+  final String? initialTripFilter;
+
+  const _AdminBookingsView({this.initialTripFilter});
+
+  @override
+  State<_AdminBookingsView> createState() => _AdminBookingsViewState();
+}
+
+class _AdminBookingsViewState extends State<_AdminBookingsView> {
   int _selectedFilterIndex = 0;
   late String _selectedTrip;
 
@@ -28,106 +48,22 @@ class _AdminBookingsPageState extends State<AdminBookingsPage> {
     _selectedTrip = widget.initialTripFilter ?? AppStrings.adminFilterAllTrips;
   }
 
-  final List<Map<String, dynamic>> _bookings = [
-    {
-      'id': '1',
-      'customerName': 'محمد أحمد',
-      'customerEmail': 'mohamed@example.com',
-      'customerPhone': '+20 100 123 4567',
-      'tripTitle': 'شرم الشيخ',
-      'tripDates': '20 - 22 يونيو 2025',
-      'totalAmount': '6,000 ج.م',
-      'passengersCount': '2 بالغ',
-      'tripImage': AppAssets.homeFeatured,
-      'status': 'pending',
-    },
-    {
-      'id': '2',
-      'customerName': 'سارة علي',
-      'customerEmail': 'sara@example.com',
-      'customerPhone': '+20 112 345 6789',
-      'tripTitle': 'الأقصر وأسوان',
-      'tripDates': '10 - 13 يوليو 2025',
-      'totalAmount': '11,250 ج.م',
-      'passengersCount': '3 بالغ',
-      'tripImage': AppAssets.destLuxor,
-      'status': 'accepted',
-    },
-    {
-      'id': '3',
-      'customerName': 'أحمد خالد',
-      'customerEmail': 'ahmed@example.com',
-      'customerPhone': '+20 109 876 5432',
-      'tripTitle': 'دهب',
-      'tripDates': '5 - 7 أغسطس 2025',
-      'totalAmount': '4,200 ج.م',
-      'passengersCount': '2 بالغ',
-      'tripImage': AppAssets.destDahab,
-      'status': 'pending',
-    },
-    {
-      'id': '4',
-      'customerName': 'محمود حسن',
-      'customerEmail': 'mahmoud@example.com',
-      'customerPhone': '+20 101 234 5678',
-      'tripTitle': 'الغردقة',
-      'tripDates': '1 - 4 سبتمبر 2025',
-      'totalAmount': '8,400 ج.م',
-      'passengersCount': '2 بالغ',
-      'tripImage': AppAssets.destHurghada,
-      'status': 'rejected',
-    },
-  ];
-
-  List<String> get _tripOptions => [
-    AppStrings.adminFilterAllTrips,
-    ..._bookings.map((b) => b['tripTitle'] as String).toSet(),
-  ];
-
-  List<Map<String, dynamic>> get _filteredBookings {
-    return _bookings.where((b) {
-      bool matchesStatus = true;
-      switch (_selectedFilterIndex) {
-        case 1:
-          matchesStatus = b['status'] == 'pending';
-          break;
-        case 2:
-          matchesStatus = b['status'] == 'accepted';
-          break;
-        case 3:
-          matchesStatus = b['status'] == 'rejected';
-          break;
-        case 0:
-        default:
-          matchesStatus = true;
-      }
-
-      bool matchesTrip =
-          _selectedTrip == AppStrings.adminFilterAllTrips || b['tripTitle'] == _selectedTrip;
-
-      return matchesStatus && matchesTrip;
-    }).toList();
+  String? _getStatusParam(int index) {
+    switch (index) {
+      case 1:
+        return 'pending';
+      case 2:
+        return 'approved';
+      case 3:
+        return 'rejected';
+      case 0:
+      default:
+        return null;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final pendingCount = _bookings
-        .where((b) => b['status'] == 'pending')
-        .length;
-    final acceptedCount = _bookings
-        .where((b) => b['status'] == 'accepted')
-        .length;
-    final rejectedCount = _bookings
-        .where((b) => b['status'] == 'rejected')
-        .length;
-
-    final filterTabs = [
-      '${AppStrings.bookingsFilterAll} (${_bookings.length})',
-      '${AppStrings.adminFilterPending} ($pendingCount)',
-      '${AppStrings.adminFilterAccepted} ($acceptedCount)',
-      '${AppStrings.adminFilterRejected} ($rejectedCount)',
-    ];
-
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -140,198 +76,149 @@ class _AdminBookingsPageState extends State<AdminBookingsPage> {
           style: AppTextStyles.titleLarge,
         ),
         centerTitle: true,
-        actions: [
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.notifications_outlined),
-                onPressed: () {},
-              ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: CircleAvatar(
-                  radius: 8,
-                  backgroundColor: AppColors.error,
-                  child: Text(
-                    '$pendingCount',
-                    style: const TextStyle(
-                      fontSize: 10,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              decoration: const BoxDecoration(
-                color: AppColors.surface,
-                border: Border(bottom: BorderSide(color: AppColors.border)),
-              ),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.symmetric(horizontal: AppSizes.p16),
-                child: Row(
-                  children: List.generate(
-                    filterTabs.length,
-                    (index) => _buildFilterTab(
-                      label: filterTabs[index],
-                      isSelected: _selectedFilterIndex == index,
-                      onTap: () {
-                        setState(() {
-                          _selectedFilterIndex = index;
-                        });
-                      },
-                    ),
-                  ),
+        child: BlocConsumer<AdminBookingsCubit, AdminBookingsState>(
+          listener: (context, state) {
+            if (state is AdminBookingsLoaded &&
+                state.actionSuccessMessage != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.actionSuccessMessage!),
+                  backgroundColor: Colors.green,
                 ),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: AppSizes.p16,
-                vertical: AppSizes.p8,
-              ),
-              decoration: const BoxDecoration(
-                color: AppColors.surface,
-                border: Border(bottom: BorderSide(color: AppColors.border)),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.filter_alt_outlined,
-                    size: 20.r,
-                    color: AppColors.primary,
-                  ),
-                  AppSizes.p8.horizontalSpace,
-                  Text(
-                    'تصفية حسب الرحلة:',
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  AppSizes.p12.horizontalSpace,
-                  Container(
-                    height: 38.h,
-                    padding: EdgeInsets.symmetric(horizontal: AppSizes.p12),
-                    decoration: BoxDecoration(
-                      color: AppColors.background,
-                      borderRadius: BorderRadius.circular(AppSizes.r8),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: _selectedTrip,
-                        isExpanded: true,
-                        icon: Icon(
-                          Icons.keyboard_arrow_down,
-                          size: 20.r,
-                          color: AppColors.primary,
-                        ),
-                        items: _tripOptions.map((trip) {
-                          return DropdownMenuItem<String>(
-                            value: trip,
-                            child: Text(
-                              trip,
-                              style: AppTextStyles.bodySmall.copyWith(
-                                color: AppColors.textPrimary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (val) {
-                          if (val != null) {
-                            setState(() {
-                              _selectedTrip = val;
-                            });
-                          }
-                        },
-                      ),
-                    ),
-                  ).expanded(),
-                ],
-              ),
-            ),
-            _filteredBookings.isEmpty
-                ? Text(
-                    AppStrings.favoritesEmpty,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                  ).center()
-                : ListView.separated(
-                    padding: EdgeInsets.all(AppSizes.p20),
-                    itemCount: _filteredBookings.length,
-                    separatorBuilder: (context, index) =>
-                        AppSizes.p16.verticalSpace,
-                    itemBuilder: (context, index) {
-                      final booking = _filteredBookings[index];
-                      return AdminBookingCard(
-                        customerName: booking['customerName']!,
-                        customerEmail: booking['customerEmail']!,
-                        customerPhone: booking['customerPhone']!,
-                        tripTitle: booking['tripTitle']!,
-                        tripDates: booking['tripDates']!,
-                        totalAmount: booking['totalAmount']!,
-                        passengersCount: booking['passengersCount']!,
-                        tripImage: booking['tripImage']!,
-                        status: booking['status']!,
-                        onAccept: () {
-                          setState(() {
-                            booking['status'] = 'accepted';
-                          });
-                        },
-                        onReject: () {
-                          setState(() {
-                            booking['status'] = 'rejected';
-                          });
-                        },
-                      );
-                    },
-                  ).expanded(),
-          ],
-        ),
-      ),
-    );
-  }
+              );
+            } else if (state is AdminBookingsError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: AppColors.error,
+                ),
+              );
+            }
+          },
+          builder: (context, state) {
+            if (state is AdminBookingsLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-  Widget _buildFilterTab({
-    required String label,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: AppSizes.p16,
-          vertical: AppSizes.p12,
-        ),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: isSelected ? AppColors.primary : Colors.transparent,
-              width: 2,
-            ),
-          ),
-        ),
-        child: Text(
-          label,
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: isSelected ? AppColors.primary : AppColors.textSecondary,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          ),
+            if (state is AdminBookingsError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(state.message, style: AppTextStyles.bodyMedium),
+                    AppSizes.p16.verticalSpace,
+                    ElevatedButton(
+                      onPressed: () =>
+                          context.read<AdminBookingsCubit>().fetchBookings(),
+                      child: const Text('إعادة المحاولة'),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            final bookings =
+                state is AdminBookingsLoaded ? state.bookings : <BookingModel>[];
+
+            final pendingCount =
+                bookings.where((b) => b.status == 'pending').length;
+            final approvedCount =
+                bookings.where((b) => b.status == 'approved' || b.status == 'accepted').length;
+            final rejectedCount =
+                bookings.where((b) => b.status == 'rejected').length;
+
+            final filterTabs = [
+              '${AppStrings.bookingsFilterAll} (${bookings.length})',
+              '${AppStrings.adminFilterPending} ($pendingCount)',
+              '${AppStrings.adminFilterAccepted} ($approvedCount)',
+              '${AppStrings.adminFilterRejected} ($rejectedCount)',
+            ];
+
+            final tripOptions = [
+              AppStrings.adminFilterAllTrips,
+              ...bookings.map((b) => b.tripTitle).where((t) => t.isNotEmpty).toSet(),
+            ];
+
+            if (!tripOptions.contains(_selectedTrip)) {
+              _selectedTrip = AppStrings.adminFilterAllTrips;
+            }
+
+            final filteredBookings = bookings.where((b) {
+              bool matchesStatus = true;
+              switch (_selectedFilterIndex) {
+                case 1:
+                  matchesStatus = b.status == 'pending';
+                  break;
+                case 2:
+                  matchesStatus = b.status == 'approved' || b.status == 'accepted';
+                  break;
+                case 3:
+                  matchesStatus = b.status == 'rejected';
+                  break;
+                case 0:
+                default:
+                  matchesStatus = true;
+              }
+
+              bool matchesTrip = _selectedTrip == AppStrings.adminFilterAllTrips ||
+                  b.tripTitle == _selectedTrip;
+
+              return matchesStatus && matchesTrip;
+            }).toList();
+
+            return Column(
+              children: [
+                AdminBookingsFilterTabs(
+                  filterTabs: filterTabs,
+                  selectedIndex: _selectedFilterIndex,
+                  onTabSelected: (index) {
+                    setState(() {
+                      _selectedFilterIndex = index;
+                    });
+                    context.read<AdminBookingsCubit>().fetchBookings(
+                          statusFilter: _getStatusParam(index),
+                        );
+                  },
+                ),
+                AdminBookingsTripFilterHeader(
+                  selectedTrip: _selectedTrip,
+                  tripOptions: tripOptions,
+                  onTripChanged: (val) {
+                    setState(() {
+                      _selectedTrip = val;
+                    });
+                  },
+                ),
+                AdminBookingsList(
+                  bookings: filteredBookings,
+                  onAcceptBooking: (bookingId) {
+                    context.read<AdminBookingsCubit>().updateStatus(
+                          bookingId: bookingId,
+                          newStatus: 'approved',
+                        );
+                  },
+                  onRejectBooking: (bookingId) {
+                    AdminRejectionReasonDialog.show(
+                      context,
+                      onConfirmRejection: (reason) {
+                        context.read<AdminBookingsCubit>().updateStatus(
+                              bookingId: bookingId,
+                              newStatus: 'rejected',
+                              rejectionReason: reason,
+                            );
+                      },
+                    );
+                  },
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
   }
 }
+
+

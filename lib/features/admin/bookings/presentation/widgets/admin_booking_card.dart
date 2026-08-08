@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
 import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/router/route_names.dart';
+import 'package:fosha_app/core/shared/widgets/app_network_image.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 
@@ -40,7 +41,8 @@ class AdminBookingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap ??
+      onTap:
+          onTap ??
           () {
             context.push(
               RouteNames.adminBookingDetails,
@@ -59,190 +61,206 @@ class AdminBookingCard extends StatelessWidget {
           },
       borderRadius: BorderRadius.circular(AppSizes.r12),
       child: Container(
-      padding: EdgeInsets.all(AppSizes.p16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSizes.r12),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadow.withValues(alpha: 0.05),
-            blurRadius: 8.r,
-            offset: Offset(0, 2.h),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header Row: Status Badge & Customer Info
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Status Badge
-              _buildStatusBadge(),
+        padding: EdgeInsets.all(AppSizes.p16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppSizes.r12),
+          border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadow.withValues(alpha: 0.05),
+              blurRadius: 8.r,
+              offset: Offset(0, 2.h),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header Row: Status Badge & Customer Info
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Status Badge
+                _buildStatusBadge(),
 
-              // Customer Details
-              Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        customerName,
-                        style: AppTextStyles.titleSmall.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      SizedBox(height: 2.h),
-                      Text(
-                        customerEmail,
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                      Text(
-                        customerPhone,
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(width: AppSizes.p12),
-                  Container(
-                    width: 48.r,
-                    height: 48.r,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.border, width: 2),
-                      color: AppColors.background,
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.person,
-                        size: 28.r,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(height: AppSizes.p16),
-          const Divider(height: 1, color: AppColors.divider),
-          SizedBox(height: AppSizes.p16),
-
-          // Trip Info & Image Row
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Trip Details Column
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                // Customer Details
+                Row(
                   children: [
-                    Text(
-                      tripTitle,
-                      style: AppTextStyles.titleMedium.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    SizedBox(height: AppSizes.p4),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          tripDates,
+                          customerName,
+                          style: AppTextStyles.titleSmall.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        SizedBox(height: 2.h),
+                        Text(
+                          customerEmail,
                           style: AppTextStyles.labelSmall.copyWith(
                             color: AppColors.textSecondary,
                           ),
                         ),
-                        SizedBox(width: AppSizes.p4),
-                        Icon(
-                          Icons.calendar_today,
-                          size: 12.r,
-                          color: AppColors.textSecondary,
+                        Text(
+                          customerPhone,
+                          style: AppTextStyles.labelSmall.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ],
                     ),
-                    SizedBox(height: AppSizes.p12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        // Passengers Count
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              AppStrings.adminPassengersCountLabel,
-                              style: AppTextStyles.labelSmall.copyWith(
-                                color: AppColors.textHint,
-                                fontSize: 10.sp,
-                              ),
-                            ),
-                            Text(
-                              passengersCount,
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ],
+                    SizedBox(width: AppSizes.p12),
+                    Container(
+                      width: 48.r,
+                      height: 48.r,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.border, width: 2),
+                        color: AppColors.background,
+                      ),
+                      child: Center(
+                        child: Icon(
+                          Icons.person,
+                          size: 28.r,
+                          color: AppColors.primary,
                         ),
-                        SizedBox(width: AppSizes.p24),
-                        // Total Price
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              AppStrings.adminTotalAmountLabel,
-                              style: AppTextStyles.labelSmall.copyWith(
-                                color: AppColors.textHint,
-                                fontSize: 10.sp,
-                              ),
-                            ),
-                            Text(
-                              totalAmount,
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
-              ),
-              SizedBox(width: AppSizes.p16),
+              ],
+            ),
+            SizedBox(height: AppSizes.p16),
+            const Divider(height: 1, color: AppColors.divider),
+            SizedBox(height: AppSizes.p16),
 
-              // Trip Image Thumbnail
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppSizes.r8),
-                child: Image.asset(
-                  tripImage,
+            // Trip Info & Image Row
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Trip Details Column
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        tripTitle,
+                        style: AppTextStyles.titleMedium.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: AppSizes.p4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              tripDates,
+                              style: AppTextStyles.labelSmall.copyWith(
+                                color: AppColors.textSecondary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          SizedBox(width: AppSizes.p4),
+                          Icon(
+                            Icons.calendar_today,
+                            size: 12.r,
+                            color: AppColors.textSecondary,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: AppSizes.p12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          // Passengers Count
+                          Flexible(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  AppStrings.adminPassengersCountLabel,
+                                  style: AppTextStyles.labelSmall.copyWith(
+                                    color: AppColors.textHint,
+                                    fontSize: 10.sp,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  passengersCount,
+                                  style: AppTextStyles.bodyMedium.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: AppSizes.p16),
+                          // Total Price
+                          Flexible(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  AppStrings.adminTotalAmountLabel,
+                                  style: AppTextStyles.labelSmall.copyWith(
+                                    color: AppColors.textHint,
+                                    fontSize: 10.sp,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  totalAmount,
+                                  style: AppTextStyles.bodyMedium.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: AppSizes.p16),
+
+                // Trip Image Thumbnail
+                AppNetworkImage(
+                  imageUrl: tripImage,
                   width: 90.w,
                   height: 90.h,
                   fit: BoxFit.cover,
+                  borderRadius: AppSizes.r8,
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: AppSizes.p16),
+              ],
+            ),
+            SizedBox(height: AppSizes.p16),
 
-          // Bottom Action Bar / Status Banners
-          _buildBottomSection(),
-        ],
+            // Bottom Action Bar / Status Banners
+            _buildBottomSection(),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildStatusBadge() {
     Color bg;

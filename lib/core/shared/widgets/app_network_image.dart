@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-
+import 'package:fosha_app/core/network/api_endpoints.dart';
 import 'app_loading.dart';
 
 class AppNetworkImage extends StatelessWidget {
@@ -21,10 +21,36 @@ class AppNetworkImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: CachedNetworkImage(
-        imageUrl: imageUrl,
+    final resolvedUrl = ApiEndpoints.getImageUrl(imageUrl);
+
+    Widget imageWidget;
+
+    if (resolvedUrl.isEmpty) {
+      imageWidget = Container(
+        width: width,
+        height: height,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        child: const Icon(
+          Icons.image_not_supported_outlined,
+          color: Colors.grey,
+        ),
+      );
+    } else if (resolvedUrl.startsWith('assets/')) {
+      imageWidget = Image.asset(
+        resolvedUrl,
+        width: width,
+        height: height,
+        fit: fit,
+        errorBuilder: (context, error, stackTrace) => Container(
+          width: width,
+          height: height,
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+          child: const Icon(Icons.broken_image_outlined, color: Colors.grey),
+        ),
+      );
+    } else {
+      imageWidget = CachedNetworkImage(
+        imageUrl: resolvedUrl,
         width: width,
         height: height,
         fit: fit,
@@ -34,10 +60,16 @@ class AppNetworkImage extends StatelessWidget {
         errorWidget: (context, url, error) => Container(
           width: width,
           height: height,
-          color: Theme.of(context).colorScheme.surface,
-          child: const Icon(Icons.error_outline),
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+          child: const Icon(Icons.broken_image_outlined, color: Colors.grey),
         ),
-      ),
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(borderRadius),
+      child: imageWidget,
     );
   }
 }
+

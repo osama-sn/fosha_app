@@ -1,3 +1,5 @@
+import 'package:fosha_app/core/network/api_endpoints.dart';
+
 class TripCategoryModel {
   final String id;
   final String nameEn;
@@ -172,7 +174,7 @@ class TripModel {
     required this.updatedAt,
   });
   List<String> get galleryWithBaseUrl =>
-      gallery.map((e) => 'https://rahala.duckdns.org$e').toList();
+      gallery.map((e) => ApiEndpoints.getImageUrl(e)).toList();
   factory TripModel.fromJson(Map<String, dynamic> json) {
     return TripModel(
       id: (json['_id'] ?? json['id']) as String? ?? '',
@@ -282,11 +284,5 @@ class TripModel {
     }
   }
 
-  String get fullCoverImageUrl {
-    if (coverImage.isEmpty) return '';
-    if (coverImage.startsWith('http://') || coverImage.startsWith('https://')) {
-      return coverImage;
-    }
-    return 'https://rahala.duckdns.org$coverImage';
-  }
+  String get fullCoverImageUrl => ApiEndpoints.getImageUrl(coverImage);
 }
