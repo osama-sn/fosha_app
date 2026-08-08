@@ -8,16 +8,21 @@ import 'package:fosha_app/core/di/service_locator.dart';
 import 'package:fosha_app/core/router/route_names.dart';
 import 'package:fosha_app/core/shared/widgets/app_button.dart';
 import 'package:fosha_app/core/shared/widgets/app_loading.dart';
+import 'package:fosha_app/core/shared/widgets/app_snackbar.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
-import 'package:fosha_app/core/shared/widgets/app_snackbar.dart';
-import 'package:fosha_app/features/user/auth/presentation/cubit/auth_cubit.dart';
 import 'package:fosha_app/features/admin/dashboard/data/models/stats_model.dart';
 import 'package:fosha_app/features/admin/dashboard/presentation/cubit/admin_cubit.dart';
 import 'package:fosha_app/features/admin/dashboard/presentation/cubit/admin_states.dart';
-import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_management_section.dart';
-import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_stats_grid.dart';
-import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_welcome_card.dart';
+import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_bookings_grid.dart';
+import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_bottom_nav_bar.dart';
+import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_dashboard_header.dart';
+import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_financials_section.dart';
+import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_net_profit_card.dart';
+import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_subscription_card.dart';
+import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_trips_card.dart';
+import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_welcome_section.dart';
+import 'package:fosha_app/features/user/auth/presentation/cubit/auth_cubit.dart';
 
 class AdminDashboardPage extends StatelessWidget {
   const AdminDashboardPage({super.key});
@@ -26,96 +31,103 @@ class AdminDashboardPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<AdminCubit>(
       create: (context) => getIt<AdminCubit>()..fetchDashboardStats(),
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        appBar: AppBar(
-          title: Text(
-            AppStrings.adminDashboardTitle,
-            style: AppTextStyles.titleLarge,
-          ),
-          actions: [
-            IconButton(
-              tooltip: AppStrings.adminSwitchUserMode,
-              icon: const Icon(Icons.swap_horiz, color: AppColors.primary),
-              onPressed: () => context.go(RouteNames.home),
-            ),
-            IconButton(
-              tooltip: AppStrings.profileLogout,
-              icon: const Icon(Icons.logout, color: Colors.red),
-              onPressed: () => _showLogoutDialog(context),
-            ),
-          ],
-        ),
-        body: SafeArea(
-          child: BlocBuilder<AdminCubit, AdminStates>(
-            builder: (context, state) {
-              if (state is AdminDashboardLoading) return const AppLoading();
-              if (state is AdminDashboardFailure) {
-                return _buildError(state, context);
-              }
-
-              final stats = state is AdminDashboardSuccess
-                  ? state.stats
-                  : const AdminDashboardStatsModel(
-                      trips: TripsStatsModel(
-                        totalTrips: 0,
-                        publishedTrips: 0,
-                        draftTrips: 0,
-                      ),
-                      bookings: BookingsStatsModel(
-                        totalBookings: 0,
-                        pendingBookings: 0,
-                        approvedBookings: 0,
-                        rejectedBookings: 0,
-                      ),
-                      financials: FinancialsStatsModel(
-                        totalGrossRevenue: 0,
-                        totalAdminCommissionPaid: 0,
-                        totalCompanyNetRevenue: 0,
-                      ),
-                    );
-              return RefreshIndicator(
-                onRefresh: () =>
-                    context.read<AdminCubit>().fetchDashboardStats(),
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.all(AppSizes.p20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      AdminWelcomeCard(
-                        companyInfo: stats.company,
-                        companyName: stats.company?.name,
-                      ),
-                      AppSizes.p20.verticalSpace,
-                      Text(
-                        AppStrings.adminOverview,
-                        style: AppTextStyles.titleMedium.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      AppSizes.p12.verticalSpace,
-                      AdminStatsGrid(stats: stats),
-                      AppSizes.p24.verticalSpace,
-                      Text(
-                        AppStrings.adminQuickActions,
-                        style: AppTextStyles.titleMedium.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      AppSizes.p12.verticalSpace,
-                      const AdminManagementSection(),
-                    ],
+      child: BlocBuilder<AdminCubit, AdminStates>(
+        builder: (context, state) {
+          final stats = state is AdminDashboardSuccess
+              ? state.stats
+              : const AdminDashboardStatsModel(
+                  trips: TripsStatsModel(
+                    totalTrips: 0,
+                    publishedTrips: 0,
+                    draftTrips: 0,
                   ),
-                ),
-              );
-            },
-          ),
-        ),
+                  bookings: BookingsStatsModel(
+                    totalBookings: 0,
+                    pendingBookings: 0,
+                    approvedBookings: 0,
+                    rejectedBookings: 0,
+                  ),
+                  financials: FinancialsStatsModel(
+                    totalGrossRevenue: 0,
+                    totalAdminCommissionPaid: 0,
+                    totalCompanyNetRevenue: 0,
+                  ),
+                );
+
+          return Scaffold(
+            backgroundColor: AppColors.background,
+            appBar: AdminDashboardHeader(
+              companyName: stats.company?.name ?? 'شركة فسحني شكراً',
+              onLogout: () => _showLogoutDialog(context),
+            ),
+            body: SafeArea(
+              child: Builder(
+                builder: (context) {
+                  if (state is AdminDashboardLoading) return const AppLoading();
+                  if (state is AdminDashboardFailure) {
+                    return _buildError(state, context);
+                  }
+
+                  return RefreshIndicator(
+                    onRefresh: () =>
+                        context.read<AdminCubit>().fetchDashboardStats(),
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppSizes.p16,
+                        vertical: AppSizes.p16,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const AdminWelcomeSection(),
+                          AppSizes.p20.verticalSpace,
+                          AdminNetProfitCard(
+                            netRevenue: stats.financials.totalCompanyNetRevenue,
+                          ),
+                          AppSizes.p24.verticalSpace,
+                          AdminFinancialsSection(
+                            grossRevenue: stats.financials.totalGrossRevenue,
+                            adminCommissionPaid:
+                                stats.financials.totalAdminCommissionPaid,
+                          ),
+                          AppSizes.p24.verticalSpace,
+                          AdminBookingsGrid(
+                            totalBookings: stats.bookings.totalBookings,
+                            approvedBookings: stats.bookings.approvedBookings,
+                            pendingBookings: stats.bookings.pendingBookings,
+                            rejectedBookings: stats.bookings.rejectedBookings,
+                          ),
+                          AppSizes.p24.verticalSpace,
+                          AdminTripsCard(
+                            totalTrips: stats.trips.totalTrips,
+                            publishedTrips: stats.trips.publishedTrips,
+                            draftTrips: stats.trips.draftTrips,
+                          ),
+                          AppSizes.p24.verticalSpace,
+                          AdminSubscriptionCard(
+                            monthlySubscriptionFee:
+                                (stats.company?.monthlySubscriptionFee ?? 500)
+                                    .toDouble(),
+                            commissionValue:
+                                (stats.company?.commissionValue ?? 10)
+                                    .toDouble(),
+                          ),
+                          AppSizes.p20.verticalSpace,
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            bottomNavigationBar: const AdminBottomNavBar(selectedIndex: 0),
+          );
+        },
       ),
     );
   }
 
-  Center _buildError(AdminDashboardFailure state, BuildContext context) {
+  Widget _buildError(AdminDashboardFailure state, BuildContext context) {
     return Center(
       child: Padding(
         padding: EdgeInsets.all(AppSizes.p20),
@@ -184,3 +196,4 @@ class AdminDashboardPage extends StatelessWidget {
     }
   }
 }
+

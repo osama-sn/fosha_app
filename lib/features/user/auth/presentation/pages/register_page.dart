@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'package:fosha_app/core/constants/app_assets.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
 import 'package:fosha_app/core/constants/app_governorates.dart';
 import 'package:fosha_app/core/constants/app_strings.dart';
@@ -112,6 +113,14 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          Center(
+                            child: Image.asset(
+                              AppAssets.registerIllustration,
+                              height: 130.h,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                          16.h.verticalSpace,
                           Text(
                             AppStrings.createAccountTitle,
                             style: AppTextStyles.headlineLarge,
@@ -125,7 +134,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          32.h.verticalSpace,
+                          24.h.verticalSpace,
                           ProfileAvatarPicker(
                             imagePath: _profileImagePath,
                             onTap: _pickImage,

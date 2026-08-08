@@ -6,6 +6,8 @@ class AppAssets {
   static const String logo = '${imagesPath}logo.png';
   static const String placeholder = '${imagesPath}placeholder.png';
   static const String splashBackground = '${imagesPath}splash_bg.png';
+  static const String loginIllustration = '${imagesPath}login.png';
+  static const String registerIllustration = '${imagesPath}register.png';
   static const String googleLogo = '${imagesPath}google_logo.png';
   static const String facebookLogo = '${imagesPath}facebook_logo.png';
   static const String homeFeatured = '${imagesPath}home_featured.png';

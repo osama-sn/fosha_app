@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fosha_app/core/constants/app_assets.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
 import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/di/service_locator.dart';
@@ -76,7 +77,15 @@ class _LoginPageState extends State<LoginPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          40.h.verticalSpace,
+                          16.h.verticalSpace,
+                          Center(
+                            child: Image.asset(
+                              AppAssets.loginIllustration,
+                              height: 140.h,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                          16.h.verticalSpace,
                           Text(
                             AppStrings.welcome,
                             style: AppTextStyles.headlineLarge,
@@ -90,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          40.h.verticalSpace,
+                          24.h.verticalSpace,
                           AppTextField(
                             controller: _emailController,
                             hintText: AppStrings.emailHint,

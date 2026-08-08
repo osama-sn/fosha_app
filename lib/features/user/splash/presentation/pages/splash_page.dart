@@ -75,45 +75,12 @@ class SplashPage extends StatelessWidget {
                     children: [
                       const Spacer(flex: 3),
 
-                      // Glassmorphism Logo
-                      Container(
-                        width: 96.w,
-                        height: 96.w,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white.withValues(alpha: 0.1),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            width: 1.w,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.25),
-                              blurRadius: 50.r,
-                              offset: Offset(0, 25.h),
-                            ),
-                          ],
-                        ),
-                        child: ClipOval(
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-                            child: Center(
-                              child: Container(
-                                width: 50.w,
-                                height: 50.w,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.surface,
-                                ),
-                                child: Icon(
-                                  Icons.explore,
-                                  size: AppSizes.iconLarge,
-                                  color: AppColors.primaryDark,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                      // Logo without background container
+                      Image.asset(
+                        AppAssets.logo,
+                        width: 110.w,
+                        height: 110.w,
+                        fit: BoxFit.contain,
                       ),
 
                       SizedBox(height: AppSizes.p16),
