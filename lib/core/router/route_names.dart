@@ -15,5 +15,8 @@ class RouteNames {
   static const String adminBookings = '/admin-bookings';
   static const String adminBookingDetails = '/admin-booking-details';
   static const String addTrip = '/add-trip';
+  static const String companyProfile = '/company-profile';
+  static const String companyOffers = '/company-offers';
+  static const String companyCoupons = '/company-coupons';
   static const String notFound = '/not-found';
 }

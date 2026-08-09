@@ -16,6 +16,9 @@ import 'package:fosha_app/features/user/not_found/presentation/pages/not_found_p
 import 'package:fosha_app/features/user/profile/presentation/pages/profile_page.dart';
 import 'package:fosha_app/features/user/settings/presentation/pages/settings_page.dart';
 import 'package:fosha_app/features/user/splash/presentation/pages/splash_page.dart';
+import 'package:fosha_app/features/admin/company_profile/presentation/pages/company_profile_page.dart';
+import 'package:fosha_app/features/admin/offers/presentation/pages/company_offers_page.dart';
+import 'package:fosha_app/features/admin/coupons/presentation/pages/company_coupons_page.dart';
 import 'route_names.dart';
 
 class AppRouter {
@@ -94,6 +97,21 @@ class AppRouter {
           final bookingData = state.extra as Map<String, dynamic>?;
           return AdminBookingDetailsPage(bookingData: bookingData);
         },
+      ),
+      GoRoute(
+        path: RouteNames.companyProfile,
+        builder: (context, state) {
+          final companyId = state.extra as String?;
+          return CompanyProfilePage(companyId: companyId);
+        },
+      ),
+      GoRoute(
+        path: RouteNames.companyOffers,
+        builder: (context, state) => const CompanyOffersPage(),
+      ),
+      GoRoute(
+        path: RouteNames.companyCoupons,
+        builder: (context, state) => const CompanyCouponsPage(),
       ),
     ],
   );

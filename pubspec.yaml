@@ -46,6 +46,7 @@ dependencies:
   flutter_bloc: ^9.1.1
   dartz: ^0.10.1
   image_picker: ^1.2.3
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:

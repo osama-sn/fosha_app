@@ -75,13 +75,49 @@ class AdminDashboardHeader extends StatelessWidget implements PreferredSizeWidge
         PopupMenuButton<String>(
           icon: const Icon(Icons.more_vert, color: AppColors.textSecondary),
           onSelected: (value) {
-            if (value == 'user_mode') {
+            if (value == 'company_profile') {
+              context.push(RouteNames.companyProfile);
+            } else if (value == 'company_offers') {
+              context.push(RouteNames.companyOffers);
+            } else if (value == 'company_coupons') {
+              context.push(RouteNames.companyCoupons);
+            } else if (value == 'user_mode') {
               context.go(RouteNames.home);
             } else if (value == 'logout') {
               onLogout();
             }
           },
           itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'company_profile',
+              child: Row(
+                children: [
+                  Icon(Icons.storefront, color: AppColors.primaryDark),
+                  SizedBox(width: 8),
+                  Text('تعديل ملف الشركة'),
+                ],
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'company_offers',
+              child: Row(
+                children: [
+                  Icon(Icons.local_offer_outlined, color: AppColors.primaryDark),
+                  SizedBox(width: 8),
+                  Text('العروض الترويجية'),
+                ],
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'company_coupons',
+              child: Row(
+                children: [
+                  Icon(Icons.confirmation_number_outlined, color: AppColors.primaryDark),
+                  SizedBox(width: 8),
+                  Text('كوبونات الخصم'),
+                ],
+              ),
+            ),
             const PopupMenuItem(
               value: 'user_mode',
               child: Row(

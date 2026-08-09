@@ -88,13 +88,13 @@ class AdminBottomNavBar extends StatelessWidget {
             ),
           ),
 
-          // Item 4: Notifications (الإشعارات)
+          // Item 4: Trips (الرحلات)
           _buildNavItem(
             context,
-            icon: Icons.notifications_none_outlined,
-            label: 'الإشعارات',
+            icon: Icons.explore_outlined,
+            label: 'الرحلات',
             isSelected: selectedIndex == 3,
-            onTap: () {},
+            onTap: () => context.push(RouteNames.adminTrips),
           ),
 
           // Item 5: Account (الحساب)
@@ -103,7 +103,7 @@ class AdminBottomNavBar extends StatelessWidget {
             icon: Icons.person_outline,
             label: 'الحساب',
             isSelected: selectedIndex == 4,
-            onTap: () => context.push(RouteNames.adminTrips),
+            onTap: () => context.push(RouteNames.companyProfile),
           ),
         ],
       ),

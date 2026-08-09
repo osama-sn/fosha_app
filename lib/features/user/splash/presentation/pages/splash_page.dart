@@ -73,39 +73,16 @@ class SplashPage extends StatelessWidget {
                   width: double.infinity,
                   child: Column(
                     children: [
-                      const Spacer(flex: 3),
+                      const Spacer(flex: 2),
 
                       // Logo without background container
                       Image.asset(
                         AppAssets.logo,
-                        width: 110.w,
-                        height: 110.w,
+                        width: 170.w,
+                        height: 170.w,
                         fit: BoxFit.contain,
                       ),
-
-                      SizedBox(height: AppSizes.p16),
-
-                      // App Title
-                      Text(
-                        AppStrings.splashTitle,
-                        style: AppTextStyles.headlineLarge.copyWith(
-                          color: Colors.white,
-                          letterSpacing: 0.7,
-                        ),
-                      ),
-
-                      SizedBox(height: AppSizes.p16),
-
-                      // Tagline
-                      Text(
-                        AppStrings.splashTagline,
-                        style: AppTextStyles.bodyLarge.copyWith(
-                          color: Colors.white.withValues(alpha: 0.8),
-                        ),
-                      ),
-
-                      const Spacer(flex: 4),
-
+                      const Spacer(flex: 6),
                       // Loading Indicator Area
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: AppSizes.p24),

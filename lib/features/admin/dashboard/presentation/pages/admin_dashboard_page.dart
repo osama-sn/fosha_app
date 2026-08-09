@@ -104,6 +104,8 @@ class AdminDashboardPage extends StatelessWidget {
                             draftTrips: stats.trips.draftTrips,
                           ),
                           AppSizes.p24.verticalSpace,
+                          _buildQuickPromotionsSection(context),
+                          AppSizes.p24.verticalSpace,
                           AdminSubscriptionCard(
                             monthlySubscriptionFee:
                                 (stats.company?.monthlySubscriptionFee ?? 500)
@@ -194,6 +196,107 @@ class AdminDashboardPage extends StatelessWidget {
         context.go(RouteNames.login);
       }
     }
+  }
+
+  Widget _buildQuickPromotionsSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'التسويق والعروض',
+          style: AppTextStyles.titleMedium.copyWith(
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        AppSizes.p12.verticalSpace,
+        Row(
+          children: [
+            Expanded(
+              child: _buildActionCard(
+                context,
+                title: 'العروض الترويجية',
+                subtitle: 'إدارة وتخصيص الخصومات',
+                icon: Icons.local_offer_outlined,
+                color: Colors.orange[800]!,
+                onTap: () => context.push(RouteNames.companyOffers),
+              ),
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: _buildActionCard(
+                context,
+                title: 'كوبونات الخصم',
+                subtitle: 'أكواد الخصم الخاصة بالشركة',
+                icon: Icons.confirmation_number_outlined,
+                color: AppColors.primaryDark,
+                onTap: () => context.push(RouteNames.companyCoupons),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionCard(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16.r),
+      child: Container(
+        padding: EdgeInsets.all(AppSizes.p16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 8.r,
+              offset: Offset(0, 3.h),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: EdgeInsets.all(8.r),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+              child: Icon(icon, color: color, size: 24.r),
+            ),
+            SizedBox(height: 12.h),
+            Text(
+              title,
+              style: AppTextStyles.labelLarge.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              subtitle,
+              style: AppTextStyles.labelSmall.copyWith(
+                color: AppColors.textSecondary,
+                fontSize: 10.sp,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

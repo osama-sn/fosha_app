@@ -19,6 +19,18 @@ import 'package:fosha_app/features/admin/trips/data/repositories/admin_trips_rep
 import 'package:fosha_app/features/admin/trips/presentation/cubit/admin_trips_cubit.dart';
 import 'package:fosha_app/features/admin/trips/data/datasource/admin_trips_remote_data_source.dart';
 
+import 'package:fosha_app/features/admin/company_profile/data/datasources/company_profile_remote_data_source.dart';
+import 'package:fosha_app/features/admin/company_profile/data/repositories/company_profile_repository.dart';
+import 'package:fosha_app/features/admin/company_profile/presentation/cubit/company_profile_cubit.dart';
+
+import 'package:fosha_app/features/admin/offers/data/datasources/offers_remote_data_source.dart';
+import 'package:fosha_app/features/admin/offers/data/repositories/offers_repository.dart';
+import 'package:fosha_app/features/admin/offers/presentation/cubit/offers_cubit.dart';
+
+import 'package:fosha_app/features/admin/coupons/data/datasources/coupons_remote_data_source.dart';
+import 'package:fosha_app/features/admin/coupons/data/repositories/coupons_repository.dart';
+import 'package:fosha_app/features/admin/coupons/presentation/cubit/coupons_cubit.dart';
+
 final GetIt getIt = GetIt.instance;
 Future<void> initServiceLocator() async {
   getIt.registerLazySingleton<DioClient>(() => DioClient());
@@ -41,6 +53,15 @@ Future<void> initServiceLocator() async {
   getIt.registerLazySingleton<AdminBookingsDataSource>(
     () => AdminBookingsDataSourceImpl(getIt()),
   );
+  getIt.registerLazySingleton<CompanyProfileRemoteDataSource>(
+    () => CompanyProfileRemoteDataSourceImpl(dioClient: getIt()),
+  );
+  getIt.registerLazySingleton<OffersRemoteDataSource>(
+    () => OffersRemoteDataSourceImpl(dioClient: getIt()),
+  );
+  getIt.registerLazySingleton<CouponsRemoteDataSource>(
+    () => CouponsRemoteDataSourceImpl(dioClient: getIt()),
+  );
 
   // repositories
   getIt.registerLazySingleton<AuthRepository>(
@@ -62,6 +83,15 @@ Future<void> initServiceLocator() async {
   getIt.registerLazySingleton<AdminBookingsRepository>(
     () => AdminBookingsRepository(dataSource: getIt()),
   );
+  getIt.registerLazySingleton<CompanyProfileRepository>(
+    () => CompanyProfileRepository(dataSource: getIt()),
+  );
+  getIt.registerLazySingleton<OffersRepository>(
+    () => OffersRepository(dataSource: getIt()),
+  );
+  getIt.registerLazySingleton<CouponsRepository>(
+    () => CouponsRepository(dataSource: getIt()),
+  );
 
   // cubits
   getIt.registerFactory<AuthCubit>(() => AuthCubit(authRepository: getIt()));
@@ -75,6 +105,15 @@ Future<void> initServiceLocator() async {
   );
   getIt.registerFactory<AdminBookingsCubit>(
     () => AdminBookingsCubit(repository: getIt()),
+  );
+  getIt.registerFactory<CompanyProfileCubit>(
+    () => CompanyProfileCubit(repository: getIt()),
+  );
+  getIt.registerFactory<OffersCubit>(
+    () => OffersCubit(repository: getIt()),
+  );
+  getIt.registerFactory<CouponsCubit>(
+    () => CouponsCubit(repository: getIt()),
   );
 }
 
