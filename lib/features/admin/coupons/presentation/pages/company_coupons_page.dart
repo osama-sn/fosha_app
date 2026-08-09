@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/di/service_locator.dart';
 import 'package:fosha_app/core/shared/widgets/app_loading.dart';
 import 'package:fosha_app/core/shared/widgets/app_snackbar.dart';
@@ -11,6 +12,8 @@ import 'package:fosha_app/features/admin/coupons/data/models/coupon_model.dart';
 import 'package:fosha_app/features/admin/coupons/presentation/cubit/coupons_cubit.dart';
 import 'package:fosha_app/features/admin/coupons/presentation/cubit/coupons_state.dart';
 import 'package:fosha_app/features/admin/coupons/presentation/widgets/add_coupon_bottom_sheet.dart';
+import 'package:fosha_app/features/admin/coupons/presentation/widgets/company_coupons_delete_dialog.dart';
+import 'package:fosha_app/features/admin/coupons/presentation/widgets/company_coupons_empty_view.dart';
 import 'package:fosha_app/features/admin/coupons/presentation/widgets/coupon_card.dart';
 
 class CompanyCouponsPage extends StatelessWidget {
@@ -36,25 +39,10 @@ class CompanyCouponsPage extends StatelessWidget {
 
   void _confirmDelete(BuildContext context, CouponModel coupon) {
     final couponsCubit = context.read<CouponsCubit>();
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('حذف الكوبون'),
-        content: Text('هل أنت تأكد من رغبتك في حذف الكوبون "${coupon.code}"؟'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('إلغاء'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-              couponsCubit.deleteCoupon(coupon.id);
-            },
-            child: const Text('حذف', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+    CompanyCouponsDeleteDialog.show(
+      context,
+      couponCode: coupon.code,
+      onConfirmDelete: () => couponsCubit.deleteCoupon(coupon.id),
     );
   }
 
@@ -72,7 +60,7 @@ class CompanyCouponsPage extends StatelessWidget {
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: Text(
-            'كوبونات الخصم للشركة',
+            AppStrings.companyCouponsTitle,
             style: AppTextStyles.titleMedium.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
@@ -85,10 +73,12 @@ class CompanyCouponsPage extends StatelessWidget {
             return FloatingActionButton.extended(
               backgroundColor: AppColors.primaryDark,
               onPressed: () => _openAddCouponBottomSheet(context),
-              icon: const Icon(Icons.confirmation_number_outlined,
-                  color: Colors.white),
+              icon: const Icon(
+                Icons.confirmation_number_outlined,
+                color: Colors.white,
+              ),
               label: Text(
-                'كوبون جديد',
+                AppStrings.newCoupon,
                 style: AppTextStyles.labelMedium.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -120,33 +110,7 @@ class CompanyCouponsPage extends StatelessWidget {
             }
 
             if (coupons.isEmpty) {
-              return Center(
-                child: Padding(
-                  padding: EdgeInsets.all(AppSizes.p20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.confirmation_number_outlined,
-                          size: 64.r, color: AppColors.textHint),
-                      AppSizes.p16.verticalSpace,
-                      Text(
-                        'لا توجد كوبونات خصم حالية',
-                        style: AppTextStyles.titleMedium.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      AppSizes.p8.verticalSpace,
-                      Text(
-                        'يمكنك إنشاء أكواد تخفيض خاصة بشركتك فقط وتوزيعها على المسافرين',
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
+              return const CompanyCouponsEmptyView();
             }
 
             return RefreshIndicator(

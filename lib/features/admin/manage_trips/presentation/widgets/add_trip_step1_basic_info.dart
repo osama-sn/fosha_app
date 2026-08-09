@@ -63,7 +63,7 @@ class _AddTripStep1BasicInfoState extends State<AddTripStep1BasicInfo> {
         AppSizes.p20.verticalSpace,
 
         // Category Dropdown
-        Text('تصنيف الرحلة (Category)', style: AppTextStyles.titleMedium),
+        Text(AppStrings.tripCategoryLabel, style: AppTextStyles.titleMedium),
         AppSizes.p8.verticalSpace,
         CategoryDropdown(
           selectedCategory: widget.formModel.selectedCategory,

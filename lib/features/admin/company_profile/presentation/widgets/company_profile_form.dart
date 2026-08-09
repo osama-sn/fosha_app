@@ -3,11 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
 import 'package:fosha_app/core/constants/app_governorates.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/shared/widgets/app_button.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 import 'package:fosha_app/features/admin/company_profile/data/models/company_profile_model.dart';
 import 'package:fosha_app/features/admin/company_profile/presentation/cubit/company_profile_cubit.dart';
+import 'package:fosha_app/features/admin/company_profile/presentation/widgets/company_profile_governorate_picker.dart';
 
 class CompanyProfileForm extends StatefulWidget {
   final String companyId;
@@ -53,7 +55,7 @@ class _CompanyProfileFormState extends State<CompanyProfileForm> {
     if (initialGov.isNotEmpty && governorates.contains(initialGov)) {
       _selectedGovernorate = initialGov;
     } else {
-      _selectedGovernorate = governorates.isNotEmpty ? governorates.first : 'المنيا';
+      _selectedGovernorate = governorates.isNotEmpty ? governorates.first : '';
     }
   }
 
@@ -95,139 +97,107 @@ class _CompanyProfileFormState extends State<CompanyProfileForm> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Name field
-          _buildSectionTitle('اسم الشركة'),
+          _buildSectionTitle(AppStrings.companyNameLabel),
           AppSizes.p8.verticalSpace,
           TextFormField(
             controller: _nameController,
             validator: (val) {
               if (val == null || val.trim().isEmpty) {
-                return 'يرجى إدخال اسم الشركة';
+                return AppStrings.companyNameRequired;
               }
               return null;
             },
             decoration: _buildInputDecoration(
-              hintText: 'مثال: شركة فسحني شكرا للسياحة',
+              hintText: AppStrings.companyNameHint,
               prefixIcon: Icons.business_outlined,
             ),
           ),
           AppSizes.p16.verticalSpace,
 
           // Description field
-          _buildSectionTitle('وصف الشركة'),
+          _buildSectionTitle(AppStrings.companyDescLabel),
           AppSizes.p8.verticalSpace,
           TextFormField(
             controller: _descriptionController,
             maxLines: 3,
             minLines: 2,
             decoration: _buildInputDecoration(
-              hintText: 'وصف ورؤية الشركة ورحلاتها...',
+              hintText: AppStrings.companyDescHint,
               prefixIcon: Icons.description_outlined,
             ),
           ),
           AppSizes.p16.verticalSpace,
 
           // Phone field
-          _buildSectionTitle('هاتف التواصل'),
+          _buildSectionTitle(AppStrings.companyPhoneLabel),
           AppSizes.p8.verticalSpace,
           TextFormField(
             controller: _phoneController,
             keyboardType: TextInputType.phone,
             validator: (val) {
               if (val == null || val.trim().isEmpty) {
-                return 'يرجى إدخال رقم الهاتف';
+                return AppStrings.companyPhoneRequired;
               }
               return null;
             },
             decoration: _buildInputDecoration(
-              hintText: '+201011111111',
+              hintText: AppStrings.phoneHint,
               prefixIcon: Icons.phone_outlined,
             ),
           ),
           AppSizes.p16.verticalSpace,
 
           // Email field
-          _buildSectionTitle('البريد الإلكتروني للتواصل'),
+          _buildSectionTitle(AppStrings.companyEmailLabel),
           AppSizes.p8.verticalSpace,
           TextFormField(
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
             validator: (val) {
               if (val == null || val.trim().isEmpty) {
-                return 'يرجى إدخال البريد الإلكتروني';
+                return AppStrings.companyEmailRequired;
               }
               if (!val.contains('@')) {
-                return 'البريد الإلكتروني غير صحيح';
+                return AppStrings.companyEmailInvalid;
               }
               return null;
             },
             decoration: _buildInputDecoration(
-              hintText: 'info@company.com',
+              hintText: AppStrings.emailHint,
               prefixIcon: Icons.email_outlined,
             ),
           ),
           AppSizes.p16.verticalSpace,
 
           // Address field
-          _buildSectionTitle('العنوان التفصيلي'),
+          _buildSectionTitle(AppStrings.companyAddressLabel),
           AppSizes.p8.verticalSpace,
           TextFormField(
             controller: _addressController,
             decoration: _buildInputDecoration(
-              hintText: 'المنيا - كورنيش النيل',
+              hintText: AppStrings.companyAddressHint,
               prefixIcon: Icons.location_on_outlined,
             ),
           ),
           AppSizes.p16.verticalSpace,
 
           // Governorate field
-          _buildSectionTitle('المحافظة'),
+          _buildSectionTitle(AppStrings.companyGovernorateLabel),
           AppSizes.p8.verticalSpace,
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: AppSizes.p12,
-              vertical: 4.h,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: AppColors.border),
-            ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: governoratesList.contains(_selectedGovernorate)
-                    ? _selectedGovernorate
-                    : governoratesList.first,
-                isExpanded: true,
-                icon: const Icon(
-                  Icons.arrow_drop_down,
-                  color: AppColors.primaryDark,
-                ),
-                items: governoratesList.map((String gov) {
-                  return DropdownMenuItem<String>(
-                    value: gov,
-                    child: Text(
-                      gov,
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  if (newValue != null) {
-                    setState(() {
-                      _selectedGovernorate = newValue;
-                    });
-                  }
-                },
-              ),
-            ),
+          CompanyProfileGovernoratePicker(
+            selectedGovernorate: _selectedGovernorate,
+            governoratesList: governoratesList,
+            onChanged: (String newValue) {
+              setState(() {
+                _selectedGovernorate = newValue;
+              });
+            },
           ),
           28.h.verticalSpace,
 
           // Save Button
           AppButton(
-            text: widget.isUpdating ? 'جاري الحفظ...' : 'حفظ التغييرات',
+            text: widget.isUpdating ? AppStrings.savingChanges : AppStrings.saveChanges,
             isLoading: widget.isUpdating,
             onPressed: () {
               if (_formKey.currentState?.validate() == true) {

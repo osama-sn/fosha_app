@@ -25,6 +25,8 @@ class BookingTripInfoModel {
   final String id;
   final String title;
   final String coverImage;
+  final String origin;
+  final String destination;
   final String startDate;
   final String endDate;
 
@@ -32,6 +34,8 @@ class BookingTripInfoModel {
     required this.id,
     required this.title,
     required this.coverImage,
+    this.origin = '',
+    this.destination = '',
     required this.startDate,
     required this.endDate,
   });
@@ -41,6 +45,8 @@ class BookingTripInfoModel {
       id: (json['_id'] ?? json['id'] ?? '').toString(),
       title: json['title'] as String? ?? '',
       coverImage: json['coverImage'] as String? ?? '',
+      origin: json['origin'] as String? ?? '',
+      destination: json['destination'] as String? ?? '',
       startDate: json['startDate'] as String? ?? '',
       endDate: json['endDate'] as String? ?? '',
     );
@@ -78,6 +84,12 @@ class BookingModel {
     this.createdAt,
   });
 
+  int get numberOfSeats => passengersCount;
+  double get totalPrice => totalAmount;
+  String get tripCoverImage => trip?.coverImage ?? '';
+  String get origin => trip?.origin ?? '';
+  String get destination => trip?.destination ?? '';
+
   factory BookingModel.fromJson(Map<String, dynamic> json) {
     BookingCustomerModel? userObj;
     if (json['user'] != null && json['user'] is Map) {
@@ -107,12 +119,13 @@ class BookingModel {
       tripTitle: json['tripTitle'] as String? ?? tripObj?.title ?? 'رحلة',
       tripDates: json['tripDates'] as String? ??
           (tripObj != null ? '${tripObj.startDate} - ${tripObj.endDate}' : ''),
-      totalAmount: (json['totalAmount'] as num?)?.toDouble() ??
+      totalAmount: (json['totalPrice'] as num?)?.toDouble() ??
+          (json['totalAmount'] as num?)?.toDouble() ??
           (json['price'] as num?)?.toDouble() ??
           0.0,
-      passengersCount: json['passengersCount'] as int? ??
-          json['seats'] as int? ??
-          json['ticketsCount'] as int? ??
+      passengersCount: (json['numberOfSeats'] as num?)?.toInt() ??
+          (json['passengersCount'] as num?)?.toInt() ??
+          (json['seats'] as num?)?.toInt() ??
           1,
       status: json['status'] as String? ?? 'pending',
       rejectionReason: json['rejectionReason'] as String?,

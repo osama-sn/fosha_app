@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fosha_app/core/constants/app_assets.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 
@@ -25,7 +26,7 @@ class AdminWelcomeSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              'أهلاً بك 👋',
+              AppStrings.welcomeBack,
               style: AppTextStyles.headlineMedium.copyWith(
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
@@ -33,7 +34,7 @@ class AdminWelcomeSection extends StatelessWidget {
             ),
             AppSizes.p4.verticalSpace,
             Text(
-              'إليك ملخص أداء شركتك',
+              AppStrings.companyPerformanceSummary,
               style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.textSecondary,
               ),

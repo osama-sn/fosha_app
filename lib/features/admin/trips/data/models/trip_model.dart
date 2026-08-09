@@ -1,4 +1,5 @@
 import 'package:fosha_app/core/network/api_endpoints.dart';
+import 'package:fosha_app/features/admin/company_profile/data/models/company_profile_model.dart';
 
 class TripCategoryModel {
   final String id;
@@ -146,6 +147,10 @@ class TripModel {
   final List<TripDayModel> days;
   final String createdAt;
   final String updatedAt;
+  final CompanyProfileModel? company;
+  final String companyId;
+  final String companyName;
+  final String companyLogo;
 
   const TripModel({
     required this.id,
@@ -172,10 +177,34 @@ class TripModel {
     required this.days,
     required this.createdAt,
     required this.updatedAt,
+    this.company,
+    this.companyId = '',
+    this.companyName = '',
+    this.companyLogo = '',
   });
   List<String> get galleryWithBaseUrl =>
       gallery.map((e) => ApiEndpoints.getImageUrl(e)).toList();
   factory TripModel.fromJson(Map<String, dynamic> json) {
+    CompanyProfileModel? companyObj;
+    String cId = '';
+    String cName = '';
+    String cLogo = '';
+
+    if (json['company'] != null) {
+      if (json['company'] is Map) {
+        final cMap = Map<String, dynamic>.from(json['company'] as Map);
+        companyObj = CompanyProfileModel.fromJson(cMap);
+        cId = companyObj.id;
+        cName = companyObj.name;
+        cLogo = companyObj.logo ?? '';
+      } else if (json['company'] is String) {
+        cId = json['company'] as String;
+      }
+    }
+    if (cId.isEmpty && json['companyId'] != null) {
+      cId = json['companyId'].toString();
+    }
+
     return TripModel(
       id: (json['_id'] ?? json['id']) as String? ?? '',
       title: json['title'] as String? ?? '',
@@ -238,6 +267,10 @@ class TripModel {
           [],
       createdAt: json['createdAt'] as String? ?? '',
       updatedAt: json['updatedAt'] as String? ?? '',
+      company: companyObj,
+      companyId: cId,
+      companyName: cName,
+      companyLogo: cLogo,
     );
   }
 
@@ -270,18 +303,30 @@ class TripModel {
     };
   }
 
-  String get durationText {
-    if (startDate.isEmpty || endDate.isEmpty) return '';
+  int get durationInDays {
+    if (startDate.isEmpty || endDate.isEmpty) {
+      return days.isNotEmpty ? days.length : 1;
+    }
     try {
       final start = DateTime.parse(startDate);
       final end = DateTime.parse(endDate);
-      final daysDiff = end.difference(start).inDays;
-      if (daysDiff <= 0) return '1 يوم';
-      final nightsDiff = daysDiff > 1 ? daysDiff - 1 : 1;
-      return '$daysDiff أيام / $nightsDiff ليالي';
+      final diff = end.difference(start).inDays;
+      return diff > 0 ? diff : (days.isNotEmpty ? days.length : 1);
     } catch (_) {
-      return '';
+      return days.isNotEmpty ? days.length : 1;
     }
+  }
+
+  int get durationInNights {
+    final d = durationInDays;
+    return d > 1 ? d - 1 : 0;
+  }
+
+  String get durationText {
+    final d = durationInDays;
+    final n = durationInNights;
+    if (n == 0) return '$d يوم';
+    return '$d أيام - $n ليالي';
   }
 
   String get fullCoverImageUrl => ApiEndpoints.getImageUrl(coverImage);

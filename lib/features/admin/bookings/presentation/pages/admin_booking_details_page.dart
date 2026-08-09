@@ -5,14 +5,25 @@ import 'package:fosha_app/core/constants/app_assets.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
 import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/extensions/extensions.dart';
-import 'package:fosha_app/core/shared/widgets/app_network_image.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
+import 'package:fosha_app/features/admin/bookings/data/models/booking_model.dart';
+import 'package:fosha_app/features/admin/bookings/presentation/widgets/admin_booking_bottom_action_bar.dart';
+import 'package:fosha_app/features/admin/bookings/presentation/widgets/admin_booking_customer_card.dart';
+import 'package:fosha_app/features/admin/bookings/presentation/widgets/admin_booking_customer_notes_card.dart';
+import 'package:fosha_app/features/admin/bookings/presentation/widgets/admin_booking_financial_details_card.dart';
+import 'package:fosha_app/features/admin/bookings/presentation/widgets/admin_booking_status_banner.dart';
+import 'package:fosha_app/features/admin/bookings/presentation/widgets/admin_booking_trip_card.dart';
 
 class AdminBookingDetailsPage extends StatefulWidget {
+  final BookingModel? booking;
   final Map<String, dynamic>? bookingData;
 
-  const AdminBookingDetailsPage({super.key, this.bookingData});
+  const AdminBookingDetailsPage({
+    super.key,
+    this.booking,
+    this.bookingData,
+  });
 
   @override
   State<AdminBookingDetailsPage> createState() =>
@@ -25,33 +36,77 @@ class _AdminBookingDetailsPageState extends State<AdminBookingDetailsPage> {
   @override
   void initState() {
     super.initState();
-    _currentStatus = widget.bookingData?['status'] ?? 'accepted';
+    _currentStatus =
+        widget.booking?.status ?? widget.bookingData?['status'] ?? 'accepted';
   }
 
   @override
   Widget build(BuildContext context) {
-    final customerName = widget.bookingData?['customerName'] ?? 'محمد أحمد';
-    final customerEmail =
-        widget.bookingData?['customerEmail'] ?? 'mohamed@example.com';
-    final customerPhone =
-        widget.bookingData?['customerPhone'] ?? '+20 100 123 4567';
+    final b = widget.booking;
+    final data = widget.bookingData;
 
-    final tripTitle = widget.bookingData?['tripTitle'] ?? 'شرم الشيخ';
-    final tripDates = widget.bookingData?['tripDates'] ?? '20 - 22 يونيو 2025';
-    const tripDuration = '3 أيام / 2 ليلة';
-    final tripImage =
-        widget.bookingData?['tripImage'] ?? AppAssets.homeFeatured;
+    final customerName = (b?.customerName.isNotEmpty == true)
+        ? b!.customerName
+        : (data?['customerName']?.toString().isNotEmpty == true
+            ? data!['customerName'].toString()
+            : (data?['user']?['fullName']?.toString() ?? 'عميل'));
 
-    final bookingNumber = widget.bookingData?['bookingNumber'] ?? '#TRP-250620';
-    final requestDate =
-        widget.bookingData?['requestDate'] ?? '15 يونيو 2025 - 10:30 ص';
-    final passengersCount = widget.bookingData?['passengersCount'] ?? '2 بالغ';
-    final paymentMethod = widget.bookingData?['paymentMethod'] ?? 'بطاقة بنكية';
-    final totalAmount = widget.bookingData?['totalAmount'] ?? '6,000 ج.م';
+    final customerEmail = (b?.customerEmail.isNotEmpty == true)
+        ? b!.customerEmail
+        : (data?['customerEmail']?.toString() ??
+            data?['user']?['email']?.toString() ??
+            '');
 
-    final customerNotes =
-        widget.bookingData?['customerNotes'] ??
-        'أتمنى توفير سيارة خاصة من وإلى المطار، ويفضل أن يكون الفندق في طابق علوي مع إطلالة مباشرة على البحر.';
+    final customerPhone = (b?.customerPhone.isNotEmpty == true)
+        ? b!.customerPhone
+        : (data?['customerPhone']?.toString() ??
+            data?['user']?['phone']?.toString() ??
+            '');
+
+    final tripTitle = (b?.tripTitle.isNotEmpty == true)
+        ? b!.tripTitle
+        : (data?['tripTitle']?.toString() ??
+            data?['trip']?['title']?.toString() ??
+            'رحلة');
+
+    final tripDates = (b?.tripDates.isNotEmpty == true)
+        ? b!.tripDates
+        : (data?['tripDates']?.toString() ??
+            (data?['trip'] != null
+                ? '${data!['trip']['startDate'] ?? ''} - ${data['trip']['endDate'] ?? ''}'
+                : ''));
+
+    final tripDuration = data?['tripDuration']?.toString() ?? 'حسب البرنامج';
+
+    final tripImage = (b?.trip?.coverImage.isNotEmpty == true
+        ? b!.trip!.coverImage
+        : (data?['tripImage']?.toString() ??
+            data?['trip']?['coverImage']?.toString() ??
+            AppAssets.homeFeatured));
+
+    final bookingNumber = data?['bookingNumber']?.toString() ??
+        (b?.id != null && b!.id.isNotEmpty
+            ? '#TRP-${b.id.length > 6 ? b.id.substring(0, 6).toUpperCase() : b.id}'
+            : '#TRP-000000');
+
+    final requestDate = data?['requestDate']?.toString() ??
+        (b?.createdAt != null
+            ? '${b!.createdAt!.day}/${b.createdAt!.month}/${b.createdAt!.year}'
+            : 'اليوم');
+
+    final passengersCount = b != null
+        ? '${b.passengersCount} شخص'
+        : (data?['passengersCount']?.toString() ?? '1 شخص');
+
+    final paymentMethod = data?['paymentMethod']?.toString() ?? 'بطاقة بنكية';
+
+    final totalAmount = b != null
+        ? '${b.totalAmount.toStringAsFixed(0)} ج.م'
+        : (data?['totalAmount']?.toString() ?? '0 ج.م');
+
+    final customerNotes = data?['customerNotes']?.toString() ??
+        data?['notes']?.toString() ??
+        'لا توجد ملاحظات إضافية من العميل.';
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -80,14 +135,14 @@ class _AdminBookingDetailsPageState extends State<AdminBookingDetailsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildStatusBanner(),
+                  AdminBookingStatusBanner(status: _currentStatus),
                   AppSizes.p20.verticalSpace,
                   _buildSectionHeader(
                     title: AppStrings.adminCustomerDataSection,
                     icon: Icons.person_outline,
                   ),
                   AppSizes.p8.verticalSpace,
-                  _buildCustomerCard(
+                  AdminBookingCustomerCard(
                     name: customerName,
                     email: customerEmail,
                     phone: customerPhone,
@@ -98,7 +153,7 @@ class _AdminBookingDetailsPageState extends State<AdminBookingDetailsPage> {
                     icon: Icons.card_travel_outlined,
                   ),
                   AppSizes.p8.verticalSpace,
-                  _buildTripCard(
+                  AdminBookingTripCard(
                     title: tripTitle,
                     duration: tripDuration,
                     dates: tripDates,
@@ -110,7 +165,7 @@ class _AdminBookingDetailsPageState extends State<AdminBookingDetailsPage> {
                     icon: Icons.receipt_long_outlined,
                   ),
                   AppSizes.p8.verticalSpace,
-                  _buildBookingDetailsCard(
+                  AdminBookingFinancialDetailsCard(
                     bookingNumber: bookingNumber,
                     requestDate: requestDate,
                     passengersCount: passengersCount,
@@ -123,83 +178,27 @@ class _AdminBookingDetailsPageState extends State<AdminBookingDetailsPage> {
                     icon: Icons.chat_bubble_outline,
                   ),
                   AppSizes.p8.verticalSpace,
-                  _buildCustomerNotesCard(notes: customerNotes),
+                  AdminBookingCustomerNotesCard(notes: customerNotes),
                   AppSizes.p20.verticalSpace,
                 ],
               ),
             ).expanded(),
-            _buildBottomActionBar(context),
+            AdminBookingBottomActionBar(
+              customerPhone: customerPhone,
+              onCancelBooking: () {
+                setState(() {
+                  _currentStatus = 'rejected';
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(AppStrings.adminRejectedBanner),
+                    backgroundColor: AppColors.error,
+                  ),
+                );
+              },
+            ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildStatusBanner() {
-    Color bgColor;
-    Color textColor;
-    IconData iconData;
-    String titleText;
-    String descText;
-
-    if (_currentStatus == 'accepted') {
-      bgColor = const Color(0xFFE8F5E9);
-      textColor = const Color(0xFF2E7D32);
-      iconData = Icons.check_circle;
-      titleText = AppStrings.adminBookingAcceptedTitle;
-      descText = AppStrings.adminBookingAcceptedDesc;
-    } else if (_currentStatus == 'rejected') {
-      bgColor = const Color(0xFFFFEBEE);
-      textColor = const Color(0xFFC62828);
-      iconData = Icons.cancel;
-      titleText = AppStrings.adminBookingRejectedTitle;
-      descText = AppStrings.adminBookingRejectedDesc;
-    } else {
-      bgColor = const Color(0xFFFFF8E1);
-      textColor = const Color(0xFFF57F17);
-      iconData = Icons.hourglass_top;
-      titleText = AppStrings.adminBookingPendingTitle;
-      descText = AppStrings.adminBookingPendingDesc;
-    }
-
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(AppSizes.p16),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(AppSizes.r12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(AppSizes.p8),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.6),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(iconData, color: textColor, size: 24.r),
-          ),
-          AppSizes.p12.horizontalSpace,
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                titleText,
-                style: AppTextStyles.titleMedium.copyWith(
-                  color: textColor,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              2.h.verticalSpace,
-              Text(
-                descText,
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: textColor.withValues(alpha: 0.85),
-                ),
-              ),
-            ],
-          ).expanded(),
-        ],
       ),
     );
   }
@@ -217,361 +216,6 @@ class _AdminBookingDetailsPageState extends State<AdminBookingDetailsPage> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildCustomerCard({
-    required String name,
-    required String email,
-    required String phone,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(AppSizes.p16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSizes.r12),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadow.withValues(alpha: 0.05),
-            blurRadius: 6.r,
-            offset: Offset(0, 2.h),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 54.r,
-            height: 54.r,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColors.border, width: 2),
-              color: AppColors.background,
-            ),
-            child: Icon(
-              Icons.person,
-              size: 32.r,
-              color: AppColors.primary,
-            ).center(),
-          ),
-          AppSizes.p16.horizontalSpace,
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                name,
-                style: AppTextStyles.titleMedium.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              4.h.verticalSpace,
-              Text(
-                email,
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              2.h.verticalSpace,
-              Text(
-                phone,
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
-          ).expanded(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTripCard({
-    required String title,
-    required String duration,
-    required String dates,
-    required String imagePath,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(AppSizes.p12),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSizes.r12),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadow.withValues(alpha: 0.05),
-            blurRadius: 6.r,
-            offset: Offset(0, 2.h),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          AppNetworkImage(
-            imageUrl: imagePath,
-            width: 90.w,
-            height: 75.h,
-            fit: BoxFit.cover,
-            borderRadius: AppSizes.r8,
-          ),
-          AppSizes.p12.horizontalSpace,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: AppTextStyles.titleMedium.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                AppSizes.p4.verticalSpace,
-                Row(
-                  children: [
-                    Icon(
-                      Icons.nightlight_round,
-                      size: 14.r,
-                      color: AppColors.textSecondary,
-                    ),
-                    AppSizes.p4.horizontalSpace,
-                    Expanded(
-                      child: Text(
-                        duration,
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-                AppSizes.p4.verticalSpace,
-                Row(
-                  children: [
-                    Icon(
-                      Icons.calendar_today,
-                      size: 14.r,
-                      color: AppColors.textSecondary,
-                    ),
-                    AppSizes.p4.horizontalSpace,
-                    Expanded(
-                      child: Text(
-                        dates,
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBookingDetailsCard({
-    required String bookingNumber,
-    required String requestDate,
-    required String passengersCount,
-    required String paymentMethod,
-    required String totalAmount,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(AppSizes.p16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSizes.r12),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadow.withValues(alpha: 0.05),
-            blurRadius: 6.r,
-            offset: Offset(0, 2.h),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          _buildDetailRow(
-            AppStrings.adminBookingNumberLabel,
-            bookingNumber,
-            isHighlight: true,
-          ),
-          AppSizes.p12.verticalSpace,
-          _buildDetailRow(AppStrings.adminRequestDateLabel, requestDate),
-          AppSizes.p12.verticalSpace,
-          _buildDetailRow(
-            AppStrings.adminPassengersCountLabel,
-            passengersCount,
-          ),
-          AppSizes.p12.verticalSpace,
-          _buildDetailRow(AppStrings.adminPaymentMethodLabel, paymentMethod),
-          AppSizes.p12.verticalSpace,
-          const Divider(color: AppColors.divider),
-          AppSizes.p8.verticalSpace,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                AppStrings.adminTotalAmountLabel,
-                style: AppTextStyles.titleMedium.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              Text(
-                totalAmount,
-                style: AppTextStyles.headlineSmall.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(
-    String label,
-    String value, {
-    bool isHighlight = false,
-  }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.textSecondary,
-          ),
-        ),
-        Text(
-          value,
-          style: AppTextStyles.bodyMedium.copyWith(
-            fontWeight: isHighlight ? FontWeight.bold : FontWeight.w600,
-            color: isHighlight ? AppColors.primary : AppColors.textPrimary,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCustomerNotesCard({required String notes}) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(AppSizes.p16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSizes.r12),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadow.withValues(alpha: 0.05),
-            blurRadius: 6.r,
-            offset: Offset(0, 2.h),
-          ),
-        ],
-      ),
-      child: Text(
-        notes,
-        style: AppTextStyles.bodyMedium.copyWith(
-          color: AppColors.textSecondary,
-          height: 1.5,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomActionBar(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(AppSizes.p16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: const Border(top: BorderSide(color: AppColors.border)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadow.withValues(alpha: 0.08),
-            blurRadius: 10.r,
-            offset: Offset(0, -3.h),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          OutlinedButton.icon(
-            onPressed: () {
-              setState(() {
-                _currentStatus = 'rejected';
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(AppStrings.adminRejectedBanner),
-                  backgroundColor: AppColors.error,
-                ),
-              );
-            },
-            icon: const Icon(Icons.delete_outline, color: AppColors.error),
-            label: Text(
-              AppStrings.adminCancelBooking,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.error,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: AppColors.error),
-              padding: EdgeInsets.symmetric(vertical: AppSizes.p12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSizes.r12),
-              ),
-            ),
-          ).expanded(),
-          AppSizes.p16.horizontalSpace,
-          ElevatedButton.icon(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'جاري الاتصال بالعميل على رقم ${widget.bookingData?['customerPhone'] ?? '+20 100 123 4567'}...',
-                  ),
-                  backgroundColor: AppColors.primary,
-                ),
-              );
-            },
-            icon: const Icon(Icons.headset_mic_outlined, color: Colors.white),
-            label: Text(
-              AppStrings.adminContactCustomer,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              padding: EdgeInsets.symmetric(vertical: AppSizes.p12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSizes.r12),
-              ),
-            ),
-          ).expanded(),
-        ],
-      ),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/di/service_locator.dart';
 import 'package:fosha_app/core/shared/widgets/app_loading.dart';
 import 'package:fosha_app/core/shared/widgets/app_snackbar.dart';
@@ -77,7 +78,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: Text(
-            'تعديل ملف الشركة',
+            AppStrings.companyProfileEditTitle,
             style: AppTextStyles.titleMedium.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
@@ -107,7 +108,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
                       child: Padding(
                         padding: EdgeInsets.all(AppSizes.p20),
                         child: Text(
-                          'لم يتم العثور على معرف الشركة الحالي',
+                          AppStrings.companyProfileIdNotFound,
                           style: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.error,
                           ),

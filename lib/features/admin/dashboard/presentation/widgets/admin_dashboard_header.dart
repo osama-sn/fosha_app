@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/router/route_names.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 
-class AdminDashboardHeader extends StatelessWidget implements PreferredSizeWidget {
+class AdminDashboardHeader extends StatelessWidget
+    implements PreferredSizeWidget {
   final String companyName;
   final VoidCallback onLogout;
 
@@ -31,14 +33,14 @@ class AdminDashboardHeader extends StatelessWidget implements PreferredSizeWidge
       title: Column(
         children: [
           Text(
-            'لوحة التحكم',
+            AppStrings.adminDashboardTitle,
             style: AppTextStyles.titleMedium.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.primaryDark,
             ),
           ),
           Text(
-            companyName.isNotEmpty ? companyName : 'شركة فسحني شكراً',
+            companyName.isNotEmpty ? companyName : '',
             style: AppTextStyles.labelSmall.copyWith(
               color: AppColors.textSecondary,
               fontSize: 11.sp,
@@ -65,7 +67,7 @@ class AdminDashboardHeader extends StatelessWidget implements PreferredSizeWidge
                 width: 8.r,
                 height: 8.r,
                 decoration: const BoxDecoration(
-                  color: Colors.red,
+                  color: AppColors.error,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -81,60 +83,57 @@ class AdminDashboardHeader extends StatelessWidget implements PreferredSizeWidge
               context.push(RouteNames.companyOffers);
             } else if (value == 'company_coupons') {
               context.push(RouteNames.companyCoupons);
-            } else if (value == 'user_mode') {
-              context.go(RouteNames.home);
             } else if (value == 'logout') {
               onLogout();
             }
           },
           itemBuilder: (context) => [
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'company_profile',
               child: Row(
                 children: [
-                  Icon(Icons.storefront, color: AppColors.primaryDark),
-                  SizedBox(width: 8),
-                  Text('تعديل ملف الشركة'),
+                  const Icon(Icons.storefront, color: AppColors.primaryDark),
+                  const SizedBox(width: 8),
+                  Text(AppStrings.companyProfileEditTitle),
                 ],
               ),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'company_offers',
               child: Row(
                 children: [
-                  Icon(Icons.local_offer_outlined, color: AppColors.primaryDark),
-                  SizedBox(width: 8),
-                  Text('العروض الترويجية'),
+                  const Icon(
+                    Icons.local_offer_outlined,
+                    color: AppColors.primaryDark,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(AppStrings.promotionalOffers),
                 ],
               ),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'company_coupons',
               child: Row(
                 children: [
-                  Icon(Icons.confirmation_number_outlined, color: AppColors.primaryDark),
-                  SizedBox(width: 8),
-                  Text('كوبونات الخصم'),
+                  const Icon(
+                    Icons.confirmation_number_outlined,
+                    color: AppColors.primaryDark,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(AppStrings.discountCoupons),
                 ],
               ),
             ),
-            const PopupMenuItem(
-              value: 'user_mode',
-              child: Row(
-                children: [
-                  Icon(Icons.swap_horiz, color: AppColors.primary),
-                  SizedBox(width: 8),
-                  Text('عرض كـ مستخدم'),
-                ],
-              ),
-            ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'logout',
               child: Row(
                 children: [
-                  Icon(Icons.logout, color: Colors.red),
-                  SizedBox(width: 8),
-                  Text('تسجيل الخروج', style: TextStyle(color: Colors.red)),
+                  const Icon(Icons.logout, color: AppColors.error),
+                  const SizedBox(width: 8),
+                  Text(
+                    AppStrings.profileLogout,
+                    style: const TextStyle(color: AppColors.error),
+                  ),
                 ],
               ),
             ),

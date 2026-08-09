@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-
-import 'package:fosha_app/core/constants/app_assets.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
-import 'package:fosha_app/core/constants/app_strings.dart';
-import 'package:fosha_app/core/extensions/extensions.dart';
-import 'package:fosha_app/core/router/route_names.dart';
-import 'package:fosha_app/core/shared/widgets/app_button.dart';
+import 'package:fosha_app/core/shared/widgets/app_network_image.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
+import 'package:fosha_app/core/di/service_locator.dart';
+import 'package:fosha_app/features/user/favorites/data/repositories/favorites_repository.dart';
+import 'package:fosha_app/features/admin/trips/data/models/trip_model.dart';
+import 'package:fosha_app/features/user/home/presentation/widgets/trip_company_card.dart';
 import 'package:fosha_app/features/user/home/presentation/widgets/trip_details_features_grid.dart';
 import 'package:fosha_app/features/user/home/presentation/widgets/trip_details_header_info.dart';
+import 'package:fosha_app/features/user/home/presentation/widgets/trip_details_included_excluded.dart';
+import 'package:fosha_app/features/user/home/presentation/widgets/trip_details_places_to_visit.dart';
+import 'package:fosha_app/features/user/home/presentation/widgets/trip_details_reviews.dart';
+import 'package:fosha_app/features/user/home/presentation/widgets/trip_details_sticky_footer.dart';
 
 class TripDetailsPage extends StatefulWidget {
-  const TripDetailsPage({super.key});
+  final TripModel? trip;
+
+  const TripDetailsPage({super.key, this.trip});
 
   @override
   State<TripDetailsPage> createState() => _TripDetailsPageState();
@@ -23,19 +28,8 @@ class TripDetailsPage extends StatefulWidget {
 class _TripDetailsPageState extends State<TripDetailsPage> {
   final ScrollController _scrollController = ScrollController();
   bool _isScrolled = false;
-  int _selectedTabIndex = 0;
-  bool _isDay1Expanded = true;
-  bool _isDay2Expanded = false;
-  bool _isDay3Expanded = false;
-
-  final List<String> _tabs = [
-    AppStrings.tripDetailsReviews,
-    AppStrings.tripDetailsGallery,
-    AppStrings.tripDetailsExcluded,
-    AppStrings.tripDetailsIncluded,
-    AppStrings.tripDetailsOverview,
-    AppStrings.tripDetailsItinerary,
-  ];
+  int _selectedDayIndex = 0;
+  bool _isFavorite = false;
 
   @override
   void initState() {
@@ -58,34 +52,78 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
     }
   }
 
+  TripModel _getEffectiveTrip(BuildContext context) {
+    if (widget.trip != null) return widget.trip!;
+    final extra = GoRouterState.of(context).extra;
+    if (extra is TripModel) return extra;
+
+    // Fallback default trip object
+    return const TripModel(
+      id: 'default_id',
+      title: 'شرم الشيخ - رحلة استجمام 5 أيام',
+      description:
+          'استمتع برحلة استجمام لا تُنسى في مدينة شرم الشيخ. إقامة في أفضل المنتجعات على البحر الأحمر مع جولات بحرية وزيارة أهم الأماكن السياحية.',
+      origin: 'القاهرة',
+      destination: 'شرم الشيخ',
+      price: 2450.0,
+      capacity: 30,
+      availableSeats: 15,
+      startDate: '2026-05-15T00:00:00.000Z',
+      endDate: '2026-05-20T00:00:00.000Z',
+      status: 'published',
+      createdBySystem: false,
+      isProtected: true,
+      coverImage: '',
+      gallery: [],
+      included: [
+        'الإقامة في فندق 5 نجوم',
+        'وجبة الإفطار يومياً',
+        'المواصلات والتنقلات',
+        'رحلات وجولات سياحية',
+        'دليل سياحي',
+      ],
+      excluded: ['تذاكر الطيران', 'الوجبات غير المذكورة', 'المصاريف الشخصية'],
+      cancelPolicy: '',
+      averageRating: 4.8,
+      reviewsCount: 125,
+      days: [],
+      createdAt: '',
+      updatedAt: '',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final trip = _getEffectiveTrip(context);
+
     return Scaffold(
-      backgroundColor: Colors.white,
-      bottomNavigationBar: _buildStickyFooter(),
+      backgroundColor: AppColors.background,
+      bottomNavigationBar: TripDetailsStickyFooter(trip: trip),
       body: CustomScrollView(
         controller: _scrollController,
         slivers: [
-          _buildSliverAppBar(),
-          SliverToBoxAdapter(child: _buildBody()),
+          _buildSliverAppBar(trip),
+          SliverToBoxAdapter(child: _buildBody(trip)),
         ],
       ),
     );
   }
 
-  Widget _buildSliverAppBar() {
+  Widget _buildSliverAppBar(TripModel trip) {
+    final gallery = trip.galleryWithBaseUrl;
+
     return SliverAppBar(
-      expandedHeight: 350.h,
+      expandedHeight: 320.h,
       pinned: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surface,
       elevation: 0,
       leading: IconButton(
         icon: Container(
-          padding: EdgeInsets.all(8.r),
+          padding: EdgeInsets.all(6.r),
           decoration: BoxDecoration(
             color: _isScrolled
                 ? Colors.transparent
-                : Colors.black.withValues(alpha: 0.3),
+                : Colors.black.withValues(alpha: 0.35),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -93,36 +131,68 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
             color: _isScrolled ? AppColors.textPrimary : Colors.white,
           ),
         ),
-        onPressed: () => context.pop(),
+        onPressed: () {
+          if (Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          } else {
+            context.pop();
+          }
+        },
       ),
       actions: [
         IconButton(
           icon: Container(
-            padding: EdgeInsets.all(8.r),
+            padding: EdgeInsets.all(6.r),
             decoration: BoxDecoration(
               color: _isScrolled
                   ? Colors.transparent
-                  : Colors.black.withValues(alpha: 0.3),
+                  : Colors.black.withValues(alpha: 0.35),
               shape: BoxShape.circle,
             ),
             child: Icon(
-              Icons.share_outlined,
-              color: _isScrolled ? AppColors.textPrimary : Colors.white,
+              _isFavorite ? Icons.favorite : Icons.favorite_border,
+              color: _isFavorite
+                  ? Colors.red
+                  : (_isScrolled ? AppColors.textPrimary : Colors.white),
             ),
           ),
-          onPressed: () {},
+          onPressed: () async {
+            final trip = _getEffectiveTrip(context);
+            setState(() {
+              _isFavorite = !_isFavorite;
+            });
+            try {
+              final repo = getIt<FavoritesRepository>();
+              final isFav = await repo.toggleFavorite(trip.id);
+              setState(() {
+                _isFavorite = isFav;
+              });
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      isFav
+                          ? 'تمت إضافة الرحلة للمفضلة ❤️'
+                          : 'تمت إزالة الرحلة من المفضلة',
+                    ),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              }
+            } catch (_) {}
+          },
         ),
         IconButton(
           icon: Container(
-            padding: EdgeInsets.all(8.r),
+            padding: EdgeInsets.all(6.r),
             decoration: BoxDecoration(
               color: _isScrolled
                   ? Colors.transparent
-                  : Colors.black.withValues(alpha: 0.3),
+                  : Colors.black.withValues(alpha: 0.35),
               shape: BoxShape.circle,
             ),
             child: Icon(
-              Icons.favorite_border,
+              Icons.ios_share,
               color: _isScrolled ? AppColors.textPrimary : Colors.white,
             ),
           ),
@@ -133,7 +203,10 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
         background: Stack(
           fit: StackFit.expand,
           children: [
-            Image.asset(AppAssets.homeFeatured, fit: BoxFit.cover),
+            AppNetworkImage(
+              imageUrl: trip.fullCoverImageUrl,
+              fit: BoxFit.cover,
+            ),
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -149,333 +222,295 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
             ),
             Positioned(
               bottom: 24.h,
-              right: 24.w,
+              left: 16.w,
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryDark.withValues(alpha: 0.8),
-                  borderRadius: BorderRadius.circular(AppSizes.r24),
+                  color: Colors.black.withValues(alpha: 0.6),
+                  borderRadius: BorderRadius.circular(12.r),
                 ),
-                child: Text(
-                  '1/15',
-                  style: AppTextStyles.labelMedium.copyWith(
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBody() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.r32)),
-      ),
-      transform: Matrix4.translationValues(0.0, -32.h, 0.0),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: AppSizes.p24,
-          vertical: AppSizes.p32,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const TripDetailsHeaderInfo(),
-            AppSizes.p24.verticalSpace,
-            const TripDetailsFeaturesGrid(),
-            AppSizes.p32.verticalSpace,
-            _buildTabs(),
-            AppSizes.p24.verticalSpace,
-            _buildItinerary(),
-            60.h.verticalSpace,
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTabs() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: List.generate(_tabs.length, (index) {
-          final isSelected = _selectedTabIndex == index;
-          return GestureDetector(
-            onTap: () => setState(() => _selectedTabIndex = index),
-            child: Container(
-              margin: EdgeInsets.only(left: AppSizes.p24),
-              padding: EdgeInsets.only(bottom: AppSizes.p12),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: isSelected
-                        ? AppColors.primaryDark
-                        : Colors.transparent,
-                    width: 2,
-                  ),
-                ),
-              ),
-              child: Text(
-                _tabs[index],
-                style: AppTextStyles.labelLarge.copyWith(
-                  color: isSelected
-                      ? AppColors.primaryDark
-                      : AppColors.textHint,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          );
-        }).reversed.toList(),
-      ),
-    );
-  }
-
-  Widget _buildItinerary() {
-    return Column(
-      children: [
-        _buildAccordion(
-          title: '${AppStrings.tripDetailsDay} الأول',
-          isExpanded: _isDay1Expanded,
-          onTap: () => setState(() => _isDay1Expanded = !_isDay1Expanded),
-          child: Padding(
-            padding: EdgeInsets.only(top: AppSizes.p24, right: AppSizes.p12),
-            child: IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(
-                    width: 2.w,
-                    child: Container(color: AppColors.divider),
-                  ),
-                  AppSizes.p16.horizontalSpace,
-                  Expanded(
-                    child: Column(
-                      children: [
-                        _buildTimelineEvent(
-                          time: '08:00',
-                          title: 'الوصول إلى شرم الشيخ',
-                          description: 'الوصول للفندق والاستقبال من مندوبنا',
-                          image: AppAssets.destHurghada,
-                        ),
-                        _buildTimelineEvent(
-                          time: '10:00',
-                          title: 'تسجيل الوصول في الفندق',
-                          description: 'استلام الغرف وتجهيز الحقائب',
-                        ),
-                        _buildTimelineEvent(
-                          time: '12:00',
-                          title: 'الغداء',
-                          description: 'بوفيه مفتوح في مطعم الفندق الرئيسي',
-                        ),
-                        _buildTimelineEvent(
-                          time: '15:00',
-                          title: 'جولة في خليج نعمة',
-                          description: 'التمتع بمناظر الخليج والأسواق التجارية',
-                        ),
-                        _buildTimelineEvent(
-                          time: '20:00',
-                          title: 'عشاء في المطعم',
-                          description: 'عشاء رومانسي تحت ضوء القمر',
-                          isLast: true,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        AppSizes.p16.verticalSpace,
-        _buildAccordion(
-          title: '${AppStrings.tripDetailsDay} الثاني',
-          isExpanded: _isDay2Expanded,
-          onTap: () => setState(() => _isDay2Expanded = !_isDay2Expanded),
-          child: const SizedBox.shrink(),
-        ),
-        AppSizes.p16.verticalSpace,
-        _buildAccordion(
-          title: '${AppStrings.tripDetailsDay} الثالث',
-          isExpanded: _isDay3Expanded,
-          onTap: () => setState(() => _isDay3Expanded = !_isDay3Expanded),
-          child: const SizedBox.shrink(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAccordion({
-    required String title,
-    required bool isExpanded,
-    required VoidCallback onTap,
-    required Widget child,
-  }) {
-    return Column(
-      children: [
-        GestureDetector(
-          onTap: onTap,
-          child: Container(
-            padding: EdgeInsets.all(AppSizes.p16),
-            decoration: BoxDecoration(
-              color: isExpanded ? AppColors.surface : Colors.white,
-              border: Border.all(color: AppColors.border),
-              borderRadius: BorderRadius.circular(AppSizes.r12),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
+                child: Row(
                   children: [
-                    Container(
-                      width: 24.w,
-                      height: 24.w,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: AppColors.border),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    AppSizes.p12.horizontalSpace,
+                    Icon(Icons.collections, color: Colors.white, size: 14.sp),
+                    SizedBox(width: 4.w),
                     Text(
-                      title,
-                      style: AppTextStyles.titleMedium.copyWith(
-                        color: AppColors.textSecondary,
+                      '1/${gallery.isNotEmpty ? gallery.length : 18}',
+                      style: AppTextStyles.labelSmall.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
-                Icon(
-                  isExpanded
-                      ? Icons.keyboard_arrow_up
-                      : Icons.keyboard_arrow_down,
-                  color: AppColors.textSecondary,
-                ),
-              ],
-            ),
-          ),
-        ),
-        if (isExpanded) child,
-      ],
-    );
-  }
-
-  Widget _buildTimelineEvent({
-    required String time,
-    required String title,
-    required String description,
-    String? image,
-    bool isLast = false,
-  }) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: isLast ? 0 : AppSizes.p32),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Positioned(
-            right: -24.w,
-            top: 0,
-            child: Container(
-              width: 12.w,
-              height: 12.w,
-              decoration: BoxDecoration(
-                color: AppColors.border,
-                border: Border.all(color: Colors.white, width: 2),
-                shape: BoxShape.circle,
               ),
-            ),
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                width: 60.w,
-                child: Text(
-                  time,
-                  style: AppTextStyles.labelMedium.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryDark,
-                  ),
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: AppTextStyles.labelMedium.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryDark,
-                    ),
-                  ),
-                  AppSizes.p4.verticalSpace,
-                  Text(
-                    description,
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ).expanded(),
-              if (image != null) ...[
-                AppSizes.p16.horizontalSpace,
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(AppSizes.r12),
-                  child: Image.asset(
-                    image,
-                    width: 80.w,
-                    height: 80.w,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStickyFooter() {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: AppSizes.p24,
-        vertical: AppSizes.p16,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryDark.withValues(alpha: 0.08),
-            blurRadius: 16,
-            offset: const Offset(0, -8),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: Row(
-          children: [
-            AppButton(
-              text: AppStrings.bookNow,
-              onPressed: () => context.push(RouteNames.bookingConfirmation),
-            ).expanded(),
-            AppSizes.p16.horizontalSpace,
-            Container(
-              width: 56.w,
-              height: AppSizes.buttonHeight,
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.border),
-                borderRadius: BorderRadius.circular(AppSizes.r12),
-              ),
-              child: Icon(Icons.favorite_border, color: AppColors.textPrimary),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildBody(TripModel trip) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+      ),
+      transform: Matrix4.translationValues(0.0, -20.h, 0.0),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: AppSizes.p16,
+          vertical: AppSizes.p20,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Gallery Thumbnails strip if available
+            if (trip.galleryWithBaseUrl.isNotEmpty) ...[
+              SizedBox(
+                height: 60.h,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: trip.galleryWithBaseUrl.length,
+                  separatorBuilder: (context, index) => SizedBox(width: 8.w),
+                  itemBuilder: (context, index) {
+                    return Container(
+                      width: 60.w,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.r),
+                        border: Border.all(
+                          color: index == 0
+                              ? AppColors.primary
+                              : AppColors.border,
+                          width: index == 0 ? 2 : 1,
+                        ),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8.r),
+                        child: AppNetworkImage(
+                          imageUrl: trip.galleryWithBaseUrl[index],
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              AppSizes.p16.verticalSpace,
+            ],
+
+            // 1. Header Info (Title, Rating, Category, Price)
+            TripDetailsHeaderInfo(trip: trip),
+            AppSizes.p16.verticalSpace,
+
+            // 2. Quick Info Grid (4 Cards)
+            TripDetailsFeaturesGrid(trip: trip),
+            AppSizes.p20.verticalSpace,
+
+            // 3. عن الرحلة (Description)
+            Text(
+              'عن الرحلة',
+              style: AppTextStyles.titleMedium.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            AppSizes.p8.verticalSpace,
+            Text(
+              trip.description.isNotEmpty
+                  ? trip.description
+                  : 'استمتع برحلة استجمام لا تُنسى في مدينة شرم الشيخ. إقامة في أفضل المنتجعات على البحر الأحمر مع جولات بحرية وزيارة أهم الأماكن السياحية.',
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.textSecondary,
+                height: 1.5,
+              ),
+            ),
+            AppSizes.p4.verticalSpace,
+            GestureDetector(
+              onTap: () {},
+              child: Text(
+                'عرض المزيد',
+                style: AppTextStyles.labelSmall.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            AppSizes.p20.verticalSpace,
+
+            // 4. الأماكن التي ستزورها (Places to visit)
+            TripDetailsPlacesToVisit(
+              places: trip.days.isNotEmpty
+                  ? trip.days
+                        .expand((d) => d.activities.map((a) => a.location))
+                        .where((loc) => loc.isNotEmpty)
+                        .toSet()
+                        .toList()
+                  : const ['خليج نعمة', 'رأس محمد', 'جزيرة تيران', 'محمية نبق'],
+            ),
+            AppSizes.p20.verticalSpace,
+
+            // 5. البرنامج اليومي (Itinerary Accordion)
+            Text(
+              'البرنامج اليومي',
+              style: AppTextStyles.titleMedium.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            AppSizes.p12.verticalSpace,
+            _buildItinerarySection(trip),
+            AppSizes.p20.verticalSpace,
+
+            // 6. ماذا يشمل السعر / ماذا لا يشمل السعر
+            TripDetailsIncludedExcluded(
+              included: trip.included.isNotEmpty
+                  ? trip.included
+                  : const [
+                      'الإقامة في فندق 5 نجوم',
+                      'وجبة الإفطار يومياً',
+                      'المواصلات والتنقلات',
+                      'رحلات وجولات سياحية',
+                      'دليل سياحي',
+                    ],
+              excluded: trip.excluded.isNotEmpty
+                  ? trip.excluded
+                  : const [
+                      'تذاكر الطيران',
+                      'الوجبات غير المذكورة',
+                      'المصاريف الشخصية',
+                    ],
+            ),
+            AppSizes.p20.verticalSpace,
+
+            // 7. تقييمات الرحلة (Reviews)
+            TripDetailsReviews(
+              averageRating: trip.averageRating > 0 ? trip.averageRating : 4.8,
+              reviewsCount: trip.reviewsCount > 0 ? trip.reviewsCount : 125,
+            ),
+            AppSizes.p20.verticalSpace,
+
+            // 8. معلومات الشركة (Company Info Card)
+            TripCompanyCard(
+              company: trip.company,
+              companyId: trip.companyId,
+              companyName: trip.companyName,
+              companyLogo: trip.companyLogo,
+            ),
+            AppSizes.p32.verticalSpace,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildItinerarySection(TripModel trip) {
+    if (trip.days.isEmpty) {
+      return Column(
+        children: [
+          _buildDayAccordion(
+            dayIndex: 0,
+            title: 'اليوم 1: الوصول والاستقبال - جولة خليج نعمة',
+            activities: [
+              '10:00 AM - الوصول لدهب والتسكين بفندق دهب بلازا',
+              '03:00 PM - جولة حرة واستكشاف الأسواق',
+            ],
+          ),
+          AppSizes.p8.verticalSpace,
+          _buildDayAccordion(
+            dayIndex: 1,
+            title: 'اليوم 2: رحلة بحرية - جزيرة تيران',
+            activities: [
+              '09:00 AM - التحرك إلى اليخت لبدء الرحلة البحرية',
+              '01:00 PM - تناول وجبة الغداء الساخنة على اليخت',
+            ],
+          ),
+        ],
+      );
+    }
+
+    return Column(
+      children: List.generate(trip.days.length, (index) {
+        final day = trip.days[index];
+        final actsList = day.activities
+            .map((a) => '${a.time.isNotEmpty ? "${a.time} - " : ""}${a.title}')
+            .toList();
+
+        return Padding(
+          padding: EdgeInsets.only(bottom: 8.h),
+          child: _buildDayAccordion(
+            dayIndex: index,
+            title: 'اليوم ${day.dayNumber}: ${day.title}',
+            activities: actsList,
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildDayAccordion({
+    required int dayIndex,
+    required String title,
+    required List<String> activities,
+  }) {
+    final isExpanded = _selectedDayIndex == dayIndex;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: ExpansionTile(
+        key: Key('day_$dayIndex'),
+        initiallyExpanded: isExpanded,
+        onExpansionChanged: (expanded) {
+          if (expanded) {
+            setState(() => _selectedDayIndex = dayIndex);
+          }
+        },
+        tilePadding: EdgeInsets.symmetric(horizontal: AppSizes.p16),
+        title: Text(
+          title,
+          style: AppTextStyles.bodyMedium.copyWith(
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppSizes.p16,
+              vertical: AppSizes.p8,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: activities.map((act) {
+                return Padding(
+                  padding: EdgeInsets.only(bottom: 6.h),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.fiber_manual_record,
+                        size: 8.r,
+                        color: AppColors.primary,
+                      ),
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: Text(
+                          act,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
       ),
     );
   }

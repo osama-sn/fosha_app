@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/router/route_names.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 
@@ -22,7 +23,7 @@ class AdminBottomNavBar extends StatelessWidget {
         border: const Border(top: BorderSide(color: AppColors.border)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: AppColors.shadow.withValues(alpha: 0.04),
             blurRadius: 10.r,
             offset: Offset(0, -3.h),
           ),
@@ -35,7 +36,7 @@ class AdminBottomNavBar extends StatelessWidget {
           _buildNavItem(
             context,
             icon: Icons.home,
-            label: 'الرئيسية',
+            label: AppStrings.navHome,
             isSelected: selectedIndex == 0,
             onTap: () {},
           ),
@@ -44,7 +45,7 @@ class AdminBottomNavBar extends StatelessWidget {
           _buildNavItem(
             context,
             icon: Icons.calendar_month_outlined,
-            label: 'الحجوزات',
+            label: AppStrings.navBookings,
             isSelected: selectedIndex == 1,
             onTap: () => context.push(RouteNames.adminBookings),
           ),
@@ -77,7 +78,7 @@ class AdminBottomNavBar extends StatelessWidget {
                 ),
                 SizedBox(height: 2.h),
                 Text(
-                  'إضافة رحلة',
+                  AppStrings.adminAddTrip,
                   style: AppTextStyles.labelSmall.copyWith(
                     fontSize: 9.sp,
                     color: AppColors.primaryDark,
@@ -92,7 +93,7 @@ class AdminBottomNavBar extends StatelessWidget {
           _buildNavItem(
             context,
             icon: Icons.explore_outlined,
-            label: 'الرحلات',
+            label: AppStrings.adminTripsTitle,
             isSelected: selectedIndex == 3,
             onTap: () => context.push(RouteNames.adminTrips),
           ),
@@ -101,7 +102,7 @@ class AdminBottomNavBar extends StatelessWidget {
           _buildNavItem(
             context,
             icon: Icons.person_outline,
-            label: 'الحساب',
+            label: AppStrings.profileTitle,
             isSelected: selectedIndex == 4,
             onTap: () => context.push(RouteNames.companyProfile),
           ),

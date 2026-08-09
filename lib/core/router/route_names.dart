@@ -18,5 +18,9 @@ class RouteNames {
   static const String companyProfile = '/company-profile';
   static const String companyOffers = '/company-offers';
   static const String companyCoupons = '/company-coupons';
+  static const String search = '/search';
+  static const String searchResults = '/search-results';
+  static const String companyDetails = '/company-details';
+  static const String categoryTrips = '/category-trips';
   static const String notFound = '/not-found';
 }

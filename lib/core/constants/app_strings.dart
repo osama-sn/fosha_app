@@ -337,4 +337,390 @@ class AppStrings {
   static String get adminSelectCity => 'admin.selectCity'.tr();
   static String get adminCustomCityHint => 'admin.customCityHint'.tr();
   static String get confirm => 'confirm'.tr();
+
+  // Company Profile
+  static String get companyProfileEditTitle {
+    final res = 'admin.companyProfileEditTitle'.tr();
+    return res == 'admin.companyProfileEditTitle' ? 'تعديل ملف الشركة' : res;
+  }
+  static String get companyProfileHeaderTitle {
+    final res = 'admin.companyProfileHeaderTitle'.tr();
+    return res == 'admin.companyProfileHeaderTitle' ? 'إعدادات حساب الشركة' : res;
+  }
+  static String get companyProfileHeaderSubtitle {
+    final res = 'admin.companyProfileHeaderSubtitle'.tr();
+    return res == 'admin.companyProfileHeaderSubtitle'
+        ? 'قم بتحديث معلومات التواصل والعنوان لظهورها للعملاء'
+        : res;
+  }
+  static String get companyProfileIdNotFound {
+    final res = 'admin.companyProfileIdNotFound'.tr();
+    return res == 'admin.companyProfileIdNotFound'
+        ? 'لم يتم العثور على معرف الشركة الحالي'
+        : res;
+  }
+  static String get companyNameLabel {
+    final res = 'admin.companyNameLabel'.tr();
+    return res == 'admin.companyNameLabel' ? 'اسم الشركة' : res;
+  }
+  static String get companyNameHint {
+    final res = 'admin.companyNameHint'.tr();
+    return res == 'admin.companyNameHint' ? 'مثال: شركة فسحني شكرا للسياحة' : res;
+  }
+  static String get companyNameRequired {
+    final res = 'admin.companyNameRequired'.tr();
+    return res == 'admin.companyNameRequired' ? 'يرجى إدخال اسم الشركة' : res;
+  }
+  static String get companyDescLabel {
+    final res = 'admin.companyDescLabel'.tr();
+    return res == 'admin.companyDescLabel' ? 'وصف الشركة' : res;
+  }
+  static String get companyDescHint {
+    final res = 'admin.companyDescHint'.tr();
+    return res == 'admin.companyDescHint' ? 'وصف ورؤية الشركة ورحلاتها...' : res;
+  }
+  static String get companyPhoneLabel {
+    final res = 'admin.companyPhoneLabel'.tr();
+    return res == 'admin.companyPhoneLabel' ? 'هاتف التواصل' : res;
+  }
+  static String get companyPhoneRequired {
+    final res = 'admin.companyPhoneRequired'.tr();
+    return res == 'admin.companyPhoneRequired' ? 'يرجى إدخال رقم الهاتف' : res;
+  }
+  static String get companyEmailLabel {
+    final res = 'admin.companyEmailLabel'.tr();
+    return res == 'admin.companyEmailLabel' ? 'البريد الإلكتروني للتواصل' : res;
+  }
+  static String get companyEmailRequired {
+    final res = 'admin.companyEmailRequired'.tr();
+    return res == 'admin.companyEmailRequired'
+        ? 'يرجى إدخال البريد الإلكتروني'
+        : res;
+  }
+  static String get companyEmailInvalid {
+    final res = 'admin.companyEmailInvalid'.tr();
+    return res == 'admin.companyEmailInvalid' ? 'البريد الإلكتروني غير صحيح' : res;
+  }
+  static String get companyAddressLabel {
+    final res = 'admin.companyAddressLabel'.tr();
+    return res == 'admin.companyAddressLabel' ? 'العنوان التفصيلي' : res;
+  }
+  static String get companyAddressHint {
+    final res = 'admin.companyAddressHint'.tr();
+    return res == 'admin.companyAddressHint' ? 'المنيا - كورنيش النيل' : res;
+  }
+  static String get companyGovernorateLabel {
+    final res = 'admin.companyGovernorateLabel'.tr();
+    return res == 'admin.companyGovernorateLabel' ? 'المحافظة' : res;
+  }
+  static String get saveChanges {
+    final res = 'buttons.saveChanges'.tr();
+    return res == 'buttons.saveChanges' ? 'حفظ التغييرات' : res;
+  }
+  static String get savingChanges {
+    final res = 'buttons.savingChanges'.tr();
+    return res == 'buttons.savingChanges' ? 'جاري الحفظ...' : res;
+  }
+
+  // Company Coupons
+  static String get companyCouponsTitle {
+    final res = 'admin.companyCouponsTitle'.tr();
+    return res == 'admin.companyCouponsTitle' ? 'كوبونات الخصم للشركة' : res;
+  }
+  static String get newCoupon {
+    final res = 'admin.newCoupon'.tr();
+    return res == 'admin.newCoupon' ? 'كوبون جديد' : res;
+  }
+  static String get addCouponTitle {
+    final res = 'admin.addCouponTitle'.tr();
+    return res == 'admin.addCouponTitle' ? 'إضافة كوبون خصم جديد' : res;
+  }
+  static String get couponCodeLabel {
+    final res = 'admin.couponCodeLabel'.tr();
+    return res == 'admin.couponCodeLabel' ? 'كود الكوبون' : res;
+  }
+  static String get couponCodeHint {
+    final res = 'admin.couponCodeHint'.tr();
+    return res == 'admin.couponCodeHint' ? 'مثال: COMPANY20' : res;
+  }
+  static String get couponCodeRequired {
+    final res = 'admin.couponCodeRequired'.tr();
+    return res == 'admin.couponCodeRequired' ? 'يرجى إدخال كود الكوبون' : res;
+  }
+  static String get couponCodeMinLength {
+    final res = 'admin.couponCodeMinLength'.tr();
+    return res == 'admin.couponCodeMinLength'
+        ? 'الكود يجب أن يتكون من 3 أحرف على الأقل'
+        : res;
+  }
+  static String get discountPercentageLabel {
+    final res = 'admin.discountPercentageLabel'.tr();
+    return res == 'admin.discountPercentageLabel' ? 'نسبة الخصم %' : res;
+  }
+  static String get discountPercentageRequired {
+    final res = 'admin.discountPercentageRequired'.tr();
+    return res == 'admin.discountPercentageRequired' ? 'نسبة الخصم مطلوبة' : res;
+  }
+  static String get discountPercentageInvalid {
+    final res = 'admin.discountPercentageInvalid'.tr();
+    return res == 'admin.discountPercentageInvalid' ? 'نسبة بين 1 و 100' : res;
+  }
+  static String get usageLimitLabel {
+    final res = 'admin.usageLimitLabel'.tr();
+    return res == 'admin.usageLimitLabel'
+        ? 'حد الاستخدام (0 = غير محدود)'
+        : res;
+  }
+  static String get maxDiscountLabel {
+    final res = 'admin.maxDiscountLabel'.tr();
+    return res == 'admin.maxDiscountLabel'
+        ? 'أقصى مبلغ خصم (0 = بدون حد)'
+        : res;
+  }
+  static String get minTripPriceLabel {
+    final res = 'admin.minTripPriceLabel'.tr();
+    return res == 'admin.minTripPriceLabel'
+        ? 'أقل سعر للرحلة (0 = الكل)'
+        : res;
+  }
+  static String get validUntilLabel {
+    final res = 'admin.validUntilLabel'.tr();
+    return res == 'admin.validUntilLabel' ? 'صالح حتى' : res;
+  }
+  static String get deleteCoupon {
+    final res = 'admin.deleteCoupon'.tr();
+    return res == 'admin.deleteCoupon' ? 'حذف الكوبون' : res;
+  }
+  static String get deleteCouponConfirm {
+    final res = 'admin.deleteCouponConfirm'.tr();
+    return res == 'admin.deleteCouponConfirm'
+        ? 'هل أنت تأكد من رغبتك في حذف الكوبون'
+        : res;
+  }
+  static String get noCouponsFound {
+    final res = 'admin.noCouponsFound'.tr();
+    return res == 'admin.noCouponsFound' ? 'لا توجد كوبونات خصم حالية' : res;
+  }
+  static String get noCouponsSubtitle {
+    final res = 'admin.noCouponsSubtitle'.tr();
+    return res == 'admin.noCouponsSubtitle'
+        ? 'يمكنك إنشاء أكواد تخفيض خاصة بشركتك فقط وتوزيعها على المسافرين'
+        : res;
+  }
+  static String get copiedToClipboard {
+    final res = 'admin.copiedToClipboard'.tr();
+    return res == 'admin.copiedToClipboard' ? 'تم نسخ الكود' : res;
+  }
+
+  // Dashboard & Navigation
+  static String get welcomeBack {
+    final res = 'admin.welcomeBack'.tr();
+    return res == 'admin.welcomeBack' ? 'أهلاً بك 👋' : res;
+  }
+  static String get companyPerformanceSummary {
+    final res = 'admin.companyPerformanceSummary'.tr();
+    return res == 'admin.companyPerformanceSummary'
+        ? 'إليك ملخص أداء شركتك'
+        : res;
+  }
+  static String get marketingAndOffers {
+    final res = 'admin.marketingAndOffers'.tr();
+    return res == 'admin.marketingAndOffers' ? 'التسويق والعروض' : res;
+  }
+  static String get promotionalOffers {
+    final res = 'admin.promotionalOffers'.tr();
+    return res == 'admin.promotionalOffers' ? 'العروض الترويجية' : res;
+  }
+  static String get managePromotionsSubtitle {
+    final res = 'admin.managePromotionsSubtitle'.tr();
+    return res == 'admin.managePromotionsSubtitle'
+        ? 'إدارة وتخصيص الخصومات'
+        : res;
+  }
+  static String get discountCoupons {
+    final res = 'admin.discountCoupons'.tr();
+    return res == 'admin.discountCoupons' ? 'كوبونات الخصم' : res;
+  }
+  static String get companyCouponsSubtitle {
+    final res = 'admin.companyCouponsSubtitle'.tr();
+    return res == 'admin.companyCouponsSubtitle'
+        ? 'أكواد الخصم الخاصة بالشركة'
+        : res;
+  }
+  static String get logoutConfirmTitle {
+    final res = 'admin.logoutConfirmTitle'.tr();
+    return res == 'admin.logoutConfirmTitle' ? 'تسجيل الخروج' : res;
+  }
+  static String get logoutConfirmMessage {
+    final res = 'admin.logoutConfirmMessage'.tr();
+    return res == 'admin.logoutConfirmMessage'
+        ? 'هل أنت تأكد من رغبتك في تسجيل الخروج؟'
+        : res;
+  }
+  static String get logoutSuccessMessage {
+    final res = 'admin.logoutSuccessMessage'.tr();
+    return res == 'admin.logoutSuccessMessage' ? 'تم تسجيل الخروج بنجاح' : res;
+  }
+
+  // Manage Trips & Itinerary
+  static String get tripTitleRequired {
+    final res = 'admin.tripTitleRequired'.tr();
+    return res == 'admin.tripTitleRequired' ? 'برجاء كتابة عنوان الرحلة' : res;
+  }
+  static String get tripCategoryLabel {
+    final res = 'admin.tripCategoryLabel'.tr();
+    return res == 'admin.tripCategoryLabel' ? 'تصنيف الرحلة' : res;
+  }
+  static String get dayTitleLabel {
+    final res = 'admin.dayTitleLabel'.tr();
+    return res == 'admin.dayTitleLabel' ? 'عنوان اليوم' : res;
+  }
+  static String get dayTitleHint {
+    final res = 'admin.dayTitleHint'.tr();
+    return res == 'admin.dayTitleHint' ? 'مثال: الوصول والتسكين بالفندق' : res;
+  }
+  static String get activitiesLabel {
+    final res = 'admin.activitiesLabel'.tr();
+    return res == 'admin.activitiesLabel' ? 'الأنشطة:' : res;
+  }
+  static String get adminTripDeleteFailed {
+    final res = 'admin.tripDeleteFailed'.tr();
+    return res == 'admin.tripDeleteFailed' ? 'فشل حذف الرحلة' : res;
+  }
+  static String get adminTripRepublishFailed {
+    final res = 'admin.tripRepublishFailed'.tr();
+    return res == 'admin.tripRepublishFailed' ? 'فشل نشر الرحلة' : res;
+  }
+
+  // Company Offers
+  static String get companyOffersTitle {
+    final res = 'admin.companyOffersTitle'.tr();
+    return res == 'admin.companyOffersTitle' ? 'عروض الشركة الترويجية' : res;
+  }
+  static String get newOffer {
+    final res = 'admin.newOffer'.tr();
+    return res == 'admin.newOffer' ? 'عرض جديد' : res;
+  }
+  static String get editOfferTitle {
+    final res = 'admin.editOfferTitle'.tr();
+    return res == 'admin.editOfferTitle' ? 'تعديل العرض الترويجي' : res;
+  }
+  static String get addOfferTitle {
+    final res = 'admin.addOfferTitle'.tr();
+    return res == 'admin.addOfferTitle' ? 'إضافة عرض ترويجي جديد' : res;
+  }
+  static String get changeOfferImage {
+    final res = 'admin.changeOfferImage'.tr();
+    return res == 'admin.changeOfferImage' ? 'تغيير صورة العرض' : res;
+  }
+  static String get selectOfferImage {
+    final res = 'admin.selectOfferImage'.tr();
+    return res == 'admin.selectOfferImage' ? 'اختر صورة العرض (مطلوب)' : res;
+  }
+  static String get titleArLabel {
+    final res = 'admin.titleArLabel'.tr();
+    return res == 'admin.titleArLabel' ? 'العنوان بالعربية *' : res;
+  }
+  static String get titleEnLabel {
+    final res = 'admin.titleEnLabel'.tr();
+    return res == 'admin.titleEnLabel' ? 'Title (EN) *' : res;
+  }
+  static String get descArLabel {
+    final res = 'admin.descArLabel'.tr();
+    return res == 'admin.descArLabel' ? 'الوصف بالعربية' : res;
+  }
+  static String get promoCodeLabel {
+    final res = 'admin.promoCodeLabel'.tr();
+    return res == 'admin.promoCodeLabel'
+        ? 'كود الخصم (مثال: SUMMER20)'
+        : res;
+  }
+  static String get selectEndDateOptional {
+    final res = 'admin.selectEndDateOptional'.tr();
+    return res == 'admin.selectEndDateOptional'
+        ? 'تحديد تاريخ انتهاء العرض (اختياري)'
+        : res;
+  }
+  static String get endDateLabel {
+    final res = 'admin.endDateLabel'.tr();
+    return res == 'admin.endDateLabel' ? 'تاريخ الانتهاء' : res;
+  }
+  static String get selectOfferImageRequired {
+    final res = 'admin.selectOfferImageRequired'.tr();
+    return res == 'admin.selectOfferImageRequired'
+        ? 'يرجى اختيار صورة للعرض الترويجي'
+        : res;
+  }
+  static String get deleteOffer {
+    final res = 'admin.deleteOffer'.tr();
+    return res == 'admin.deleteOffer' ? 'حذف العرض' : res;
+  }
+  static String get deleteOfferConfirm {
+    final res = 'admin.deleteOfferConfirm'.tr();
+    return res == 'admin.deleteOfferConfirm'
+        ? 'هل أنت تأكد من رغبتك في حذف العرض'
+        : res;
+  }
+  static String get noOffersFound {
+    final res = 'admin.noOffersFound'.tr();
+    return res == 'admin.noOffersFound' ? 'لا توجد عروض ترويجية حالية' : res;
+  }
+  static String get noOffersSubtitle {
+    final res = 'admin.noOffersSubtitle'.tr();
+    return res == 'admin.noOffersSubtitle'
+        ? 'يمكنك إضافة عروض ترويجية وتخفيضات لجذب عملاء جدد'
+        : res;
+  }
+  static String get validity {
+    final res = 'admin.validity'.tr();
+    return res == 'admin.validity' ? 'الصلاحية' : res;
+  }
+  static String get unrestricted {
+    final res = 'admin.unrestricted'.tr();
+    return res == 'admin.unrestricted' ? 'غير مقتصر' : res;
+  }
+  static String get noTripsFound {
+    final res = 'admin.noTripsFound'.tr();
+    return res == 'admin.noTripsFound' ? 'لا توجد رحلات حالية' : res;
+  }
+
+  // Search Page
+  static String get searchTripsTitle {
+    final res = 'search.title'.tr();
+    return res == 'search.title' ? 'بحث عن رحلات' : res;
+  }
+  static String get tabTrips {
+    final res = 'search.tabTrips'.tr();
+    return res == 'search.tabTrips' ? 'رحلات' : res;
+  }
+  static String get tabCompanies {
+    final res = 'search.tabCompanies'.tr();
+    return res == 'search.tabCompanies' ? 'شركات' : res;
+  }
+  static String get tabDestinations {
+    final res = 'search.tabDestinations'.tr();
+    return res == 'search.tabDestinations' ? 'وجهات' : res;
+  }
+  static String get selectGovernorateHint {
+    final res = 'search.selectGovernorateHint'.tr();
+    return res == 'search.selectGovernorateHint' ? 'اختر المحافظة' : res;
+  }
+  static String get selectDestinationHint {
+    final res = 'search.selectDestinationHint'.tr();
+    return res == 'search.selectDestinationHint'
+        ? 'اختر الوجهة أو اكتب للبحث'
+        : res;
+  }
+  static String get tripTypeLabel {
+    final res = 'search.tripTypeLabel'.tr();
+    return res == 'search.tripTypeLabel' ? 'النوع' : res;
+  }
+  static String get showResults {
+    final res = 'search.showResults'.tr();
+    return res == 'search.showResults' ? 'عرض النتائج' : res;
+  }
+  static String get clearAllFilters {
+    final res = 'search.clearAllFilters'.tr();
+    return res == 'search.clearAllFilters' ? 'مسح جميع الفلاتر' : res;
+  }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 
@@ -15,7 +16,7 @@ class CompanyProfileHeaderBanner extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             AppColors.primaryDark,
-            AppColors.primaryDark.withValues(alpha: 0.8),
+            AppColors.primaryDark.withValues(alpha: 0.85),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -49,7 +50,7 @@ class CompanyProfileHeaderBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'إعدادات حساب الشركة',
+                  AppStrings.companyProfileHeaderTitle,
                   style: AppTextStyles.titleMedium.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -57,7 +58,7 @@ class CompanyProfileHeaderBanner extends StatelessWidget {
                 ),
                 SizedBox(height: 4.h),
                 Text(
-                  'قم بتحديث معلومات التواصل والعنوان لظهورها للعملاء',
+                  AppStrings.companyProfileHeaderSubtitle,
                   style: AppTextStyles.labelSmall.copyWith(
                     color: Colors.white.withValues(alpha: 0.9),
                   ),

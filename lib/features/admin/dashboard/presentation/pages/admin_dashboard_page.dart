@@ -19,6 +19,7 @@ import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_bo
 import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_dashboard_header.dart';
 import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_financials_section.dart';
 import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_net_profit_card.dart';
+import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_quick_promotions_section.dart';
 import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_subscription_card.dart';
 import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_trips_card.dart';
 import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_welcome_section.dart';
@@ -57,7 +58,7 @@ class AdminDashboardPage extends StatelessWidget {
           return Scaffold(
             backgroundColor: AppColors.background,
             appBar: AdminDashboardHeader(
-              companyName: stats.company?.name ?? 'شركة فسحني شكراً',
+              companyName: stats.company?.name ?? '',
               onLogout: () => _showLogoutDialog(context),
             ),
             body: SafeArea(
@@ -104,7 +105,7 @@ class AdminDashboardPage extends StatelessWidget {
                             draftTrips: stats.trips.draftTrips,
                           ),
                           AppSizes.p24.verticalSpace,
-                          _buildQuickPromotionsSection(context),
+                          const AdminQuickPromotionsSection(),
                           AppSizes.p24.verticalSpace,
                           AdminSubscriptionCard(
                             monthlySubscriptionFee:
@@ -167,18 +168,18 @@ class AdminDashboardPage extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('تسجيل الخروج'),
-        content: const Text('هل أنت تأكد من رغبتك في تسجيل الخروج؟'),
+        title: Text(AppStrings.logoutConfirmTitle),
+        content: Text(AppStrings.logoutConfirmMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('إلغاء'),
+            child: Text(AppStrings.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text(
-              'تسجيل الخروج',
-              style: TextStyle(color: Colors.red),
+            child: Text(
+              AppStrings.profileLogout,
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],
@@ -191,112 +192,10 @@ class AdminDashboardPage extends StatelessWidget {
       if (context.mounted) {
         AppSnackbar.showSuccess(
           context: context,
-          message: 'تم تسجيل الخروج بنجاح',
+          message: AppStrings.logoutSuccessMessage,
         );
         context.go(RouteNames.login);
       }
     }
   }
-
-  Widget _buildQuickPromotionsSection(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'التسويق والعروض',
-          style: AppTextStyles.titleMedium.copyWith(
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        AppSizes.p12.verticalSpace,
-        Row(
-          children: [
-            Expanded(
-              child: _buildActionCard(
-                context,
-                title: 'العروض الترويجية',
-                subtitle: 'إدارة وتخصيص الخصومات',
-                icon: Icons.local_offer_outlined,
-                color: AppColors.secondary,
-                onTap: () => context.push(RouteNames.companyOffers),
-              ),
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: _buildActionCard(
-                context,
-                title: 'كوبونات الخصم',
-                subtitle: 'أكواد الخصم الخاصة بالشركة',
-                icon: Icons.confirmation_number_outlined,
-                color: AppColors.primaryDark,
-                onTap: () => context.push(RouteNames.companyCoupons),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionCard(
-    BuildContext context, {
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16.r),
-      child: Container(
-        padding: EdgeInsets.all(AppSizes.p16),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: AppColors.border),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 8.r,
-              offset: Offset(0, 3.h),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: EdgeInsets.all(8.r),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10.r),
-              ),
-              child: Icon(icon, color: color, size: 24.r),
-            ),
-            SizedBox(height: 12.h),
-            Text(
-              title,
-              style: AppTextStyles.labelLarge.copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            SizedBox(height: 4.h),
-            Text(
-              subtitle,
-              style: AppTextStyles.labelSmall.copyWith(
-                color: AppColors.textSecondary,
-                fontSize: 10.sp,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
-

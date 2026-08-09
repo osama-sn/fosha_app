@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fosha_app/features/admin/bookings/data/models/booking_model.dart';
 import 'package:fosha_app/features/admin/bookings/presentation/pages/admin_booking_details_page.dart';
 import 'package:fosha_app/features/admin/bookings/presentation/pages/admin_bookings_page.dart';
 import 'package:fosha_app/features/admin/dashboard/presentation/pages/admin_dashboard_page.dart';
@@ -19,6 +20,10 @@ import 'package:fosha_app/features/user/splash/presentation/pages/splash_page.da
 import 'package:fosha_app/features/admin/company_profile/presentation/pages/company_profile_page.dart';
 import 'package:fosha_app/features/admin/offers/presentation/pages/company_offers_page.dart';
 import 'package:fosha_app/features/admin/coupons/presentation/pages/company_coupons_page.dart';
+import 'package:fosha_app/features/user/search/presentation/pages/search_page.dart';
+import 'package:fosha_app/features/user/company/presentation/pages/company_details_page.dart';
+import 'package:fosha_app/features/user/home/presentation/pages/category_trips_page.dart';
+import 'package:fosha_app/features/categories/data/models/category_model.dart';
 import 'route_names.dart';
 
 class AppRouter {
@@ -54,7 +59,10 @@ class AppRouter {
       GoRoute(
         path: RouteNames.bookingConfirmation,
         name: RouteNames.bookingConfirmation,
-        builder: (context, state) => const BookingConfirmationPage(),
+        builder: (context, state) {
+          final trip = state.extra as TripModel?;
+          return BookingConfirmationPage(trip: trip);
+        },
       ),
       GoRoute(
         path: RouteNames.bookingDetails,
@@ -94,8 +102,13 @@ class AppRouter {
       GoRoute(
         path: RouteNames.adminBookingDetails,
         builder: (context, state) {
-          final bookingData = state.extra as Map<String, dynamic>?;
-          return AdminBookingDetailsPage(bookingData: bookingData);
+          final extra = state.extra;
+          if (extra is BookingModel) {
+            return AdminBookingDetailsPage(booking: extra);
+          } else if (extra is Map<String, dynamic>) {
+            return AdminBookingDetailsPage(bookingData: extra);
+          }
+          return const AdminBookingDetailsPage();
         },
       ),
       GoRoute(
@@ -112,6 +125,27 @@ class AppRouter {
       GoRoute(
         path: RouteNames.companyCoupons,
         builder: (context, state) => const CompanyCouponsPage(),
+      ),
+      GoRoute(
+        path: RouteNames.search,
+        builder: (context, state) {
+          final query = state.extra as String?;
+          return SearchPage(initialQuery: query);
+        },
+      ),
+      GoRoute(
+        path: RouteNames.companyDetails,
+        builder: (context, state) {
+          final companyId = state.extra as String?;
+          return CompanyDetailsPage(companyId: companyId);
+        },
+      ),
+      GoRoute(
+        path: RouteNames.categoryTrips,
+        builder: (context, state) {
+          final category = state.extra as CategoryModel;
+          return CategoryTripsPage(category: category);
+        },
       ),
     ],
   );

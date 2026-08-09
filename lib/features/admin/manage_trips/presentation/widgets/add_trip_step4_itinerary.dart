@@ -44,7 +44,7 @@ class AddTripStep4Itinerary extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'اليوم ${dayIndex + 1}',
+                      '${AppStrings.tripDetailsDay} ${dayIndex + 1}',
                       style: AppTextStyles.titleMedium.copyWith(
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
@@ -63,9 +63,9 @@ class AddTripStep4Itinerary extends StatelessWidget {
                 SizedBox(height: AppSizes.p8),
                 TextFormField(
                   initialValue: day.title,
-                  decoration: const InputDecoration(
-                    labelText: 'عنوان اليوم',
-                    hintText: 'مثال: الوصول والتسكين بالفندق',
+                  decoration: InputDecoration(
+                    labelText: AppStrings.dayTitleLabel,
+                    hintText: AppStrings.dayTitleHint,
                   ),
                   onChanged: (val) {
                     day.title = val;
@@ -73,7 +73,7 @@ class AddTripStep4Itinerary extends StatelessWidget {
                 ),
                 SizedBox(height: AppSizes.p16),
                 Text(
-                  'الأنشطة:',
+                  AppStrings.activitiesLabel,
                   style: AppTextStyles.labelLarge.copyWith(
                     fontWeight: FontWeight.bold,
                   ),

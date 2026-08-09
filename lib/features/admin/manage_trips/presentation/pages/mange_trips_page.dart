@@ -64,7 +64,7 @@ class _AddTripPageState extends State<AddTripPage> {
     if (_tripRequest.title.trim().isEmpty) {
       AppSnackbar.showError(
         context: context,
-        message: 'برجاء كتابة عنوان الرحلة',
+        message: AppStrings.tripTitleRequired,
       );
       return;
     }

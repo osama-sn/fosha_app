@@ -85,7 +85,7 @@ class _AdminBookingsViewState extends State<_AdminBookingsView> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.actionSuccessMessage!),
-                  backgroundColor: Colors.green,
+                  backgroundColor: AppColors.success,
                 ),
               );
             } else if (state is AdminBookingsError) {
@@ -112,7 +112,7 @@ class _AdminBookingsViewState extends State<_AdminBookingsView> {
                     ElevatedButton(
                       onPressed: () =>
                           context.read<AdminBookingsCubit>().fetchBookings(),
-                      child: const Text('إعادة المحاولة'),
+                      child: Text(AppStrings.retry),
                     ),
                   ],
                 ),

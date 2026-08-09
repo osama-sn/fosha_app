@@ -3,9 +3,9 @@ import 'package:fosha_app/core/constants/app_colors.dart';
 import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/features/user/bookings/presentation/pages/bookings_tab.dart';
 import 'package:fosha_app/features/user/profile/presentation/pages/profile_tab.dart';
+import 'package:fosha_app/features/user/search/presentation/pages/search_page.dart';
 import 'tabs/favorites_tab.dart';
 import 'tabs/home_tab.dart';
-import 'tabs/notifications_tab.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,7 +19,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _pages = const [
     HomeTab(),
-    NotificationsTab(),
+    SearchPage(),
     BookingsTab(),
     FavoritesTab(),
     ProfileTab(),
@@ -35,7 +35,7 @@ class _HomePageState extends State<HomePage> {
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppColors.primary,
+        selectedItemColor: AppColors.primaryDark,
         unselectedItemColor: AppColors.textHint,
         items: [
           BottomNavigationBarItem(
@@ -44,9 +44,9 @@ class _HomePageState extends State<HomePage> {
             label: AppStrings.navHome,
           ),
           BottomNavigationBarItem(
-            icon: const Icon(Icons.notifications_outlined),
-            activeIcon: const Icon(Icons.notifications),
-            label: AppStrings.navNotifications,
+            icon: const Icon(Icons.search_outlined),
+            activeIcon: const Icon(Icons.search),
+            label: 'بحث',
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.bookmark_outline),

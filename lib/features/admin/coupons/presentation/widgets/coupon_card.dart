@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/shared/widgets/app_snackbar.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
@@ -28,7 +29,7 @@ class CouponCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppColors.shadow.withValues(alpha: 0.05),
             blurRadius: 10.r,
             offset: Offset(0, 4.h),
           ),
@@ -54,8 +55,11 @@ class CouponCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(Icons.confirmation_number_outlined,
-                    color: Colors.white, size: 24.r),
+                Icon(
+                  Icons.confirmation_number_outlined,
+                  color: Colors.white,
+                  size: 24.r,
+                ),
                 SizedBox(width: 8.w),
                 // Coupon Code Badge
                 Expanded(
@@ -70,14 +74,16 @@ class CouponCard extends StatelessWidget {
                         ),
                       ),
                       IconButton(
-                        icon: Icon(Icons.copy,
-                            color: Colors.white.withValues(alpha: 0.8),
-                            size: 18.r),
+                        icon: Icon(
+                          Icons.copy,
+                          color: Colors.white.withValues(alpha: 0.8),
+                          size: 18.r,
+                        ),
                         onPressed: () {
                           Clipboard.setData(ClipboardData(text: coupon.code));
                           AppSnackbar.showSuccess(
                             context: context,
-                            message: 'تم نسخ الكود ${coupon.code}',
+                            message: '${AppStrings.copiedToClipboard} ${coupon.code}',
                           );
                         },
                       ),
@@ -91,7 +97,7 @@ class CouponCard extends StatelessWidget {
                     vertical: 4.h,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.amber[700],
+                    color: AppColors.secondary,
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Text(
@@ -116,14 +122,14 @@ class CouponCard extends StatelessWidget {
                   children: [
                     _buildInfoTile(
                       icon: Icons.money_off,
-                      label: 'أقصى خصم',
+                      label: AppStrings.maxDiscountLabel,
                       value: coupon.maxDiscountAmount > 0
                           ? '${coupon.maxDiscountAmount.toStringAsFixed(0)} ج.م'
                           : 'بدون حد أقصى',
                     ),
                     _buildInfoTile(
                       icon: Icons.shopping_bag_outlined,
-                      label: 'أقل رحلة',
+                      label: AppStrings.minTripPriceLabel,
                       value: coupon.minTripPrice > 0
                           ? '${coupon.minTripPrice.toStringAsFixed(0)} ج.م'
                           : 'بدون حد أدنى',
@@ -131,18 +137,17 @@ class CouponCard extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 12.h),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     _buildInfoTile(
                       icon: Icons.event_available,
-                      label: 'ينتهي في',
+                      label: AppStrings.validUntilLabel,
                       value: dateFormat.format(coupon.validUntil),
                     ),
                     _buildInfoTile(
                       icon: Icons.people_outline,
-                      label: 'الاستخدامات',
+                      label: AppStrings.usageLimitLabel,
                       value: coupon.usageLimit > 0
                           ? '${coupon.usedCount} من ${coupon.usageLimit}'
                           : '${coupon.usedCount} (غير محدود)',
@@ -150,7 +155,6 @@ class CouponCard extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 12.h),
-
                 const Divider(color: AppColors.border, height: 1),
                 SizedBox(height: 8.h),
 
@@ -159,12 +163,15 @@ class CouponCard extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: TextButton.icon(
                     onPressed: onDelete,
-                    icon: Icon(Icons.delete_outline,
-                        size: 18.r, color: Colors.red),
+                    icon: Icon(
+                      Icons.delete_outline,
+                      size: 18.r,
+                      color: AppColors.error,
+                    ),
                     label: Text(
-                      'حذف الكوبون',
+                      AppStrings.deleteCoupon,
                       style: AppTextStyles.labelMedium.copyWith(
-                        color: Colors.red,
+                        color: AppColors.error,
                       ),
                     ),
                   ),

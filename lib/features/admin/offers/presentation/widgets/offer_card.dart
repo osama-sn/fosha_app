@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/shared/widgets/app_network_image.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
@@ -29,7 +30,7 @@ class OfferCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppColors.shadow.withValues(alpha: 0.05),
             blurRadius: 10.r,
             offset: Offset(0, 4.h),
           ),
@@ -63,11 +64,11 @@ class OfferCard extends StatelessWidget {
                     vertical: 6.h,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.redAccent,
+                    color: AppColors.error,
                     borderRadius: BorderRadius.circular(20.r),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
+                        color: AppColors.shadow.withValues(alpha: 0.2),
                         blurRadius: 4.r,
                       ),
                     ],
@@ -139,12 +140,15 @@ class OfferCard extends StatelessWidget {
                 if (offer.tripTitle != null && offer.tripTitle!.isNotEmpty) ...[
                   Row(
                     children: [
-                      Icon(Icons.directions_bus,
-                          size: 14.r, color: AppColors.primaryDark),
+                      Icon(
+                        Icons.directions_bus,
+                        size: 14.r,
+                        color: AppColors.primaryDark,
+                      ),
                       SizedBox(width: 4.w),
                       Expanded(
                         child: Text(
-                          'الرحلة: ${offer.tripTitle}',
+                          '${AppStrings.tripCategoryLabel}: ${offer.tripTitle}',
                           style: AppTextStyles.labelSmall.copyWith(
                             color: AppColors.primaryDark,
                             fontWeight: FontWeight.bold,
@@ -162,11 +166,14 @@ class OfferCard extends StatelessWidget {
                 if (offer.startDate != null || offer.endDate != null) ...[
                   Row(
                     children: [
-                      Icon(Icons.calendar_today_outlined,
-                          size: 14.r, color: AppColors.textHint),
+                      Icon(
+                        Icons.calendar_today_outlined,
+                        size: 14.r,
+                        color: AppColors.textHint,
+                      ),
                       SizedBox(width: 4.w),
                       Text(
-                        'الصلاحية: ${offer.startDate != null ? dateFormat.format(offer.startDate!) : 'الآن'} - ${offer.endDate != null ? dateFormat.format(offer.endDate!) : 'غير مقتصر'}',
+                        '${AppStrings.validity}: ${offer.startDate != null ? dateFormat.format(offer.startDate!) : 'الآن'} - ${offer.endDate != null ? dateFormat.format(offer.endDate!) : AppStrings.unrestricted}',
                         style: AppTextStyles.labelSmall.copyWith(
                           color: AppColors.textSecondary,
                           fontSize: 11.sp,
@@ -186,10 +193,13 @@ class OfferCard extends StatelessWidget {
                   children: [
                     TextButton.icon(
                       onPressed: onEdit,
-                      icon: Icon(Icons.edit_outlined,
-                          size: 18.r, color: AppColors.primaryDark),
+                      icon: Icon(
+                        Icons.edit_outlined,
+                        size: 18.r,
+                        color: AppColors.primaryDark,
+                      ),
                       label: Text(
-                        'تعديل',
+                        AppStrings.adminEditTrip,
                         style: AppTextStyles.labelMedium.copyWith(
                           color: AppColors.primaryDark,
                         ),
@@ -198,12 +208,15 @@ class OfferCard extends StatelessWidget {
                     SizedBox(width: 8.w),
                     TextButton.icon(
                       onPressed: onDelete,
-                      icon: Icon(Icons.delete_outline,
-                          size: 18.r, color: Colors.red),
+                      icon: Icon(
+                        Icons.delete_outline,
+                        size: 18.r,
+                        color: AppColors.error,
+                      ),
                       label: Text(
-                        'حذف',
+                        AppStrings.adminDeleteTrip,
                         style: AppTextStyles.labelMedium.copyWith(
-                          color: Colors.red,
+                          color: AppColors.error,
                         ),
                       ),
                     ),

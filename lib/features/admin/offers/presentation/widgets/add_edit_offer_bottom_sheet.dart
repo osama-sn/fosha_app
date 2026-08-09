@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/shared/widgets/app_button.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
@@ -125,7 +126,7 @@ class _AddEditOfferBottomSheetState extends State<AddEditOfferBottomSheet> {
 
               // Title
               Text(
-                isEditing ? 'تعديل العرض الترويجي' : 'إضافة عرض ترويجي جديد',
+                isEditing ? AppStrings.editOfferTitle : AppStrings.addOfferTitle,
                 style: AppTextStyles.titleMedium.copyWith(
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -152,7 +153,7 @@ class _AddEditOfferBottomSheetState extends State<AddEditOfferBottomSheet> {
                       : (isEditing && widget.offerToEdit!.image.isNotEmpty
                           ? Center(
                               child: Text(
-                                'تغيير صورة العرض',
+                                AppStrings.changeOfferImage,
                                 style: AppTextStyles.labelMedium.copyWith(
                                   color: AppColors.primaryDark,
                                 ),
@@ -161,11 +162,14 @@ class _AddEditOfferBottomSheetState extends State<AddEditOfferBottomSheet> {
                           : Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.add_photo_alternate_outlined,
-                                    size: 36.r, color: AppColors.primaryDark),
+                                Icon(
+                                  Icons.add_photo_alternate_outlined,
+                                  size: 36.r,
+                                  color: AppColors.primaryDark,
+                                ),
                                 SizedBox(height: 4.h),
                                 Text(
-                                  'اختر صورة العرض (مطلوب)',
+                                  AppStrings.selectOfferImage,
                                   style: AppTextStyles.labelSmall.copyWith(
                                     color: AppColors.textSecondary,
                                   ),
@@ -183,9 +187,9 @@ class _AddEditOfferBottomSheetState extends State<AddEditOfferBottomSheet> {
                     child: TextFormField(
                       controller: _titleArController,
                       validator: (v) => v == null || v.isEmpty
-                          ? 'أدخل العنوان بالعربية'
+                          ? AppStrings.titleArLabel
                           : null,
-                      decoration: _buildInputDecoration('العنوان بالعربية *'),
+                      decoration: _buildInputDecoration(AppStrings.titleArLabel),
                     ),
                   ),
                   SizedBox(width: 12.w),
@@ -193,9 +197,9 @@ class _AddEditOfferBottomSheetState extends State<AddEditOfferBottomSheet> {
                     child: TextFormField(
                       controller: _titleEnController,
                       validator: (v) => v == null || v.isEmpty
-                          ? 'Title in English'
+                          ? AppStrings.titleEnLabel
                           : null,
-                      decoration: _buildInputDecoration('Title (EN) *'),
+                      decoration: _buildInputDecoration(AppStrings.titleEnLabel),
                     ),
                   ),
                 ],
@@ -206,7 +210,7 @@ class _AddEditOfferBottomSheetState extends State<AddEditOfferBottomSheet> {
               TextFormField(
                 controller: _descArController,
                 maxLines: 2,
-                decoration: _buildInputDecoration('الوصف بالعربية'),
+                decoration: _buildInputDecoration(AppStrings.descArLabel),
               ),
               AppSizes.p12.verticalSpace,
 
@@ -218,14 +222,14 @@ class _AddEditOfferBottomSheetState extends State<AddEditOfferBottomSheet> {
                       controller: _discountController,
                       keyboardType: TextInputType.number,
                       validator: (v) {
-                        if (v == null || v.isEmpty) return 'نسبة الخصم';
+                        if (v == null || v.isEmpty) return AppStrings.discountPercentageRequired;
                         final val = double.tryParse(v);
                         if (val == null || val <= 0 || val > 100) {
-                          return 'نسبة بين 1 و 100';
+                          return AppStrings.discountPercentageInvalid;
                         }
                         return null;
                       },
-                      decoration: _buildInputDecoration('نسبة الخصم % *'),
+                      decoration: _buildInputDecoration('${AppStrings.discountPercentageLabel} *'),
                     ),
                   ),
                   SizedBox(width: 12.w),
@@ -233,7 +237,7 @@ class _AddEditOfferBottomSheetState extends State<AddEditOfferBottomSheet> {
                     child: TextFormField(
                       controller: _promoCodeController,
                       textCapitalization: TextCapitalization.characters,
-                      decoration: _buildInputDecoration('كود الخصم (مثال: SUMMER20)'),
+                      decoration: _buildInputDecoration(AppStrings.promoCodeLabel),
                     ),
                   ),
                 ],
@@ -255,13 +259,16 @@ class _AddEditOfferBottomSheetState extends State<AddEditOfferBottomSheet> {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.calendar_month,
-                          color: AppColors.primaryDark, size: 20.r),
+                      Icon(
+                        Icons.calendar_month,
+                        color: AppColors.primaryDark,
+                        size: 20.r,
+                      ),
                       SizedBox(width: 8.w),
                       Text(
                         _selectedEndDate != null
-                            ? 'تاريخ الانتهاء: ${DateFormat('yyyy/MM/dd').format(_selectedEndDate!)}'
-                            : 'تحديد تاريخ انتهاء العرض (اختياري)',
+                            ? '${AppStrings.endDateLabel}: ${DateFormat('yyyy/MM/dd').format(_selectedEndDate!)}'
+                            : AppStrings.selectEndDateOptional,
                         style: AppTextStyles.bodyMedium.copyWith(
                           color: _selectedEndDate != null
                               ? AppColors.textPrimary
@@ -276,13 +283,14 @@ class _AddEditOfferBottomSheetState extends State<AddEditOfferBottomSheet> {
 
               // Submit Button
               AppButton(
-                text: isEditing ? 'حفظ التعديلات' : 'إضافة العرض',
+                text: isEditing ? AppStrings.saveChanges : AppStrings.addOfferTitle,
                 onPressed: () {
                   if (_formKey.currentState?.validate() == true) {
                     if (!isEditing && _selectedImage == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('يرجى اختيار صورة للعرض الترويجي')),
+                        SnackBar(
+                          content: Text(AppStrings.selectOfferImageRequired),
+                        ),
                       );
                       return;
                     }

@@ -31,9 +31,28 @@ import 'package:fosha_app/features/admin/coupons/data/datasources/coupons_remote
 import 'package:fosha_app/features/admin/coupons/data/repositories/coupons_repository.dart';
 import 'package:fosha_app/features/admin/coupons/presentation/cubit/coupons_cubit.dart';
 
+import 'package:fosha_app/features/user/home/data/datasources/home_remote_data_source.dart';
+import 'package:fosha_app/features/user/home/data/repositories/home_repository.dart';
+import 'package:fosha_app/features/user/home/presentation/cubit/home_cubit.dart';
+
+import 'package:fosha_app/features/user/search/data/datasources/search_remote_data_source.dart';
+import 'package:fosha_app/features/user/search/data/repositories/search_repository.dart';
+import 'package:fosha_app/features/user/search/presentation/cubit/search_cubit.dart';
+
+import 'package:fosha_app/features/user/bookings/data/datasources/user_bookings_remote_data_source.dart';
+import 'package:fosha_app/features/user/bookings/data/repositories/user_bookings_repository.dart';
+import 'package:fosha_app/features/user/bookings/presentation/cubit/create_booking_cubit.dart';
+import 'package:fosha_app/features/user/bookings/presentation/cubit/user_bookings_cubit.dart';
+
+import 'package:fosha_app/features/user/favorites/data/datasources/favorites_remote_data_source.dart';
+import 'package:fosha_app/features/user/favorites/data/repositories/favorites_repository.dart';
+import 'package:fosha_app/features/user/favorites/presentation/cubit/favorites_cubit.dart';
+
 final GetIt getIt = GetIt.instance;
+
 Future<void> initServiceLocator() async {
   getIt.registerLazySingleton<DioClient>(() => DioClient());
+
   // data sources
   getIt.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(getIt()),
@@ -62,6 +81,18 @@ Future<void> initServiceLocator() async {
   getIt.registerLazySingleton<CouponsRemoteDataSource>(
     () => CouponsRemoteDataSourceImpl(dioClient: getIt()),
   );
+  getIt.registerLazySingleton<HomeRemoteDataSource>(
+    () => HomeRemoteDataSourceImpl(dioClient: getIt()),
+  );
+  getIt.registerLazySingleton<SearchRemoteDataSource>(
+    () => SearchRemoteDataSourceImpl(dioClient: getIt()),
+  );
+  getIt.registerLazySingleton<UserBookingsRemoteDataSource>(
+    () => UserBookingsRemoteDataSourceImpl(dioClient: getIt()),
+  );
+  getIt.registerLazySingleton<FavoritesRemoteDataSource>(
+    () => FavoritesRemoteDataSourceImpl(dioClient: getIt()),
+  );
 
   // repositories
   getIt.registerLazySingleton<AuthRepository>(
@@ -70,7 +101,6 @@ Future<void> initServiceLocator() async {
   getIt.registerLazySingleton<AdminDashboardStatsRepository>(
     () => AdminDashboardStatsRepository(remoteDataSource: getIt()),
   );
-
   getIt.registerLazySingleton<AdminTripsRepository>(
     () => AdminTripsRepository(dataSource: getIt()),
   );
@@ -91,6 +121,18 @@ Future<void> initServiceLocator() async {
   );
   getIt.registerLazySingleton<CouponsRepository>(
     () => CouponsRepository(dataSource: getIt()),
+  );
+  getIt.registerLazySingleton<HomeRepository>(
+    () => HomeRepository(dataSource: getIt()),
+  );
+  getIt.registerLazySingleton<SearchRepository>(
+    () => SearchRepository(dataSource: getIt()),
+  );
+  getIt.registerLazySingleton<UserBookingsRepository>(
+    () => UserBookingsRepository(dataSource: getIt()),
+  );
+  getIt.registerLazySingleton<FavoritesRepository>(
+    () => FavoritesRepository(dataSource: getIt()),
   );
 
   // cubits
@@ -115,5 +157,19 @@ Future<void> initServiceLocator() async {
   getIt.registerFactory<CouponsCubit>(
     () => CouponsCubit(repository: getIt()),
   );
+  getIt.registerFactory<HomeCubit>(
+    () => HomeCubit(repository: getIt()),
+  );
+  getIt.registerFactory<SearchCubit>(
+    () => SearchCubit(repository: getIt()),
+  );
+  getIt.registerFactory<CreateBookingCubit>(
+    () => CreateBookingCubit(repository: getIt()),
+  );
+  getIt.registerFactory<UserBookingsCubit>(
+    () => UserBookingsCubit(repository: getIt()),
+  );
+  getIt.registerFactory<FavoritesCubit>(
+    () => FavoritesCubit(repository: getIt()),
+  );
 }
-

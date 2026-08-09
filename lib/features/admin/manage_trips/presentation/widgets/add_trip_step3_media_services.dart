@@ -125,7 +125,7 @@ class _AddTripStep3MediaServicesState extends State<AddTripStep3MediaServices> {
                         right: 8,
                         child: CircleAvatar(
                           radius: 16.r,
-                          backgroundColor: Colors.black.withValues(alpha: 0.6),
+                          backgroundColor: AppColors.shadow.withValues(alpha: 0.6),
                           child: IconButton(
                             icon: Icon(
                               Icons.close,
@@ -155,7 +155,7 @@ class _AddTripStep3MediaServicesState extends State<AddTripStep3MediaServices> {
                             right: 8,
                             child: CircleAvatar(
                               radius: 16.r,
-                              backgroundColor: Colors.black.withValues(alpha: 0.6),
+                              backgroundColor: AppColors.shadow.withValues(alpha: 0.6),
                               child: IconButton(
                                 icon: Icon(
                                   Icons.close,
@@ -228,7 +228,7 @@ class _AddTripStep3MediaServicesState extends State<AddTripStep3MediaServices> {
                         },
                         child: CircleAvatar(
                           radius: 12.r,
-                          backgroundColor: Colors.red,
+                          backgroundColor: AppColors.error,
                           child: Icon(
                             Icons.close,
                             size: 12.r,
@@ -259,7 +259,7 @@ class _AddTripStep3MediaServicesState extends State<AddTripStep3MediaServices> {
                         },
                         child: CircleAvatar(
                           radius: 12.r,
-                          backgroundColor: Colors.red,
+                          backgroundColor: AppColors.error,
                           child: Icon(
                             Icons.close,
                             size: 12.r,

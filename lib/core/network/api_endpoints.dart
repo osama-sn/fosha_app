@@ -42,8 +42,10 @@ class ApiEndpoints {
   static const String googleAuth = '/auth/google';
   static const String refreshToken = '/auth/refresh-token';
   static const String profile = '/user/profile';
+  static const String home = '/home';
   static const String categories = '/categories';
   static const String companies = '/companies';
+  static const String favorites = '/favorites';
 
   /// admin
   static const String adminStats = '/admin/stats';

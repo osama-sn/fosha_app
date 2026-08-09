@@ -38,4 +38,8 @@ class CompanyProfileRepository {
       throw Exception(e.toString().replaceAll('Exception: ', ''));
     }
   }
+
+  Future<List<Map<String, dynamic>>> getCompanyReviews(String companyId) async {
+    return await dataSource.getCompanyReviews(companyId);
+  }
 }

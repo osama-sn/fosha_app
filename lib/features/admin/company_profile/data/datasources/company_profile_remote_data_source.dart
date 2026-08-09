@@ -9,6 +9,7 @@ abstract class CompanyProfileRemoteDataSource {
     String companyId,
     Map<String, dynamic> data,
   );
+  Future<List<Map<String, dynamic>>> getCompanyReviews(String companyId);
 }
 
 class CompanyProfileRemoteDataSourceImpl
@@ -71,5 +72,28 @@ class CompanyProfileRemoteDataSourceImpl
     }
 
     return CompanyProfileModel.fromJson(companyJson);
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getCompanyReviews(String companyId) async {
+    try {
+      final response = await _dioClient.dio.get(
+        '${ApiEndpoints.companies}/$companyId/reviews',
+      );
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic> && responseData['data'] != null) {
+        final data = responseData['data'];
+        if (data is List) {
+          return data.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+        } else if (data is Map && data['reviews'] is List) {
+          return (data['reviews'] as List)
+              .map((e) => Map<String, dynamic>.from(e as Map))
+              .toList();
+        }
+      }
+      return [];
+    } catch (_) {
+      return [];
+    }
   }
 }

@@ -5,10 +5,12 @@ import 'package:fosha_app/core/constants/app_colors.dart';
 import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/router/route_names.dart';
 import 'package:fosha_app/core/shared/widgets/app_network_image.dart';
+import 'package:fosha_app/features/admin/bookings/data/models/booking_model.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 
 class AdminBookingCard extends StatelessWidget {
+  final BookingModel? booking;
   final String customerName;
   final String customerEmail;
   final String customerPhone;
@@ -24,6 +26,7 @@ class AdminBookingCard extends StatelessWidget {
 
   const AdminBookingCard({
     super.key,
+    this.booking,
     required this.customerName,
     required this.customerEmail,
     required this.customerPhone,
@@ -44,20 +47,7 @@ class AdminBookingCard extends StatelessWidget {
       onTap:
           onTap ??
           () {
-            context.push(
-              RouteNames.adminBookingDetails,
-              extra: {
-                'customerName': customerName,
-                'customerEmail': customerEmail,
-                'customerPhone': customerPhone,
-                'tripTitle': tripTitle,
-                'tripDates': tripDates,
-                'totalAmount': totalAmount,
-                'passengersCount': passengersCount,
-                'tripImage': tripImage,
-                'status': status,
-              },
-            );
+            context.push(RouteNames.adminBookingDetails, extra: booking);
           },
       borderRadius: BorderRadius.circular(AppSizes.r12),
       child: Container(
@@ -82,10 +72,7 @@ class AdminBookingCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Status Badge
                 _buildStatusBadge(),
-
-                // Customer Details
                 Row(
                   children: [
                     Column(
@@ -142,7 +129,6 @@ class AdminBookingCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Trip Details Column
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -182,7 +168,6 @@ class AdminBookingCard extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          // Passengers Count
                           Flexible(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
@@ -209,7 +194,6 @@ class AdminBookingCard extends StatelessWidget {
                             ),
                           ),
                           SizedBox(width: AppSizes.p16),
-                          // Total Price
                           Flexible(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
@@ -241,8 +225,6 @@ class AdminBookingCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: AppSizes.p16),
-
-                // Trip Image Thumbnail
                 AppNetworkImage(
                   imageUrl: tripImage,
                   width: 90.w,
@@ -253,8 +235,6 @@ class AdminBookingCard extends StatelessWidget {
               ],
             ),
             SizedBox(height: AppSizes.p16),
-
-            // Bottom Action Bar / Status Banners
             _buildBottomSection(),
           ],
         ),
@@ -269,19 +249,20 @@ class AdminBookingCard extends StatelessWidget {
 
     switch (status) {
       case 'accepted':
-        bg = const Color(0xFFDCFCE7);
-        text = const Color(0xFF15803D);
+      case 'approved':
+        bg = AppColors.success.withValues(alpha: 0.12);
+        text = AppColors.success;
         label = AppStrings.adminFilterAccepted;
         break;
       case 'rejected':
-        bg = const Color(0xFFFEE2E2);
-        text = const Color(0xFFB91C1C);
+        bg = AppColors.error.withValues(alpha: 0.12);
+        text = AppColors.error;
         label = AppStrings.adminFilterRejected;
         break;
       case 'pending':
       default:
-        bg = const Color(0xFFFFDDB9);
-        text = const Color(0xFF663E00);
+        bg = AppColors.warning.withValues(alpha: 0.15);
+        text = AppColors.warning;
         label = AppStrings.adminFilterPending;
         break;
     }
@@ -349,20 +330,20 @@ class AdminBookingCard extends StatelessWidget {
           ),
         ],
       );
-    } else if (status == 'accepted') {
+    } else if (status == 'accepted' || status == 'approved') {
       return Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(vertical: AppSizes.p8),
         decoration: BoxDecoration(
-          color: const Color(0xFFF0FDF4),
+          color: AppColors.success.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AppSizes.r8),
-          border: Border.all(color: const Color(0xFFDCFCE7)),
+          border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
         ),
         child: Center(
           child: Text(
             AppStrings.adminAcceptedBanner,
             style: AppTextStyles.bodyMedium.copyWith(
-              color: const Color(0xFF15803D),
+              color: AppColors.success,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -373,15 +354,15 @@ class AdminBookingCard extends StatelessWidget {
         width: double.infinity,
         padding: EdgeInsets.symmetric(vertical: AppSizes.p8),
         decoration: BoxDecoration(
-          color: const Color(0xFFFEF2F2),
+          color: AppColors.error.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AppSizes.r8),
-          border: Border.all(color: const Color(0xFFFEE2E2)),
+          border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
         ),
         child: Center(
           child: Text(
             AppStrings.adminRejectedBanner,
             style: AppTextStyles.bodyMedium.copyWith(
-              color: const Color(0xFFB91C1C),
+              color: AppColors.error,
               fontWeight: FontWeight.bold,
             ),
           ),

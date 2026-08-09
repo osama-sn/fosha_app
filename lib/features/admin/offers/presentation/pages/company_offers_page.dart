@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/di/service_locator.dart';
 import 'package:fosha_app/core/shared/widgets/app_loading.dart';
 import 'package:fosha_app/core/shared/widgets/app_snackbar.dart';
@@ -11,6 +12,8 @@ import 'package:fosha_app/features/admin/offers/data/models/offer_model.dart';
 import 'package:fosha_app/features/admin/offers/presentation/cubit/offers_cubit.dart';
 import 'package:fosha_app/features/admin/offers/presentation/cubit/offers_state.dart';
 import 'package:fosha_app/features/admin/offers/presentation/widgets/add_edit_offer_bottom_sheet.dart';
+import 'package:fosha_app/features/admin/offers/presentation/widgets/company_offers_delete_dialog.dart';
+import 'package:fosha_app/features/admin/offers/presentation/widgets/company_offers_empty_view.dart';
 import 'package:fosha_app/features/admin/offers/presentation/widgets/offer_card.dart';
 
 class CompanyOffersPage extends StatelessWidget {
@@ -36,25 +39,10 @@ class CompanyOffersPage extends StatelessWidget {
 
   void _confirmDelete(BuildContext context, OfferModel offer) {
     final offersCubit = context.read<OffersCubit>();
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('حذف العرض'),
-        content: Text('هل أنت تأكد من رغبتك في حذف العرض "${offer.titleAr}"؟'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('إلغاء'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-              offersCubit.deleteOffer(offer.id);
-            },
-            child: const Text('حذف', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+    CompanyOffersDeleteDialog.show(
+      context,
+      offerTitle: offer.titleAr,
+      onConfirmDelete: () => offersCubit.deleteOffer(offer.id),
     );
   }
 
@@ -72,7 +60,7 @@ class CompanyOffersPage extends StatelessWidget {
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: Text(
-            'عروض الشركة الترويجية',
+            AppStrings.companyOffersTitle,
             style: AppTextStyles.titleMedium.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
@@ -87,7 +75,7 @@ class CompanyOffersPage extends StatelessWidget {
               onPressed: () => _openAddEditBottomSheet(context),
               icon: const Icon(Icons.add, color: Colors.white),
               label: Text(
-                'عرض جديد',
+                AppStrings.newOffer,
                 style: AppTextStyles.labelMedium.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -119,33 +107,7 @@ class CompanyOffersPage extends StatelessWidget {
             }
 
             if (offers.isEmpty) {
-              return Center(
-                child: Padding(
-                  padding: EdgeInsets.all(AppSizes.p20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.local_offer_outlined,
-                          size: 64.r, color: AppColors.textHint),
-                      AppSizes.p16.verticalSpace,
-                      Text(
-                        'لا توجد عروض ترويجية حالية',
-                        style: AppTextStyles.titleMedium.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      AppSizes.p8.verticalSpace,
-                      Text(
-                        'يمكنك إضافة عروض ترويجية وتخفيضات لجذب عملاء جدد',
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
+              return const CompanyOffersEmptyView();
             }
 
             return RefreshIndicator(

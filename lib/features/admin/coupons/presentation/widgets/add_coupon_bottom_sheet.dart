@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/shared/widgets/app_button.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
@@ -97,7 +98,7 @@ class _AddCouponBottomSheetState extends State<AddCouponBottomSheet> {
               AppSizes.p12.verticalSpace,
 
               Text(
-                'إضافة كوبون خصم جديد',
+                AppStrings.addCouponTitle,
                 style: AppTextStyles.titleMedium.copyWith(
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -112,15 +113,15 @@ class _AddCouponBottomSheetState extends State<AddCouponBottomSheet> {
                 textCapitalization: TextCapitalization.characters,
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) {
-                    return 'يرجى إدخال كود الكوبون';
+                    return AppStrings.couponCodeRequired;
                   }
                   if (v.trim().length < 3) {
-                    return 'الكود يجب أن يتكون من 3 أحرف على الأقل';
+                    return AppStrings.couponCodeMinLength;
                   }
                   return null;
                 },
                 decoration: _buildInputDecoration(
-                  label: 'كود الكوبون (مثال: COMPANY20) *',
+                  label: '${AppStrings.couponCodeLabel} (${AppStrings.couponCodeHint}) *',
                   prefixIcon: Icons.confirmation_number_outlined,
                 ),
               ),
@@ -134,15 +135,15 @@ class _AddCouponBottomSheetState extends State<AddCouponBottomSheet> {
                       controller: _discountController,
                       keyboardType: TextInputType.number,
                       validator: (v) {
-                        if (v == null || v.isEmpty) return 'نسبة الخصم';
+                        if (v == null || v.isEmpty) return AppStrings.discountPercentageRequired;
                         final val = double.tryParse(v);
                         if (val == null || val <= 0 || val > 100) {
-                          return 'نسبة بين 1 و 100';
+                          return AppStrings.discountPercentageInvalid;
                         }
                         return null;
                       },
                       decoration: _buildInputDecoration(
-                        label: 'نسبة الخصم % *',
+                        label: '${AppStrings.discountPercentageLabel} *',
                         prefixIcon: Icons.percent,
                       ),
                     ),
@@ -153,7 +154,7 @@ class _AddCouponBottomSheetState extends State<AddCouponBottomSheet> {
                       controller: _usageLimitController,
                       keyboardType: TextInputType.number,
                       decoration: _buildInputDecoration(
-                        label: 'حد الاستخدام (0 = غير محدود)',
+                        label: AppStrings.usageLimitLabel,
                         prefixIcon: Icons.people_outline,
                       ),
                     ),
@@ -170,7 +171,7 @@ class _AddCouponBottomSheetState extends State<AddCouponBottomSheet> {
                       controller: _maxDiscountController,
                       keyboardType: TextInputType.number,
                       decoration: _buildInputDecoration(
-                        label: 'أقصى مبلغ خصم (0 = بدون حد)',
+                        label: AppStrings.maxDiscountLabel,
                         prefixIcon: Icons.attach_money,
                       ),
                     ),
@@ -181,7 +182,7 @@ class _AddCouponBottomSheetState extends State<AddCouponBottomSheet> {
                       controller: _minPriceController,
                       keyboardType: TextInputType.number,
                       decoration: _buildInputDecoration(
-                        label: 'أقل سعر للرحلة (0 = الكل)',
+                        label: AppStrings.minTripPriceLabel,
                         prefixIcon: Icons.shopping_bag_outlined,
                       ),
                     ),
@@ -202,11 +203,14 @@ class _AddCouponBottomSheetState extends State<AddCouponBottomSheet> {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.event_available,
-                          color: AppColors.primaryDark, size: 20.r),
+                      Icon(
+                        Icons.event_available,
+                        color: AppColors.primaryDark,
+                        size: 20.r,
+                      ),
                       SizedBox(width: 8.w),
                       Text(
-                        'صالح حتى: ${DateFormat('yyyy/MM/dd').format(_selectedValidUntil)}',
+                        '${AppStrings.validUntilLabel}: ${DateFormat('yyyy/MM/dd').format(_selectedValidUntil)}',
                         style: AppTextStyles.bodyMedium.copyWith(
                           color: AppColors.textPrimary,
                           fontWeight: FontWeight.bold,
@@ -220,7 +224,7 @@ class _AddCouponBottomSheetState extends State<AddCouponBottomSheet> {
 
               // Submit Button
               AppButton(
-                text: 'إضافة الكوبون',
+                text: AppStrings.addCouponTitle,
                 onPressed: () {
                   if (_formKey.currentState?.validate() == true) {
                     final discount =
