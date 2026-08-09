@@ -218,7 +218,7 @@ class AdminDashboardPage extends StatelessWidget {
                 title: 'العروض الترويجية',
                 subtitle: 'إدارة وتخصيص الخصومات',
                 icon: Icons.local_offer_outlined,
-                color: Colors.orange[800]!,
+                color: AppColors.secondary,
                 onTap: () => context.push(RouteNames.companyOffers),
               ),
             ),

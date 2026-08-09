@@ -24,7 +24,7 @@ class AdminSubscriptionCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Text(
-              'الاشتراك',
+              'الاشتراك والعمولة',
               style: AppTextStyles.titleMedium.copyWith(
                 fontWeight: FontWeight.bold,
                 color: AppColors.primaryDark,
@@ -67,7 +67,7 @@ class AdminSubscriptionCard extends StatelessWidget {
                         vertical: AppSizes.p6,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFDCFCE7),
+                        color: AppColors.success.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(AppSizes.r20),
                       ),
                       child: Row(
@@ -76,13 +76,13 @@ class AdminSubscriptionCard extends StatelessWidget {
                           Icon(
                             Icons.check_circle_outline,
                             size: 14.r,
-                            color: const Color(0xFF16A34A),
+                            color: AppColors.success,
                           ),
                           AppSizes.p4.horizontalSpace,
                           Text(
                             'نشط',
                             style: AppTextStyles.labelSmall.copyWith(
-                              color: const Color(0xFF16A34A),
+                              color: AppColors.success,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -114,13 +114,13 @@ class AdminSubscriptionCard extends StatelessWidget {
                     Container(
                       width: 36.r,
                       height: 36.r,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Color(0xFFE0F2FE),
+                        color: AppColors.primary.withValues(alpha: 0.1),
                       ),
                       child: Icon(
                         Icons.calendar_today,
-                        color: const Color(0xFF0284C7),
+                        color: AppColors.primary,
                         size: 16.r,
                       ),
                     ),
@@ -157,15 +157,15 @@ class AdminSubscriptionCard extends StatelessWidget {
                     Container(
                       width: 36.r,
                       height: 36.r,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Color(0xFFE0F2FE),
+                        color: AppColors.secondary.withValues(alpha: 0.15),
                       ),
                       child: Center(
                         child: Text(
                           '%',
                           style: AppTextStyles.bodyMedium.copyWith(
-                            color: const Color(0xFF0284C7),
+                            color: AppColors.secondary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -184,7 +184,7 @@ class AdminSubscriptionCard extends StatelessWidget {
                       '${commissionValue.toStringAsFixed(0)}%',
                       style: AppTextStyles.bodyMedium.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF0284C7),
+                        color: AppColors.secondary,
                       ),
                     ),
                   ],

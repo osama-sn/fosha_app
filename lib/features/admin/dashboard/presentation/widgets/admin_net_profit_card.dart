@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fosha_app/core/constants/app_colors.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 
@@ -19,37 +20,37 @@ class AdminNetProfitCard extends StatelessWidget {
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
           colors: [
-            Color(0xFF0F3854),
-            Color(0xFF0E4C7A),
-            Color(0xFF135A92),
+            AppColors.primaryDark,
+            AppColors.primary,
+            AppColors.primaryLight,
           ],
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0E4C7A).withValues(alpha: 0.35),
-            blurRadius: 12.r,
-            offset: Offset(0, 4.h),
+            color: AppColors.primaryDark.withValues(alpha: 0.3),
+            blurRadius: 14.r,
+            offset: Offset(0, 5.h),
           ),
         ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Left: Wallet icon in circular avatar
+          // Left: Wallet icon in elegant golden tinted avatar
           Container(
-            width: 52.r,
-            height: 52.r,
+            width: 54.r,
+            height: 54.r,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.15),
+              color: AppColors.secondary.withValues(alpha: 0.2),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.25),
-                width: 1,
+                color: AppColors.secondary.withValues(alpha: 0.5),
+                width: 1.5,
               ),
             ),
             child: Icon(
               Icons.account_balance_wallet_outlined,
-              color: Colors.white,
+              color: AppColors.secondaryLight,
               size: 26.r,
             ),
           ),
@@ -61,7 +62,7 @@ class AdminNetProfitCard extends StatelessWidget {
               Text(
                 'صافي أرباح الشركة',
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: Colors.white.withValues(alpha: 0.85),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -75,11 +76,18 @@ class AdminNetProfitCard extends StatelessWidget {
                 ),
               ),
               AppSizes.p4.verticalSpace,
-              Text(
-                'بعد خصم عمولة المنصة',
-                style: AppTextStyles.labelSmall.copyWith(
-                  color: Colors.white.withValues(alpha: 0.75),
-                  fontSize: 10.sp,
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                child: Text(
+                  'بعد استقطاع عمولة المنصة',
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: AppColors.secondaryLight,
+                    fontSize: 10.sp,
+                  ),
                 ),
               ),
             ],

@@ -49,19 +49,19 @@ class AdminFinancialsSection extends StatelessWidget {
                 iconWidget: Container(
                   width: 42.r,
                   height: 42.r,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Color(0xFFE0F2FE),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                   ),
                   child: Icon(
                     Icons.account_balance_wallet_outlined,
-                    color: const Color(0xFF0284C7),
+                    color: AppColors.primary,
                     size: 20.r,
                   ),
                 ),
                 title: 'إجمالي المبيعات',
                 value: '${grossRevenue.toStringAsFixed(0)} ج.م',
-                valueColor: const Color(0xFF0284C7),
+                valueColor: AppColors.primary,
                 subtitle: 'إجمالي المبيعات الكلية',
               ),
             ),
@@ -73,15 +73,15 @@ class AdminFinancialsSection extends StatelessWidget {
                 iconWidget: Container(
                   width: 42.r,
                   height: 42.r,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Color(0xFFFFEDD5),
+                    color: AppColors.secondary.withValues(alpha: 0.15),
                   ),
                   child: Center(
                     child: Text(
                       '%',
                       style: AppTextStyles.titleMedium.copyWith(
-                        color: const Color(0xFFEA580C),
+                        color: AppColors.secondary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -89,7 +89,7 @@ class AdminFinancialsSection extends StatelessWidget {
                 ),
                 title: 'عمولة المنصة',
                 value: '${adminCommissionPaid.toStringAsFixed(0)} ج.م',
-                valueColor: const Color(0xFFEA580C),
+                valueColor: AppColors.secondary,
                 subtitle: 'إجمالي عمولة المنصة',
               ),
             ),
