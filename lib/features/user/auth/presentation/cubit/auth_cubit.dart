@@ -55,4 +55,30 @@ class AuthCubit extends Cubit<AuthState> {
     await authRepository.logout();
     emit(AuthInitial());
   }
+
+  Future<void> forgotPassword({required String email}) async {
+    emit(AuthLoading());
+    final result = await authRepository.forgotPassword(email: email);
+    result.fold(
+      (failure) => emit(AuthFailure(errorMessage: failure.message)),
+      (success) => emit(ForgotPasswordOtpSentState(email: email)),
+    );
+  }
+
+  Future<void> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) async {
+    emit(AuthLoading());
+    final result = await authRepository.resetPassword(
+      email: email,
+      otp: otp,
+      newPassword: newPassword,
+    );
+    result.fold(
+      (failure) => emit(AuthFailure(errorMessage: failure.message)),
+      (success) => emit(ResetPasswordSuccessState()),
+    );
+  }
 }

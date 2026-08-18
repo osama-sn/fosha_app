@@ -10,6 +10,7 @@ import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 import 'package:fosha_app/features/admin/bookings/data/models/booking_model.dart';
 import 'package:fosha_app/features/user/bookings/presentation/cubit/user_bookings_cubit.dart';
+import 'package:fosha_app/features/chat/presentation/pages/chat_page.dart';
 
 class UserBookingDetailsPage extends StatelessWidget {
   final BookingModel booking;
@@ -200,7 +201,22 @@ class _UserBookingDetailsBody extends StatelessWidget {
                       borderRadius: BorderRadius.circular(14.r),
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ChatPage(
+                          companyId: booking.companyId,
+                          bookingId: booking.id,
+                          tripId: booking.tripId,
+                          companyName: booking.companyName.isNotEmpty
+                              ? booking.companyName
+                              : 'الشركة المنظمة',
+                          companyPhone: booking.customerPhone,
+                        ),
+                      ),
+                    );
+                  },
                   icon: const Icon(Icons.chat_bubble_outline),
                   label: Text(
                     'تواصل مع الشركة',

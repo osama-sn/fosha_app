@@ -67,7 +67,13 @@ class SearchTripCard extends StatefulWidget {
 }
 
 class _SearchTripCardState extends State<SearchTripCard> {
-  bool _isFavorite = false;
+  late bool _isFavorite;
+
+  @override
+  void initState() {
+    super.initState();
+    _isFavorite = widget.trip.isFavorite;
+  }
 
   @override
   Widget build(BuildContext context) {

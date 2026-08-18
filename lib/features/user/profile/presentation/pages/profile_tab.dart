@@ -15,7 +15,10 @@ import 'package:fosha_app/core/theme/app_text_styles.dart';
 import 'package:fosha_app/features/user/auth/data/models/user_model.dart';
 import 'package:fosha_app/features/user/auth/presentation/cubit/auth_cubit.dart';
 import 'package:fosha_app/features/user/auth/presentation/cubit/auth_states.dart';
+import 'package:fosha_app/core/network/api_endpoints.dart';
 import 'package:fosha_app/features/user/profile/presentation/widgets/profile_menu_item_widget.dart';
+import 'package:fosha_app/features/chat/presentation/pages/user_chats_list_page.dart';
+import 'package:fosha_app/features/user/profile/presentation/pages/edit_profile_page.dart';
 
 class ProfileTab extends StatelessWidget {
   const ProfileTab({super.key});
@@ -56,7 +59,7 @@ class ProfileTab extends StatelessWidget {
                     children: [
                       _buildHeader(user),
                       AppSizes.p32.verticalSpace,
-                      _buildOptionsList(),
+                      _buildOptionsList(context),
                       AppSizes.p32.verticalSpace,
                       _buildLogoutButton(context),
                       AppSizes.p32.verticalSpace,
@@ -72,6 +75,11 @@ class ProfileTab extends StatelessWidget {
   }
 
   Widget _buildHeader(UserModel? user) {
+    final profileImgUrl = ApiEndpoints.getImageUrl(user?.profileImage);
+    final isValidUrl = profileImgUrl.isNotEmpty &&
+        (profileImgUrl.startsWith('http://') ||
+            profileImgUrl.startsWith('https://'));
+
     return Column(
       children: [
         Stack(
@@ -80,8 +88,8 @@ class ProfileTab extends StatelessWidget {
             CircleAvatar(
               radius: 50.r,
               backgroundColor: AppColors.border,
-              backgroundImage: (user != null && user.profileImage.isNotEmpty)
-                  ? NetworkImage(user.profileImage) as ImageProvider
+              backgroundImage: isValidUrl
+                  ? NetworkImage(profileImgUrl) as ImageProvider
                   : AssetImage(AppAssets.placeholder),
             ),
             Container(
@@ -121,12 +129,61 @@ class ProfileTab extends StatelessWidget {
     );
   }
 
-  Widget _buildOptionsList() {
+  Widget _buildOptionsList(BuildContext context) {
     return Column(
       children: [
-        ProfileMenuItemWidget(title: AppStrings.profilePersonalData, icon: Icons.person_outline),
+        ProfileMenuItemWidget(
+          title: 'محادثاتي المباشرة',
+          icon: Icons.chat_bubble_outline,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const UserChatsListPage(),
+              ),
+            );
+          },
+        ),
         AppSizes.p12.verticalSpace,
-        ProfileMenuItemWidget(title: AppStrings.profileEditAccount, icon: Icons.edit_outlined),
+        ProfileMenuItemWidget(
+          title: AppStrings.profilePersonalData,
+          icon: Icons.person_outline,
+          onTap: () {
+            final user = context.read<AuthCubit>().state is AuthSuccess
+                ? (context.read<AuthCubit>().state as AuthSuccess).user
+                : null;
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => EditProfilePage(user: user),
+              ),
+            ).then((updated) {
+              if (updated == true && context.mounted) {
+                context.read<AuthCubit>().checkAuthStatus();
+              }
+            });
+          },
+        ),
+        AppSizes.p12.verticalSpace,
+        ProfileMenuItemWidget(
+          title: AppStrings.profileEditAccount,
+          icon: Icons.edit_outlined,
+          onTap: () {
+            final user = context.read<AuthCubit>().state is AuthSuccess
+                ? (context.read<AuthCubit>().state as AuthSuccess).user
+                : null;
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => EditProfilePage(user: user),
+              ),
+            ).then((updated) {
+              if (updated == true && context.mounted) {
+                context.read<AuthCubit>().checkAuthStatus();
+              }
+            });
+          },
+        ),
         AppSizes.p12.verticalSpace,
         ProfileMenuItemWidget(title: AppStrings.profileChangePassword, icon: Icons.lock_outline),
         AppSizes.p12.verticalSpace,

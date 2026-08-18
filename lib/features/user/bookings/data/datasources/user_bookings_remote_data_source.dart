@@ -72,14 +72,33 @@ class UserBookingsRemoteDataSourceImpl implements UserBookingsRemoteDataSource {
       );
 
       final resData = response.data as Map<String, dynamic>;
-      final dataMap = (resData['data'] is Map<String, dynamic>)
-          ? resData['data'] as Map<String, dynamic>
-          : <String, dynamic>{};
+      List bookingsList = [];
+      if (resData['data'] is Map && resData['data']['bookings'] is List) {
+        bookingsList = resData['data']['bookings'] as List;
+      } else if (resData['data'] is List) {
+        bookingsList = resData['data'] as List;
+      } else if (resData['bookings'] is List) {
+        bookingsList = resData['bookings'] as List;
+      }
 
-      final bookingsList = dataMap['bookings'] as List? ?? [];
-      return bookingsList
+      final allBookings = bookingsList
           .map((item) => BookingModel.fromJson(Map<String, dynamic>.from(item as Map)))
           .toList();
+
+      if (status == null || status.isEmpty || status == 'all') {
+        return allBookings;
+      }
+
+      final targetStatus = status.toLowerCase();
+      return allBookings.where((b) {
+        final s = b.status.toLowerCase();
+        if (targetStatus == 'approved' ||
+            targetStatus == 'accepted' ||
+            targetStatus == 'confirmed') {
+          return s == 'approved' || s == 'accepted' || s == 'confirmed';
+        }
+        return s == targetStatus;
+      }).toList();
     } on DioException catch (e) {
       final errorMsg =
           e.response?.data?['message']?.toString() ?? e.message ?? 'فشل جلب الحجوزات';

@@ -151,6 +151,8 @@ class TripModel {
   final String companyId;
   final String companyName;
   final String companyLogo;
+  final bool isFavorite;
+  final bool isBooked;
 
   const TripModel({
     required this.id,
@@ -181,6 +183,8 @@ class TripModel {
     this.companyId = '',
     this.companyName = '',
     this.companyLogo = '',
+    this.isFavorite = false,
+    this.isBooked = false,
   });
   List<String> get galleryWithBaseUrl =>
       gallery.map((e) => ApiEndpoints.getImageUrl(e)).toList();
@@ -271,6 +275,8 @@ class TripModel {
       companyId: cId,
       companyName: cName,
       companyLogo: cLogo,
+      isFavorite: json['isFavorite'] as bool? ?? false,
+      isBooked: json['isBooked'] as bool? ?? false,
     );
   }
 

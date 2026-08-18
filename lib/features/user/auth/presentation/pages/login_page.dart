@@ -19,6 +19,7 @@ import 'package:fosha_app/core/utils/app_validators.dart';
 import 'package:fosha_app/features/user/auth/presentation/cubit/auth_cubit.dart';
 import 'package:fosha_app/features/user/auth/presentation/cubit/auth_states.dart';
 import 'package:fosha_app/features/user/auth/presentation/widgets/social_auth_buttons.dart';
+import 'package:fosha_app/features/user/auth/presentation/pages/forgot_password_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -119,7 +120,14 @@ class _LoginPageState extends State<LoginPage> {
                           Align(
                             alignment: AlignmentDirectional.centerEnd,
                             child: TextButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const ForgotPasswordPage(),
+                                  ),
+                                );
+                              },
                               child: Text(
                                 AppStrings.forgotPassword,
                                 style: AppTextStyles.bodyMedium.copyWith(

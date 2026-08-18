@@ -12,6 +12,14 @@ abstract class AuthRemoteDataSource {
   Future<AuthResponseModel> register(RegisterRequestModel request);
 
   Future<AuthResponseModel> loginWithGoogle({required String idToken});
+
+  Future<bool> forgotPassword({required String email});
+
+  Future<bool> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  });
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -57,6 +65,40 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         data: {'idToken': idToken},
       );
       return AuthResponseModel.fromJson(response.data as Map<String, dynamic>);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<bool> forgotPassword({required String email}) async {
+    try {
+      final response = await _dioClient.dio.post(
+        ApiEndpoints.forgotPassword,
+        data: {'email': email},
+      );
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<bool> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) async {
+    try {
+      final response = await _dioClient.dio.post(
+        ApiEndpoints.resetPassword,
+        data: {
+          'email': email,
+          'otp': otp,
+          'newPassword': newPassword,
+        },
+      );
+      return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
       rethrow;
     }

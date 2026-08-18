@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
 import 'package:fosha_app/core/constants/app_governorates.dart';
 import 'package:fosha_app/core/constants/app_strings.dart';
+import 'package:fosha_app/core/network/api_endpoints.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
+import 'package:fosha_app/features/user/auth/data/models/user_model.dart';
+import 'package:fosha_app/features/user/auth/presentation/cubit/auth_cubit.dart';
+import 'package:fosha_app/features/user/auth/presentation/cubit/auth_states.dart';
 
 class HomeHeaderWidget extends StatelessWidget {
   final String currentGovernorate;
@@ -25,14 +30,34 @@ class HomeHeaderWidget extends StatelessWidget {
         children: [
           Row(
             children: [
-              CircleAvatar(
-                radius: 20.r,
-                backgroundColor: AppColors.primaryLight.withValues(alpha: 0.2),
-                child: Icon(
-                  Icons.person_outline,
-                  color: AppColors.primaryDark,
-                  size: 22.sp,
-                ),
+              BlocBuilder<AuthCubit, AuthState>(
+                builder: (context, authState) {
+                  UserModel? user;
+                  if (authState is AuthSuccess) {
+                    user = authState.user;
+                  }
+                  final profileImgUrl =
+                      ApiEndpoints.getImageUrl(user?.profileImage);
+                  final hasImage = profileImgUrl.isNotEmpty &&
+                      (profileImgUrl.startsWith('http://') ||
+                          profileImgUrl.startsWith('https://'));
+
+                  return CircleAvatar(
+                    radius: 22.r,
+                    backgroundColor:
+                        AppColors.primaryLight.withValues(alpha: 0.2),
+                    backgroundImage: hasImage
+                        ? NetworkImage(profileImgUrl) as ImageProvider
+                        : null,
+                    child: !hasImage
+                        ? Icon(
+                            Icons.person_outline,
+                            color: AppColors.primaryDark,
+                            size: 22.sp,
+                          )
+                        : null,
+                  );
+                },
               ),
               AppSizes.p12.horizontalSpace,
               Column(

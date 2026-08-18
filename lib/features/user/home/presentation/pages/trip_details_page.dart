@@ -29,7 +29,7 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
   final ScrollController _scrollController = ScrollController();
   bool _isScrolled = false;
   int _selectedDayIndex = 0;
-  bool _isFavorite = false;
+  bool? _isFavorite;
 
   @override
   void initState() {
@@ -95,6 +95,7 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final trip = _getEffectiveTrip(context);
+    _isFavorite ??= trip.isFavorite;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -111,6 +112,7 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
 
   Widget _buildSliverAppBar(TripModel trip) {
     final gallery = trip.galleryWithBaseUrl;
+    final isFav = _isFavorite ?? trip.isFavorite;
 
     return SliverAppBar(
       expandedHeight: 320.h,
@@ -150,28 +152,29 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
               shape: BoxShape.circle,
             ),
             child: Icon(
-              _isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: _isFavorite
+              isFav ? Icons.favorite : Icons.favorite_border,
+              color: isFav
                   ? Colors.red
                   : (_isScrolled ? AppColors.textPrimary : Colors.white),
             ),
           ),
           onPressed: () async {
             final trip = _getEffectiveTrip(context);
+            final currentFav = _isFavorite ?? trip.isFavorite;
             setState(() {
-              _isFavorite = !_isFavorite;
+              _isFavorite = !currentFav;
             });
             try {
               final repo = getIt<FavoritesRepository>();
-              final isFav = await repo.toggleFavorite(trip.id);
+              final isFavResult = await repo.toggleFavorite(trip.id);
               setState(() {
-                _isFavorite = isFav;
+                _isFavorite = isFavResult;
               });
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      isFav
+                      isFavResult
                           ? 'تمت إضافة الرحلة للمفضلة ❤️'
                           : 'تمت إزالة الرحلة من المفضلة',
                     ),

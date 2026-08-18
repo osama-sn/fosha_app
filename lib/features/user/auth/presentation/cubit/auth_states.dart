@@ -24,3 +24,12 @@ class AuthFailure extends AuthState {
   @override
   List<Object?> get props => [errorMessage];
 }
+
+class ForgotPasswordOtpSentState extends AuthState {
+  final String email;
+  const ForgotPasswordOtpSentState({required this.email});
+  @override
+  List<Object?> get props => [email];
+}
+
+class ResetPasswordSuccessState extends AuthState {}

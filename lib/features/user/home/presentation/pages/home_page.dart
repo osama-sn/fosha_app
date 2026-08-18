@@ -16,24 +16,32 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
-
-  final List<Widget> _pages = const [
-    HomeTab(),
-    SearchPage(),
-    BookingsTab(),
-    FavoritesTab(),
-    ProfileTab(),
-  ];
+  int _favoritesKeyCounter = 0;
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> pages = [
+      const HomeTab(),
+      const SearchPage(),
+      const BookingsTab(),
+      FavoritesTab(key: ValueKey(_favoritesKeyCounter)),
+      const ProfileTab(),
+    ];
+
     return Scaffold(
       body: SafeArea(
-        child: IndexedStack(index: _currentIndex, children: _pages),
+        child: IndexedStack(index: _currentIndex, children: pages),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: (index) {
+          setState(() {
+            if (index == 3) {
+              _favoritesKeyCounter++;
+            }
+            _currentIndex = index;
+          });
+        },
         type: BottomNavigationBarType.fixed,
         selectedItemColor: AppColors.primaryDark,
         unselectedItemColor: AppColors.textHint,

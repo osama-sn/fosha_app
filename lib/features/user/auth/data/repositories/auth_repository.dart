@@ -56,6 +56,32 @@ class AuthRepository {
     }
   }
 
+  Future<Either<Failure, bool>> forgotPassword({required String email}) async {
+    try {
+      final success = await _authRemoteDataSource.forgotPassword(email: email);
+      return Right(success);
+    } catch (e) {
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
+    }
+  }
+
+  Future<Either<Failure, bool>> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) async {
+    try {
+      final success = await _authRemoteDataSource.resetPassword(
+        email: email,
+        otp: otp,
+        newPassword: newPassword,
+      );
+      return Right(success);
+    } catch (e) {
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
+    }
+  }
+
   Future<bool> isLoggedIn() async {
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('access_token');

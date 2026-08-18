@@ -17,6 +17,7 @@ import 'package:fosha_app/features/admin/company_profile/presentation/cubit/comp
 import 'package:fosha_app/features/admin/trips/data/models/paginated_trips_model.dart';
 import 'package:fosha_app/features/user/search/data/repositories/search_repository.dart';
 import 'package:fosha_app/features/user/search/presentation/widgets/search_results_list.dart';
+import 'package:fosha_app/features/chat/presentation/pages/chat_page.dart';
 
 class CompanyDetailsPage extends StatelessWidget {
   final String? companyId;
@@ -132,8 +133,15 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
                       ),
                     ),
                     onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('الاتصال بالشركة: $phone')),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ChatPage(
+                            companyId: widget.companyId,
+                            companyName: profile?.name ?? 'الشركة',
+                            companyPhone: phone,
+                          ),
+                        ),
                       );
                     },
                     icon: const Icon(Icons.chat_bubble_outline),

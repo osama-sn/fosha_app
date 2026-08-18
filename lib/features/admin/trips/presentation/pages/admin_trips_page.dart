@@ -202,6 +202,7 @@ class _AdminTripsPageState extends State<AdminTripsPage> {
                             final success = await context
                                 .read<AdminManageTripsCubit>()
                                 .deleteTrip(trip.id);
+                            if (!context.mounted) return;
                             if (success) {
                               AppSnackbar.showSuccess(
                                 context: context,
@@ -213,16 +214,15 @@ class _AdminTripsPageState extends State<AdminTripsPage> {
                                 message: AppStrings.adminTripDeleteFailed,
                               );
                             }
-                            if (context.mounted) {
-                              context.read<AdminTripsCubit>().fetchTrips(
-                                status: _filters[_selectedFilterIndex],
-                              );
-                            }
+                            context.read<AdminTripsCubit>().fetchTrips(
+                              status: _filters[_selectedFilterIndex],
+                            );
                           },
                           onRepublish: () async {
                             final success = await context
                                 .read<AdminManageTripsCubit>()
                                 .republishTrip(trip.id);
+                            if (!context.mounted) return;
                             if (success) {
                               AppSnackbar.showSuccess(
                                 context: context,
@@ -234,11 +234,9 @@ class _AdminTripsPageState extends State<AdminTripsPage> {
                                 message: AppStrings.adminTripRepublishFailed,
                               );
                             }
-                            if (context.mounted) {
-                              context.read<AdminTripsCubit>().fetchTrips(
-                                status: _filters[_selectedFilterIndex],
-                              );
-                            }
+                            context.read<AdminTripsCubit>().fetchTrips(
+                              status: _filters[_selectedFilterIndex],
+                            );
                           },
                           onView: () {},
                         );

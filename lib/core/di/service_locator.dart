@@ -48,6 +48,14 @@ import 'package:fosha_app/features/user/favorites/data/datasources/favorites_rem
 import 'package:fosha_app/features/user/favorites/data/repositories/favorites_repository.dart';
 import 'package:fosha_app/features/user/favorites/presentation/cubit/favorites_cubit.dart';
 
+import 'package:fosha_app/features/user/profile/data/datasources/profile_remote_data_source.dart';
+import 'package:fosha_app/features/user/profile/data/repositories/profile_repository.dart';
+import 'package:fosha_app/features/user/profile/presentation/cubit/profile_cubit.dart';
+
+import 'package:fosha_app/features/chat/data/datasources/chat_remote_data_source.dart';
+import 'package:fosha_app/features/chat/data/repositories/chat_repository.dart';
+import 'package:fosha_app/features/chat/presentation/cubit/chat_cubit.dart';
+
 final GetIt getIt = GetIt.instance;
 
 Future<void> initServiceLocator() async {
@@ -93,6 +101,12 @@ Future<void> initServiceLocator() async {
   getIt.registerLazySingleton<FavoritesRemoteDataSource>(
     () => FavoritesRemoteDataSourceImpl(dioClient: getIt()),
   );
+  getIt.registerLazySingleton<ProfileRemoteDataSource>(
+    () => ProfileRemoteDataSourceImpl(dioClient: getIt()),
+  );
+  getIt.registerLazySingleton<ChatRemoteDataSource>(
+    () => ChatRemoteDataSourceImpl(dioClient: getIt()),
+  );
 
   // repositories
   getIt.registerLazySingleton<AuthRepository>(
@@ -134,6 +148,12 @@ Future<void> initServiceLocator() async {
   getIt.registerLazySingleton<FavoritesRepository>(
     () => FavoritesRepository(dataSource: getIt()),
   );
+  getIt.registerLazySingleton<ProfileRepository>(
+    () => ProfileRepository(remoteDataSource: getIt()),
+  );
+  getIt.registerLazySingleton<ChatRepository>(
+    () => ChatRepository(dataSource: getIt()),
+  );
 
   // cubits
   getIt.registerFactory<AuthCubit>(() => AuthCubit(authRepository: getIt()));
@@ -171,5 +191,11 @@ Future<void> initServiceLocator() async {
   );
   getIt.registerFactory<FavoritesCubit>(
     () => FavoritesCubit(repository: getIt()),
+  );
+  getIt.registerFactory<ProfileCubit>(
+    () => ProfileCubit(repository: getIt()),
+  );
+  getIt.registerFactory<ChatCubit>(
+    () => ChatCubit(repository: getIt()),
   );
 }

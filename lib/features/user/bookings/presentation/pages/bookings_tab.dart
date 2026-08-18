@@ -39,7 +39,7 @@ class _BookingsTabBodyState extends State<_BookingsTabBody> {
   final List<Map<String, String>> _statusFilters = const [
     {'title': 'الكل', 'value': 'all'},
     {'title': 'قيد الانتظار', 'value': 'pending'},
-    {'title': 'المؤكدة', 'value': 'accepted'},
+    {'title': 'المؤكدة', 'value': 'approved'},
     {'title': 'المرفوضة', 'value': 'rejected'},
     {'title': 'الملغاة', 'value': 'cancelled'},
   ];
@@ -222,10 +222,12 @@ class _BookingsTabBodyState extends State<_BookingsTabBody> {
     switch (booking.status.toLowerCase()) {
       case 'confirmed':
       case 'accepted':
+      case 'approved':
         statusColor = Colors.green;
         statusText = 'مؤكدة';
         break;
       case 'pending':
+      case 'pending_verification':
         statusColor = Colors.orange;
         statusText = 'قيد الانتظار';
         break;

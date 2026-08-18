@@ -56,7 +56,9 @@ class AdminBookingBottomActionBar extends StatelessWidget {
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('جاري الاتصال بالعميل على رقم $customerPhone...'),
+                  content: Text(
+                    'جاري الاتصال بالعميل على رقم $customerPhone...',
+                  ),
                   backgroundColor: AppColors.primary,
                 ),
               );

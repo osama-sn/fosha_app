@@ -24,8 +24,21 @@ class FavoritesTab extends StatelessWidget {
   }
 }
 
-class _FavoritesTabBody extends StatelessWidget {
+class _FavoritesTabBody extends StatefulWidget {
   const _FavoritesTabBody();
+
+  @override
+  State<_FavoritesTabBody> createState() => _FavoritesTabBodyState();
+}
+
+class _FavoritesTabBodyState extends State<_FavoritesTabBody> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<FavoritesCubit>().loadFavorites();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

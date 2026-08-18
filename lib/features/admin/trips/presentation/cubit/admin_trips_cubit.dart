@@ -9,7 +9,7 @@ class AdminTripsCubit extends Cubit<AdminTripsState> {
   AdminTripsCubit(this.repo) : super(AdminTripsInitial());
 
   String? _currentStatus;
-  int _currentPage = 1;
+  final int _currentPage = 1;
   int limit = 5;
 
   Future<void> fetchTrips({String? status}) async {

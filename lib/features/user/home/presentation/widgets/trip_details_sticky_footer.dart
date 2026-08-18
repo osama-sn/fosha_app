@@ -8,6 +8,11 @@ import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 import 'package:fosha_app/features/admin/trips/data/models/trip_model.dart';
 
+import 'package:fosha_app/core/di/service_locator.dart';
+import 'package:fosha_app/features/admin/bookings/data/models/booking_model.dart';
+import 'package:fosha_app/features/user/bookings/data/repositories/user_bookings_repository.dart';
+import 'package:fosha_app/features/user/bookings/presentation/pages/user_booking_details_page.dart';
+
 class TripDetailsStickyFooter extends StatelessWidget {
   final TripModel trip;
 
@@ -60,23 +65,118 @@ class TripDetailsStickyFooter extends StatelessWidget {
               height: 46.h,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.secondary, // Warm Orange from screenshot
+                  backgroundColor: trip.isBooked
+                      ? Colors.green.shade600
+                      : AppColors.secondary, // Warm Orange
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16.r),
                   ),
                   elevation: 2,
                 ),
-                onPressed: () => context.push(
-                  RouteNames.bookingConfirmation,
-                  extra: trip,
-                ),
+                onPressed: () async {
+                  if (trip.isBooked) {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (_) => const Center(
+                        child: CircularProgressIndicator(color: AppColors.primary),
+                      ),
+                    );
+
+                    try {
+                      final repo = getIt<UserBookingsRepository>();
+                      final bookings = await repo.getMyBookings();
+                      if (context.mounted) Navigator.pop(context);
+
+                      BookingModel? matchingBooking;
+                      for (final b in bookings) {
+                        if (b.tripId == trip.id ||
+                            (b.trip != null && b.trip!.id == trip.id)) {
+                          matchingBooking = b;
+                          break;
+                        }
+                      }
+
+                      matchingBooking ??= BookingModel(
+                        id: trip.id,
+                        tripId: trip.id,
+                        customerName: 'عميل',
+                        customerEmail: '',
+                        customerPhone: '',
+                        tripTitle: trip.title,
+                        tripDates: trip.durationText,
+                        totalAmount: trip.price,
+                        passengersCount: 1,
+                        status: 'approved',
+                        trip: BookingTripInfoModel(
+                          id: trip.id,
+                          title: trip.title,
+                          coverImage: trip.coverImage,
+                          startDate: trip.startDate,
+                          endDate: trip.endDate,
+                        ),
+                        companyId: trip.companyId,
+                        companyName: trip.companyName,
+                      );
+
+                      if (context.mounted) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => UserBookingDetailsPage(
+                              booking: matchingBooking!,
+                            ),
+                          ),
+                        );
+                      }
+                    } catch (_) {
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                        final fallbackBooking = BookingModel(
+                          id: trip.id,
+                          tripId: trip.id,
+                          customerName: 'عميل',
+                          customerEmail: '',
+                          customerPhone: '',
+                          tripTitle: trip.title,
+                          tripDates: trip.durationText,
+                          totalAmount: trip.price,
+                          passengersCount: 1,
+                          status: 'approved',
+                          trip: BookingTripInfoModel(
+                            id: trip.id,
+                            title: trip.title,
+                            coverImage: trip.coverImage,
+                            startDate: trip.startDate,
+                            endDate: trip.endDate,
+                          ),
+                          companyId: trip.companyId,
+                          companyName: trip.companyName,
+                        );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => UserBookingDetailsPage(
+                              booking: fallbackBooking,
+                            ),
+                          ),
+                        );
+                      }
+                    }
+                  } else {
+                    context.push(
+                      RouteNames.bookingConfirmation,
+                      extra: trip,
+                    );
+                  }
+                },
                 child: Text(
-                  AppStrings.bookNow,
+                  trip.isBooked ? 'تم الحجز بالفعل ✓' : AppStrings.bookNow,
                   style: AppTextStyles.labelLarge.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    fontSize: 16.sp,
+                    fontSize: trip.isBooked ? 14.sp : 16.sp,
                   ),
                 ),
               ),

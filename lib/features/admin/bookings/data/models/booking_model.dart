@@ -67,6 +67,9 @@ class BookingModel {
   final String status;
   final String? rejectionReason;
   final DateTime? createdAt;
+  final String companyId;
+  final String companyName;
+  final String tripId;
 
   const BookingModel({
     required this.id,
@@ -82,6 +85,9 @@ class BookingModel {
     required this.status,
     this.rejectionReason,
     this.createdAt,
+    this.companyId = '',
+    this.companyName = '',
+    this.tripId = '',
   });
 
   int get numberOfSeats => passengersCount;
@@ -132,6 +138,15 @@ class BookingModel {
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'].toString())
           : null,
+      companyId: (json['company'] != null)
+          ? (json['company'] is Map
+              ? (json['company']['_id'] ?? json['company']['id'] ?? '').toString()
+              : json['company'].toString())
+          : (json['companyId']?.toString() ?? ''),
+      companyName: (json['company'] != null && json['company'] is Map)
+          ? (json['company']['name'] as String? ?? json['company']['fullName'] as String? ?? '')
+          : (json['companyName'] as String? ?? ''),
+      tripId: tripObj?.id ?? (json['tripId']?.toString() ?? ''),
     );
   }
 }
