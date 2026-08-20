@@ -1,9 +1,9 @@
 class ApiEndpoints {
   ApiEndpoints._();
 
-  static const String baseUrl = 'http://192.168.1.11:3000/api/v1';
+  static const String baseUrl = 'https://foshaa.duckdns.org/api/v1';
 
-  static String get baseOrigin => 'http://192.168.1.11:3000';
+  static const String baseOrigin = 'https://foshaa.duckdns.org';
 
   static String getImageUrl(String? path) {
     if (path == null || path.trim().isEmpty) return '';
@@ -67,4 +67,3 @@ class ApiEndpoints {
   static const String bookings = '/bookings';
   static const String chats = '/chats';
 }
-
