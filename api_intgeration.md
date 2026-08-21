@@ -1,806 +1,466 @@
-# 📱 التوثيق الكامل والمطوّر لتطبيق وموقع العميل (Mobile & Web API Reference)
+# 🏢 دليل تكامل ودكومنتيشن لوحة تحكم شركة السياحة (Company Admin Integration Guide)
 
-يقدم هذا التوثيق الشامل **لبرمجة وتكامل تطبيق الموبايل (Flutter / React Native / Native iOS & Android)** وجميع الواجهات المخصصة للعميل (User App) بأدق التفاصيل: العناوين (Endpoints)، أنواع الطلبات، الهيدرز (Headers)، المعاملات (Parameters)، صيغة الـ Body، الـ Response المتوقع، وأكواد الأخطاء لضمان بناء التطبيق وتجربة المستخدم بنسبة 100%.
-
----
-
-## 🌐 1. القواعد العامة والتكوين الأساسي (Base Config & Standards)
-
-### Base URL
-```
-http://localhost:5000/api/v1
-```
-*(أو رابط السيرفر المباشر)*
-
-### Standard Headers
-| Header Name | Type | Value / Description | Required |
-|---|---|---|---|
-| `Content-Type` | String | `application/json` (أو `multipart/form-data` للرفع) | نعم |
-| `Authorization` | String | `Bearer <ACCESS_TOKEN>` | في الواجهات المحمية |
-| `Accept-Language` | String | `ar` (الافتراضي) أو `en` لترجمة الرسائل | اختياري |
+يقدم هذا الدليل توثيقاً **كاملاً وتفصيلياً الشامل بحذافيره** لكافة الواجهات المبرمجة (APIs) والنماذج (Models) المخصصة **لإدارة شركة السياحة والرحلات (Company Admin)** لإدارة الرحلات، الحجوزات، العملاء، قائمة المسافرين، المصروفات، الأرباح، الشات، وتحديثات الرحلات.
 
 ---
 
-### 📦 الهيكل الموحد للاستجابة (Standard API Response Schema)
+## 🔑 Header المعتمد لكافة طلبات المحمية
+```http
+Authorization: Bearer <ACCESS_TOKEN>
+Content-Type: application/json (أو multipart/form-data في حالة رفع الملفات والصور)
+```
 
-#### أ) استجابة النجاح (Success Response):
+---
+
+## 📌 فهرس وجدول جميع الـ Endpoints المتاحة لأدمن الشركة (Complete Endpoints Reference Table)
+
+| Category | HTTP Method | API Endpoint | Content-Type | Purpose / الوصف |
+| :--- | :---: | :--- | :--- | :--- |
+| **Auth** | `POST` | `/api/v1/auth/login` | `JSON` | تسجيل الدخول كـ Company Admin واستلام التوكن |
+| **Dashboard** | `GET` | `/api/v1/admin/company-stats` | `JSON` | إحصائيات المبيعات، المصروفات، صافي الربح الفعلي، والعملاء |
+| **Profile** | `PATCH` / `PUT` | `/api/v1/companies/:id` | `multipart/form-data` | تعديل بيانات الشركة، الواتساب، التواصل الاجتماعي، واللوجو/الغلاف |
+| **Trips** | `POST` | `/api/v1/trips` | `multipart/form-data` | إنشاء رحلة جديدة بنقاط ومواعيد التجمع والبرنامج |
+| | `POST` | `/api/v1/trips/:id/duplicate` | `JSON` | تكرار ونسخ رحلة قائمة كمسودة جديدة تلقائياً |
+| | `GET` | `/api/v1/trips` | `JSON` | عرض رحلات الشركة الخاصة |
+| | `GET` | `/api/v1/trips/:id` | `JSON` | عرض تفاصيل رحلة معينة |
+| | `PUT` / `PATCH` | `/api/v1/trips/:id` | `multipart/form-data` | تعديل بيانات رحلة قائمة |
+| | `DELETE` | `/api/v1/trips/:id` | `JSON` | حذف رحلة (Soft delete) |
+| **Passenger List** | `GET` | `/api/v1/trips/:id/passengers` | `JSON` | مانفيست وقائمة ركاب الرحلة ونقاط التجمع يوم الحركة |
+| **Announcements** | `POST` | `/api/v1/trips/:id/announcements` | `JSON` | إرسال إشعار وتحديث عاجل لجميع ركاب الرحلة الحاجزين |
+| **Bookings** | `GET` | `/api/v1/bookings` | `JSON` | عرض طلبات حجوزات رحلات الشركة |
+| | `GET` | `/api/v1/bookings/:id` | `JSON` | تفاصيل حجز معين |
+| | `PATCH` | `/api/v1/bookings/:id/approve` | `JSON` | موافقة وقبول طلب حجز |
+| | `PATCH` | `/api/v1/bookings/:id/reject` | `JSON` | رفض طلب حجز مع سبب الرفض |
+| | `PATCH` | `/api/v1/bookings/:id/cancel` | `JSON` | إلغاء حجز وإرجاع المقاعد للرحلة |
+| **Customers** | `GET` | `/api/v1/admin/company-customers` | `JSON` | عرض العملاء الذين حجزوا مع الشركة والرحلات السابقة |
+| **Expenses** | `POST` | `/api/v1/expenses` | `multipart/form-data` | إضافة مصروف رحلة/شركة جديد مع صوره الفاتورة |
+| | `GET` | `/api/v1/expenses` | `JSON` | عرض مصروفات الشركة وتصفيتها |
+| | `GET` | `/api/v1/expenses/summary` | `JSON` | ملخص المصروفات مجمعة حسب الفئات |
+| | `PUT` / `PATCH` | `/api/v1/expenses/:id` | `multipart/form-data` | تعديل بند مصروف |
+| | `DELETE` | `/api/v1/expenses/:id` | `JSON` | حذف بند مصروف |
+| **Financial Report**| `GET` | `/api/v1/admin/company-financial-report` | `JSON` | التقرير المالي وصافي الربح الحقيقي بالمدة الزمنية |
+| **Chat & WebSockets**| `WS` | `ws://localhost:3000` | `WebSockets` | اتصال المحادثات الحي المباشر (Events: `join_chat`, `send_message`, `typing`) |
+| | `POST` | `/api/v1/chats` | `JSON` | بدء أو جلب محادثة قائمة مع عميل |
+| | `GET` | `/api/v1/chats` | `JSON` | عرض قائمة المحادثات النشطة |
+| | `GET` | `/api/v1/chats/:id/messages` | `JSON` | عرض رسائل المحادثة |
+| | `POST` | `/api/v1/chats/:id/messages` | `multipart/form-data` | إرسال رسالة نصية أو صورة عبر HTTP |
+| **Reviews** | `GET` | `/api/v1/companies/:id/reviews` | `JSON` | عرض تقييمات الشركة |
+| | `GET` | `/api/v1/trips/:id/reviews` | `JSON` | عرض تقييمات الرحلة |
+| **Offers & Coupons**| `GET` | `/api/v1/offers/admin/all` | `JSON` | عرض عروض الشركة |
+| | `POST` | `/api/v1/offers` | `multipart/form-data` | إنشاء عرض بنر جديد مع صورة |
+| | `PUT` / `DELETE` | `/api/v1/offers/:id` | `multipart/form-data` | تعديل أو حذف عرض |
+| | `POST` | `/api/v1/coupons` | `JSON` | إنشاء كوبون خصم لرحلات الشركة |
+| | `GET` | `/api/v1/coupons` | `JSON` | عرض كوبونات الشركة |
+| | `DELETE` | `/api/v1/coupons/:id` | `JSON` | حذف كوبون خصم |
+
+---
+
+## 🔐 1. تسجيل الدخول (Company Admin Auth)
+
+* **الرابط**: `POST /api/v1/auth/login`
+* **Body**:
 ```json
 {
+  "email": "company@admin.com",
+  "password": "CompanyPassword123!"
+}
+```
+* **Response**: يرجع بيانات الحساب والـ `token` بالإضافة لبيانات الشركة المرتبطة بالحساب.
+
+---
+
+## 📊 2. لوحة التحكم والإحصائيات الشاملة (Company Dashboard)
+
+* **الرابط**: `GET /api/v1/admin/company-stats`
+* **وصف الاستجابة**: يرجع إحصائيات شاملة تتضمن عدد الرحلات، الحجوزات، عدد العملاء، الرحلات القادمة، إجمالي المبيعات، إجمالي المصروفات، عمولة المنصة، **صافي الربح الفعلي** (Sales - Expenses - Commission)، أفضل الرحلات مبيعاً، آخر 5 حجوزات، وآخر 5 محادثات نشطة.
+
+### 📥 شكل الـ Response:
+```json
+{
+  "success": true,
   "statusCode": 200,
-  "message": "DATA_FETCHED_SUCCESSFULLY",
-  "data": { ... },
-  "success": true
-}
-```
-
-#### ب) استجابة الخطأ (Error Response):
-```json
-{
-  "statusCode": 400,
-  "message": "COMPLETED_BOOKING_REQUIRED_FOR_REVIEW",
-  "data": null,
-  "success": false
-}
-```
-
----
-
-## 🔐 2. الحساب والملف الشخصي (Auth & User Profile)
-
-### 2.1) تسجيل حساب جديد مع المحافظة (Register)
-* **Endpoint**: `POST /auth/register`
-* **Auth Required**: ❌ لا
-* **Content-Type**: `multipart/form-data` (عند إرفاق صورة) أو `application/json`
-
-#### Form / JSON Fields:
-| Field Name | Type | Required | Description |
-|---|---|---|---|
-| `fullName` | String | نعم | الاسم الكامل للمستخدم |
-| `email` | String | نعم | البريد الإلكتروني (فريد) |
-| `phone` | String | نعم | رقم الموبايل (فريد) |
-| `password` | String | نعم | كلمة المرور (6 أحرف على الأقل) |
-| `governorate` | String | نعم | المحافظة (مثل: "القاهرة"، "الإسكندرية"، "الجيزة"...) |
-| `profileImage` | File | اختياري | صورة البروفايل الشخصية |
-
-#### Response (217 Created / 200 OK):
-```json
-{
-  "statusCode": 201,
-  "message": "USER_REGISTERED_SUCCESSFULLY",
+  "code": "COMPANY_STATS_FETCHED",
   "data": {
-    "user": {
-      "_id": "685bc920f1882d21051b72a1",
-      "fullName": "أسامة عصام",
-      "email": "user@example.com",
-      "phone": "+201099887766",
-      "profileImage": "/uploads/profiles/user-123.jpg",
-      "governorate": "القاهرة",
-      "role": "user"
+    "company": {
+      "_id": "66bc123456789abcdef00111",
+      "name": "شركة فسحني للسياحة",
+      "logo": "/uploads/companies/company-logo.jpg",
+      "coverImage": "/uploads/companies/company-cover.jpg",
+      "description": "شركة متخصصة في الرحلات البحرية والسفاري",
+      "contactPhone": "+201012345678",
+      "contactEmail": "info@fasheny.com",
+      "address": "المنيا - كورنيش النيل",
+      "whatsapp": "+201012345678",
+      "socialMedia": {
+        "facebook": "https://facebook.com/fasheny",
+        "instagram": "https://instagram.com/fasheny"
+      },
+      "averageRating": 4.8,
+      "reviewsCount": 15
     },
-    "accessToken": "eyJhbGciOi...",
-    "refreshToken": "eyJhbGciOi..."
-  },
-  "success": true
-}
-```
-
----
-
-### 2.2) تسجيل الدخول (Login)
-* **Endpoint**: `POST /auth/login`
-* **Auth Required**: ❌ لا
-* **Request Body**:
-```json
-{
-  "email": "user@example.com",
-  "password": "UserPassword123!"
-}
-```
-
-#### Response (200 OK):
-```json
-{
-  "statusCode": 200,
-  "message": "LOGIN_SUCCESSFUL",
-  "data": {
-    "user": {
-      "_id": "685bc920f1882d21051b72a1",
-      "fullName": "أسامة عصام",
-      "email": "user@example.com",
-      "phone": "+201099887766",
-      "governorate": "القاهرة",
-      "role": "user"
+    "trips": {
+      "totalTrips": 12,
+      "publishedTrips": 8,
+      "draftTrips": 4,
+      "upcomingTripsCount": 5
     },
-    "accessToken": "eyJhbGciOi...",
-    "refreshToken": "eyJhbGciOi..."
-  },
-  "success": true
-}
-```
-
----
-
-### 2.3) تسجيل الدخول عبر جوجل (Google Auth Login)
-* **Endpoint**: `POST /auth/google`
-* **Auth Required**: ❌ لا
-* **Request Body**:
-```json
-{
-  "idToken": "google_oauth_id_token_string..."
-}
-```
-
----
-
-### 2.4) نسيت كلمة السر وإعادة الضبط (Forgot & Reset Password)
-1. **طلب كود التحقق (OTP)**: `POST /auth/forgot-password`
-```json
-{
-  "email": "user@example.com"
-}
-```
-2. **إعادة الضبط بكود التحقق**: `POST /auth/reset-password`
-```json
-{
-  "email": "user@example.com",
-  "otp": "482910",
-  "newPassword": "NewSecurePassword123!"
-}
-```
-
----
-
-### 2.5) جلب بيانات الملف الشخصي (Get Current User)
-* **Endpoint**: `GET /auth/me`
-* **Auth Required**: ✅ نعم (`Bearer <ACCESS_TOKEN>`)
-
-#### Response (200 OK):
-```json
-{
-  "statusCode": 200,
-  "message": "PROFILE_FETCHED",
-  "data": {
-    "_id": "685bc920f1882d21051b72a1",
-    "fullName": "أسامة عصام",
-    "email": "user@example.com",
-    "phone": "+201099887766",
-    "profileImage": "/uploads/profiles/profile-123.jpg",
-    "governorate": "القاهرة",
-    "fcmTokens": ["token1", "token2"],
-    "createdAt": "2026-08-18T21:00:00.000Z"
-  },
-  "success": true
-}
-```
-
----
-
-### 2.6) تحديث بيانات الملف الشخصي والمحافظة (Update Profile)
-* **Endpoint**: `PUT /auth/profile`
-* **Auth Required**: ✅ نعم
-* **Content-Type**: `multipart/form-data` أو `application/json`
-
-#### Body / Form Fields:
-```json
-{
-  "fullName": "أسامة عصام المعدل",
-  "phone": "+201099887799",
-  "governorate": "الإسكندرية"
-}
-```
-
----
-
-### 2.7) تغيير كلمة المرور (Change Password)
-* **Endpoint**: `PUT /auth/change-password`
-* **Auth Required**: ✅ نعم
-* **Request Body**:
-```json
-{
-  "currentPassword": "OldPassword123!",
-  "newPassword": "NewPassword123!"
-}
-```
-
----
-
-### 2.8) تسجيل الخروج (Logout)
-* **Endpoint**: `POST /auth/logout`
-* **Auth Required**: ✅ نعم
-
----
-
-## 🏠 3. صفحة الهوم بيج المجمعة (Home Screen Data)
-
-### 3.1) جلب بيانات الهوم بيج كاملاً بطلب واحد
-* **Endpoint**: `GET /home`
-* **Auth Required**: 💡 اختياري (إذا كان مسجلاً يتم جلب رحلات محافظته تلقائياً)
-* **Query Parameters**:
-  - `governorate` (String): اسم المحافظة في حال كان العميل زائر غير مسجل (مثل `?governorate=القاهرة`)
-
-#### Response (200 OK):
-```json
-{
-  "statusCode": 200,
-  "message": "HOME_DATA_FETCHED",
-  "data": {
-    "userGovernorate": "القاهرة",
-    "featuredTrips": [
+    "bookings": {
+      "totalBookings": 120,
+      "pendingBookings": 10,
+      "approvedBookings": 100,
+      "rejectedBookings": 5,
+      "cancelledBookings": 5,
+      "customersCount": 85
+    },
+    "financials": {
+      "totalGrossRevenue": 300000,          // إجمالي المبيعات (GMV)
+      "totalExpenses": 190000,              // إجمالي المصروفات (Expenses)
+      "totalAdminCommissionPaid": 30000,    // عمولة المنصة
+      "netProfit": 80000,                   // 💵 صافي الربح = Revenue - Commission - Expenses
+      "companyNetRevenue": 270000           // Sales - Commission
+    },
+    "topTrips": [
       {
-        "_id": "685bc920f1882d21051b72b1",
-        "title": "رحلة دهب وسانت كاترين VIP",
+        "_id": "66bc987654321fedcba00222",
+        "title": "رحلة دهب وسانت كاترين",
+        "destination": "دهب",
+        "price": 2500,
         "coverImage": "/uploads/trips/dahab.jpg",
-        "price": 1850,
-        "startDate": "2026-09-01T00:00:00.000Z",
-        "endDate": "2026-09-04T00:00:00.000Z",
-        "durationDays": 4,
-        "durationNights": 3,
-        "availableSeats": 12,
-        "averageRating": 4.9,
-        "reviewsCount": 42,
-        "company": {
-          "_id": "685bc920f1882d21051b7001",
-          "name": "شركة رحلات مصر",
-          "logo": "/uploads/companies/logo.png"
-        }
+        "bookingCount": 40,
+        "totalSeatsBooked": 85,
+        "totalRevenue": 100000
       }
     ],
-    "governorateTrips": [ ... ],
-    "featuredCompanies": [
+    "recentBookings": [
       {
-        "_id": "685bc920f1882d21051b7001",
-        "name": "شركة رحلات مصر",
-        "logo": "/uploads/companies/logo.png",
-        "coverImage": "/uploads/companies/cover.jpg",
-        "averageRating": 4.8,
-        "reviewsCount": 110,
-        "governorate": "القاهرة"
+        "_id": "66bd11122233344455566677",
+        "user": { "fullName": "أحمد محمود", "phone": "+201000000000" },
+        "trip": { "title": "رحلة دهب وسانت كاترين" },
+        "numberOfSeats": 2,
+        "totalPrice": 5000,
+        "status": "pending",
+        "createdAt": "2026-08-16T12:00:00.000Z"
       }
     ],
-    "categories": [
+    "recentMessages": [
       {
-        "_id": "685bc920f1882d21051b7901",
-        "nameAr": "رحلات بحرية",
-        "nameEn": "Sea Trips",
-        "slug": "sea",
-        "image": "/uploads/categories/sea.png"
-      }
-    ],
-    "offers": [
-      {
-        "_id": "685bc920f1882d21051b7999",
-        "title": "خصم الصيف 20%",
-        "image": "/uploads/offers/banner.png",
-        "code": "SUMMER2026",
-        "discountPercentage": 20
+        "_id": "66bd99887766554433221100",
+        "user": { "fullName": "أحمد محمود" },
+        "lastMessage": "هل متاح حجز 3 مقاعد للأسبوع القادم؟",
+        "lastMessageAt": "2026-08-16T15:30:00.000Z"
       }
     ]
-  },
-  "success": true
+  }
 }
 ```
 
 ---
 
-## 🔍 4. البحث المتقدم والتصفية الذكية للرحلات (Search & Filters)
+## 🏢 3. تعديل ملف الشركة (Company Profile)
 
-### 4.1) البحث وتصفية الرحلات (Search & Filter Trips)
-* **Endpoint**: `GET /trips`
-* **Auth Required**: ❌ لا
+* **الرابط**: `PATCH /api/v1/companies/:id` (أو `PUT /api/v1/companies/:id`)
+* **Content-Type**: `multipart/form-data` (يدعم رفع اللوجو وصورة الغلاف مباشرة)
 
-#### Query Parameters المتاحة بالتفصيل:
-| Parameter | Type | Description | Example |
-|---|---|---|---|
-| `search` | String | بحث بالكلمة المفتاحية (عنوان، وصف، مدينة) | `?search=دهب` |
-| `destination` | String | التصفية بوجهة الرحلة | `?destination=شرم الشيخ` |
-| `origin` / `city` | String | التصفية بمدينة الانطلاق | `?city=القاهرة` |
-| `governorate` | String | التصفية برحلات المحافظة | `?governorate=الإسكندرية` |
-| `category` | String | التصنيف (ObjectId أو Slug) | `?category=safari` |
-| `minPrice` | Number | الحد الأدنى للسعر | `?minPrice=500` |
-| `maxPrice` | Number | الحد الأقصى للسعر | `?maxPrice=3000` |
-| `minDate` | Date | تاريخ البداية من | `?minDate=2026-09-01` |
-| `maxDate` | Date | تاريخ البداية إلى | `?maxDate=2026-09-30` |
-| `durationDays` | Number | عدد أيام الرحلة بالضبط | `?durationDays=3` |
-| `minDuration` | Number | الحد الأدنى لأيام الرحلة | `?minDuration=2` |
-| `maxDuration` | Number | الحد الأقصى لأيام الرحلة | `?maxDuration=5` |
-| `minRating` | Number | الحد الأدنى للتقييم (1-5) | `?minRating=4` |
-| `sort` | String | خيارات الترتيب | `price_asc`, `price_desc`, `date_asc`, `date_desc`, `rating_desc` |
-| `page` | Number | رقم الصفحة (الافتراضي 1) | `?page=1` |
-| `limit` | Number | عدد النتائج (الافتراضي 10) | `?limit=10` |
-
-#### Response (200 OK):
-```json
-{
-  "statusCode": 200,
-  "message": "TRIPS_FETCHED",
-  "data": {
-    "trips": [
-      {
-        "_id": "685bc920f1882d21051b72b1",
-        "title": "رحلة دهب وسانت كاترين VIP",
-        "origin": "القاهرة",
-        "destination": "دهب",
-        "price": 1850,
-        "startDate": "2026-09-01T00:00:00.000Z",
-        "endDate": "2026-09-04T00:00:00.000Z",
-        "durationDays": 4,
-        "durationNights": 3,
-        "availableSeats": 12,
-        "averageRating": 4.9,
-        "reviewsCount": 42,
-        "coverImage": "/uploads/trips/dahab.jpg",
-        "company": {
-          "_id": "685bc920f1882d21051b7001",
-          "name": "شركة رحلات مصر",
-          "logo": "/uploads/companies/logo.png"
-        }
-      }
-    ],
-    "pagination": {
-      "total": 24,
-      "page": 1,
-      "limit": 10,
-      "totalPages": 3
-    }
-  },
-  "success": true
-}
-```
+### 📥 Form-Data Fields:
+* `name`: اسم الشركة
+* `description`: وصف الشركة
+* `contactPhone`: رقم الهاتف
+* `contactEmail`: البريد الإلكتروني
+* `address`: العنوان
+* `governorate`: المحافظة
+* `whatsapp`: رقم الواتساب (+2010XXXXXXXX)
+* `socialMedia`: JSON String مثل `'{"facebook":"https://fb.com/page","instagram":"https://inst.com/page"}'`
+* `logo`: ملف صورة اللوجو (File - `logo`)
+* `coverImage`: ملف صورة الغلاف (File - `coverImage`)
 
 ---
 
-## 🚌 5. صفحة تفاصيل الرحلة الشاملة (Trip Details Page)
+## 🚌 4. إدارة الرحلات (Trips Management)
 
-### 5.1) جلب تفاصيل الرحلة بالـ ID
-* **Endpoint**: `GET /trips/:id`
-* **Auth Required**: ❌ لا
+### أ) إنشاء رحلة جديدة (`POST /api/v1/trips`)
+* **Content-Type**: `multipart/form-data`
+* **Fields**:
+  * `title`: "رحلة شرم الشيخ وراس محمد" (مطلوب)
+  * `description`: "رحلة 4 أيام شاملة الإقامة والأنشطة والوجبات" (مطلوب)
+  * `origin`: "القاهرة" (مطلوب)
+  * `destination`: "شرم الشيخ" (مطلوب)
+  * `price`: "3000" (مطلوب - سعر الفرد)
+  * `capacity`: "40" (مطلوب - إجمالي عدد المقاعد)
+  * `startDate`: "2026-09-01T00:00:00.000Z" (مطلوب)
+  * `endDate`: "2026-09-05T00:00:00.000Z" (مطلوب)
+  * `status`: "published" أو "draft"
+  * `pickupPoints`: `'[{"location":"ميدان عبد المنعم رياض","time":"06:00 AM"},{"location":"مصر الجديدة - النادي الأهلي","time":"06:45 AM"}]'` (JSON String)
+  * `pickupTimes`: `'["06:00 AM", "06:45 AM"]'` (JSON String)
+  * `included`: `'["الإقامة 4 نجوم", "الوجبات", "الانتقالات أتوبيس حديث"]'` (JSON String)
+  * `excluded`: `'["المشروبات الروحية", "المصاريف الشخصية"]'` (JSON String)
+  * `cancelPolicy`: "إلغاء مجاني قبل الرحلة بـ 72 ساعة"
+  * `days`: `'[{"dayNumber":1,"title":"الوصول والتسكين","activities":[{"time":"10:00 AM","title":"الوصول للفندق والتسكين"}]}]'` (JSON String)
+  * `coverImage`: صورة غلاف الرحلة (File)
+  * `gallery`: صور المعرض (File Array - max 15)
 
-#### Response (200 OK):
+### ب) نسخ وتكرار رحلة (`POST /api/v1/trips/:id/duplicate`)
+* يقوم بتكرار الرحلة الحالية بكافة تفاصيلها (البرنامج، المشتملات، الأسعار، نقاط التجمع) وإنشائها كمسودة جديدة باسم `"اسم الرحلة (نسخة)"`.
+
+### ج) إدارة الرحلات (تعديل، إخفاء، حذف)
+* **تعديل رحلة**: `PUT /api/v1/trips/:id` (مع `multipart/form-data`)
+* **حذف رحلة**: `DELETE /api/v1/trips/:id`
+* **عرض رحلات الشركة**: `GET /api/v1/trips?status=published` أو `status=draft`
+
+---
+
+## 📋 5. قائمة المسافرين لكل رحلة (Passenger List Manifest)
+
+مفيدة جداً يوم حركة الرحلة لمشرفي الشركة.
+
+* **الرابط**: `GET /api/v1/trips/:id/passengers`
+* **Response**:
 ```json
 {
+  "success": true,
   "statusCode": 200,
-  "message": "TRIP_DETAILS_FETCHED",
+  "code": "PASSENGER_LIST_FETCHED",
   "data": {
     "trip": {
-      "_id": "685bc920f1882d21051b72b1",
-      "title": "رحلة دهب وسانت كاترين VIP",
-      "description": "استمتع بأجمل 4 أيام في دهب وتشلق على الرمال وصعود جبل موسى",
-      "origin": "القاهرة",
-      "destination": "دهب",
-      "price": 1850,
-      "capacity": 30,
-      "availableSeats": 12,
+      "_id": "66bc987654321fedcba00222",
+      "title": "رحلة دهب وسانت كاترين",
       "startDate": "2026-09-01T00:00:00.000Z",
-      "endDate": "2026-09-04T00:00:00.000Z",
-      "durationDays": 4,
-      "durationNights": 3,
-      "coverImage": "/uploads/trips/cover.jpg",
-      "gallery": [
-        "/uploads/trips/cover.jpg",
-        "/uploads/trips/img1.jpg",
-        "/uploads/trips/img2.jpg"
-      ],
-      "included": ["الإقامة بالفندق", "الانتقالات بأوتوبيسات حديثة", "وجبة الإفطار"],
-      "excluded": ["الأنشطة الاختيارية", "المشروبات إضافية"],
-      "cancelPolicy": "إلغاء مجاني قبل موعد الرحلة بـ 72 ساعة",
-      "pickupPoints": [
-        { "location": "ميدان عبد المنعم رياض - التحرير", "time": "05:00 AM" },
-        { "location": "نادي السكة - مدينة نصر", "time": "05:30 AM" }
-      ],
-      "days": [
-        {
-          "dayNumber": 1,
-          "title": "اليوم الأول: الوصول والتسكين بالفندق",
-          "activities": [
-            {
-              "time": "02:00 PM",
-              "title": "الوصول للفندق والتسكين",
-              "description": "استلام الغرف والاستراحة",
-              "location": "فندق دهب بلازا",
-              "image": "/uploads/trips/hotel.jpg"
-            }
-          ]
-        }
-      ],
-      "company": {
-        "_id": "685bc920f1882d21051b7001",
-        "name": "شركة رحلات مصر",
-        "description": "شركة متخصصة في الرحلات الداخلية والمغامرات",
-        "logo": "/uploads/companies/logo.png",
-        "coverImage": "/uploads/companies/cover.jpg",
-        "contactPhone": "+201012345678",
-        "contactEmail": "info@company.com",
-        "averageRating": 4.8,
-        "reviewsCount": 110,
-        "paymentMethods": {
-          "vodafoneCash": { "number": "01012345678", "instructions": "حول المبلغ ثم ارفق الصورة" },
-          "orangeCash": { "number": "", "instructions": "" },
-          "etisalatCash": { "number": "", "instructions": "" },
-          "bankTransfer": { "bankName": "CIB", "accountNumber": "100029384", "iban": "EG99000100000000100029384", "accountHolder": "شركة رحلات مصر", "instructions": "تحويل بنكي مباشر" },
-          "cash": { "instructions": "الدفع كاش بمقر الشركة أو عند التجمع" }
-        }
-      }
+      "capacity": 40,
+      "availableSeats": 10,
+      "totalSeatsBooked": 30
     },
-    "reviews": [
+    "passengersCount": 15,
+    "totalSeatsBooked": 30,
+    "passengers": [
       {
-        "_id": "685bc920f1882d21051b7888",
-        "rating": 5,
-        "comment": "رحلة ممتازة والتنظيم رائع جداً",
+        "bookingId": "66bd11122233344455566677",
         "user": {
-          "fullName": "محمد أحمد",
-          "profileImage": "/uploads/profiles/user-55.jpg"
+          "fullName": "أحمد محمود",
+          "email": "ahmed@gmail.com",
+          "phone": "+201011111111"
         },
-        "createdAt": "2026-08-10T12:00:00.000Z"
-      }
-    ],
-    "upcomingSchedules": [ ... ]
-  },
-  "success": true
-}
-```
-
----
-
-## 🏢 6. بروفايل الشركة (Company Profile & Reviews)
-
-### 6.1) جلب بروفايل الشركة
-* **Endpoint**: `GET /companies/:id`
-* **Auth Required**: ❌ لا
-
-### 6.2) جلب تقييمات الشركة
-* **Endpoint**: `GET /companies/:id/reviews?page=1&limit=10`
-* **Auth Required**: ❌ لا
-
----
-
-## 🎫 7. الحجز والدفع المباشر V1 (Booking & Payment Flow)
-
-### الـ Flow التفاعلي على الموبايل:
-```
-Trip Details ➔ Pick Date ➔ Select Seats ➔ Enter Traveler Data ➔ Select Pickup Point ➔ Select Payment Method ➔ Review Summary ➔ Confirm
-```
-
----
-
-### 7.1) تقديم طلب الحجز (Create Booking)
-* **Endpoint**: `POST /bookings`
-* **Auth Required**: ✅ نعم (`Bearer <ACCESS_TOKEN>`)
-
-#### Request Body:
-```json
-{
-  "tripId": "685bc920f1882d21051b72b1",
-  "numberOfSeats": 2,
-  "pickupPoint": "ميدان عبد المنعم رياض - التحرير",
-  "pickupTime": "05:00 AM",
-  "paymentMethod": "vodafone_cash",
-  "paymentNotes": "تم التحويل من رقم 01099887766",
-  "notes": "يرجى توفير مقاعد متجورة بأول الأوتوبيس",
-  "couponCode": "SUMMER2026",
-  "passengers": [
-    {
-      "fullName": "أسامة عصام",
-      "phone": "+201099887766",
-      "age": 26,
-      "gender": "male",
-      "notes": "المسافر الرئيسي"
-    },
-    {
-      "fullName": "علي عصام",
-      "phone": "+201011223344",
-      "age": 22,
-      "gender": "male",
-      "notes": "مسافر مرافق"
-    }
-  ]
-}
-```
-
-#### القيم المتاحة لـ `paymentMethod`:
-- `vodafone_cash` (فودافون كاش)
-- `orange_cash` (أورانج كاش)
-- `etisalat_cash` (اتصالات كاش)
-- `bank_transfer` (تحويل بنكي)
-- `cash` (دفع كاش / عند الوصول)
-
-#### Response (201 Created):
-```json
-{
-  "statusCode": 201,
-  "message": "BOOKING_CREATED",
-  "data": {
-    "_id": "685bc920f1882d21051b7999",
-    "user": "685bc920f1882d21051b72a1",
-    "trip": "685bc920f1882d21051b72b1",
-    "company": {
-      "_id": "685bc920f1882d21051b7001",
-      "name": "شركة رحلات مصر",
-      "contactPhone": "+201012345678",
-      "paymentMethods": { ... }
-    },
-    "numberOfSeats": 2,
-    "totalPrice": 3700,
-    "status": "pending",
-    "paymentMethod": "vodafone_cash",
-    "paymentStatus": "pending_verification",
-    "pickupPoint": "ميدان عبد المنعم رياض - التحرير",
-    "pickupTime": "05:00 AM",
-    "passengers": [ ... ],
-    "tripSnapshot": {
-      "title": "رحلة دهب وسانت كاترين VIP",
-      "coverImage": "/uploads/trips/cover.jpg",
-      "origin": "القاهرة",
-      "destination": "دهب",
-      "startDate": "2026-09-01T00:00:00.000Z",
-      "endDate": "2026-09-04T00:00:00.000Z",
-      "pricePerSeat": 1850
-    },
-    "createdAt": "2026-08-18T21:40:00.000Z"
-  },
-  "success": true
-}
-```
-
----
-
-### 7.2) رفع صورة إيصال التحويل / إثبات الدفع (Upload Payment Receipt)
-* **Endpoint**: `PATCH /bookings/:id/payment`
-* **Auth Required**: ✅ نعم
-* **Content-Type**: `multipart/form-data`
-
-#### Form Fields:
-- `receiptImage`: (File - صورة شاشة الإيصال أو التحويل)
-- `paymentMethod`: (String - اختياري للتحديث)
-- `paymentNotes`: (String - ملاحظات التحويل رقم الحساب/العملية)
-
-#### Response (200 OK):
-```json
-{
-  "statusCode": 200,
-  "message": "PAYMENT_INFO_UPDATED",
-  "data": {
-    "_id": "685bc920f1882d21051b7999",
-    "paymentMethod": "vodafone_cash",
-    "paymentStatus": "pending_verification",
-    "paymentReceiptImage": "/uploads/payments/payment-1724012345.jpg",
-    "paymentNotes": "إيصال رقم عملية 998811"
-  },
-  "success": true
-}
-```
-
----
-
-## 🎟️ 8. شاشة حجوزاتي (My Bookings)
-
-### 8.1) عرض قائمة حجوزات العميل (My Bookings List)
-* **Endpoint**: `GET /bookings/my`
-* **Auth Required**: ✅ نعم
-* **Query Parameters**:
-  - `tab`: `upcoming` (الحجوزات القادمة) | `completed` (المكتملة بعد انتهاء تاريخ الرحلة) | `cancelled` (الملغاة والمرفوضة)
-  - `page`: رقم الصفحة (1)
-  - `limit`: عدد النتائج (10)
-
-#### Response (200 OK):
-```json
-{
-  "statusCode": 200,
-  "message": "BOOKINGS_FETCHED",
-  "data": {
-    "bookings": [
-      {
-        "_id": "685bc920f1882d21051b7999",
+        "numberOfSeats": 2,
+        "pickupPoint": "ميدان عبد المنعم رياض",
+        "pickupTime": "06:00 AM",
         "status": "approved",
         "paymentStatus": "paid",
-        "numberOfSeats": 2,
-        "totalPrice": 3700,
-        "pickupPoint": "ميدان التحرير",
-        "pickupTime": "05:00 AM",
-        "isCompleted": true,
-        "canReview": true,
-        "isReviewed": false,
-        "tripSnapshot": {
-          "title": "رحلة دهب وسانت كاترين VIP",
-          "coverImage": "/uploads/trips/cover.jpg",
-          "origin": "القاهرة",
-          "destination": "دهب",
-          "startDate": "2026-08-01T00:00:00.000Z",
-          "endDate": "2026-08-04T00:00:00.000Z"
-        },
-        "company": {
-          "_id": "685bc920f1882d21051b7001",
-          "name": "شركة رحلات مصر",
-          "logo": "/uploads/companies/logo.png",
-          "contactPhone": "+201012345678",
-          "whatsapp": "+201012345678"
-        }
+        "totalPrice": 5000,
+        "notes": "نريد المقاعد الأمامية إن أمكن"
       }
-    ],
-    "pagination": { ... }
-  },
-  "success": true
+    ]
+  }
 }
 ```
 
-#### 🔥 ميزة حقول زر التقييم على الموبايل:
-- إذا كان `canReview: true` ➔ يظهر للمستخدم زر **"تقييم الرحلة والشركة"**.
-- إذا كان `isReviewed: true` ➔ يُعرض للمستخدم زر **"تم التقييم"**.
-- إذا كان `isCompleted: false` ➔ يُمنع التقييم ويظهر زر **"التواصل مع الشركة"**.
-
 ---
 
-### 8.2) تفاصيل حجز معين (Get Booking Details)
-* **Endpoint**: `GET /bookings/:id`
-* **Auth Required**: ✅ نعم
+## 📢 6. إرسال تحديث/إشعار لمسافري الرحلة (Trip Announcement)
 
----
+تستطيع الشركة إرسال تحديث عاجل لجميع العملاء الذين حجزوا الرحلة (مثل: تغيير موعد التحرك).
 
-### 8.3) إلغاء حجز (Cancel Booking)
-* **Endpoint**: `PATCH /bookings/:id/cancel`
-* **Auth Required**: ✅ نعم
-* **Request Body**:
+* **الرابط**: `POST /api/v1/trips/:id/announcements`
+* **Body**:
 ```json
 {
-  "cancellationReason": "ظروف طارئة تمنع من السفر"
+  "title": "تعديل موعد التحرك",
+  "message": "تم تغيير موعد التحرك إلى الساعة 7:00 صباحاً بدلاً من 6:00 صباحاً من نقطة عبد المنعم رياض. يرجى التواجد قبل الموعد بـ 15 دقيقة."
 }
 ```
+* **Response**: يرجع عدد الإشعارات التي تم إرسالها بنجاح للعملاء الحاجزين.
 
 ---
 
-## 💬 9. الشات والمحادثات المباشرة (Chat System)
+## 🎫 7. إدارة الحجوزات (Bookings Control)
 
-### 9.1) بدء أو فتح محادثة (Start / Get Chat Room)
-* **Endpoint**: `POST /chats`
-* **Auth Required**: ✅ نعم
-* **Request Body**:
-```json
-{
-  "companyId": "685bc920f1882d21051b7001",
-  "tripId": "685bc920f1882d21051b72b1",
-  "bookingId": "685bc920f1882d21051b7999",
-  "type": "booking_related"
-}
-```
-
-#### Response (200 OK):
-```json
-{
-  "statusCode": 200,
-  "message": "CHAT_RETRIEVED_SUCCESSFULLY",
-  "data": {
-    "_id": "685bc920f1882d21051b7chat",
-    "type": "booking_related",
-    "user": "685bc920f1882d21051b72a1",
-    "company": {
-      "_id": "685bc920f1882d21051b7001",
-      "name": "شركة رحلات مصر",
-      "logo": "/uploads/companies/logo.png"
-    },
-    "trip": { ... },
-    "unreadCountUser": 0,
-    "lastMessage": "أهلاً بك، تم تأكيد نقطة التجمع"
-  },
-  "success": true
-}
-```
-
----
-
-### 9.2) جلب الرسائل داخل المحادثة (Get Chat Messages)
-* **Endpoint**: `GET /chats/:chatId/messages?page=1&limit=50`
-* **Auth Required**: ✅ نعم
-
----
-
-### 9.3) إرسال رسالة نصية أو صورة (Send Message)
-* **Endpoint**: `POST /chats/:chatId/messages`
-* **Auth Required**: ✅ نعم
-* **Content-Type**: `multipart/form-data`
-
-#### Form Fields:
-- `text`: "السلام عليكم، متى موعد التحرك بالتحديد؟"
-- `image`: (File - اختياري لإرسال صورة استفسار أو تحويل)
-
----
-
-## ⭐ 10. نظام التقييم المشروط بالانتهاء (Reviews)
-
-> ⚠️ **قاعدة صارمة**: يُقبل التقييم **فقط للعميل الذي يمتلك حجزاً مكتتملاً وتجاوز تاريخ انتهاء الرحلة**.
-
-### 10.1) تقييم الرحلة والشركة بعد انتهاء الحجز
-* **Endpoint**: `POST /trips/:tripId/reviews`
-* **Auth Required**: ✅ نعم
-
-#### Request Body:
-```json
-{
-  "rating": 5,
-  "comment": "رحلة ممتعة جداً، الباص كان مريحاً والمواعيد مضبوطة",
-  "companyRating": 5,
-  "companyComment": "شركة ممتازة في التعامل والخدمة"
-}
-```
-
-#### Response في حال عدم وجود حجز مكتمل (400 Bad Request):
-```json
-{
-  "statusCode": 400,
-  "message": "COMPLETED_BOOKING_REQUIRED_FOR_REVIEW",
-  "data": null,
-  "success": false
-}
-```
-
-#### Response عند النجاح (201 Created):
-```json
-{
-  "statusCode": 201,
-  "message": "REVIEW_CREATED_SUCCESSFULLY",
-  "data": {
-    "_id": "685bc920f1882d21051b7rev",
-    "trip": "685bc920f1882d21051b72b1",
-    "rating": 5,
-    "comment": "رحلة ممتعة جداً",
-    "user": {
-      "fullName": "أسامة عصام",
-      "profileImage": "/uploads/profiles/user-123.jpg"
-    }
-  },
-  "success": true
-}
-```
-
----
-
-### 10.2) تقييم تجربة الشركة بشكل مباشر
-* **Endpoint**: `POST /companies/:companyId/reviews`
-* **Auth Required**: ✅ نعم
-* **Request Body**:
-```json
-{
-  "rating": 5,
-  "comment": "شركة ممتازة جداً وأسعارها مناسبة"
-}
-```
-
----
-
-## 🔔 11. الإشعارات والمفضلة (Notifications & Favorites)
-
-### 11.1) المفضلة (Favorites)
-- **إضافة / إزالة رحلة من المفضلة**: `POST /favorites/toggle/:tripId`
-- **جلب قائمة المفضلة**: `GET /favorites`
-
----
-
-### 11.2) الإشعارات (Notifications)
-- **جلب إشعارات العميل**: `GET /notifications?page=1&limit=20`
-- **تحديث رمز جهاز الموبايل (FCM Token for Push Notifications)**:
-  * **Endpoint**: `PATCH /notifications/fcm-token`
+* **عرض الحجوزات**: `GET /api/v1/bookings?status=pending` (أو `approved` / `rejected`)
+* **قبول حجز**: `PATCH /api/v1/bookings/:id/approve`
+* **رفض حجز**: `PATCH /api/v1/bookings/:id/reject`
   ```json
   {
-    "fcmToken": "eXampleFcmDeviceToken123456789..."
+    "rejectionReason": "عذراً، اكتمل عدد المقاعد المتاحة لهذه الرحلة"
   }
   ```
-- **تحديد جميع الإشعارات كُمقروءة**: `PATCH /notifications/read-all`
-- **تحديد إشعار واحد كُمقروء**: `PATCH /notifications/:id/read`
-- **حذف إشعار**: `DELETE /notifications/:id`
+* **إلغاء حجز**: `PATCH /api/v1/bookings/:id/cancel`
 
 ---
 
-## 🔴 12. جدول أكواد الأخطاء الشائعة (Mobile Error Code Reference)
+## 👥 8. إدارة عملاء الشركة (Customers)
 
-يمكن لمطور الموبايل استخدام كود `message` في الـ JSON لعرض رسائل متوافقة ومترجمة للمستخدم:
+عرض قائمة العملاء الذين حجزوا مع الشركة سابقاً وتفاصيل تواصلهم وحجوزاتهم.
 
-| Error Message Code | HTTP Status | Meaning / Solution |
-|---|---|---|
-| `EMAIL_ALREADY_EXISTS` | 409 | البريد الإلكتروني مُسجل بالفعل |
-| `PHONE_ALREADY_EXISTS` | 409 | رقم الهاتف مُسجل بالفعل |
-| `INVALID_CREDENTIALS` | 401 | البريد أو كلمة المرور غير صحيحة |
-| `COMPLETED_BOOKING_REQUIRED_FOR_REVIEW` | 400 | التقييم متاح فقط بعد انتهاء رحلتك المحجوزة |
-| `REVIEW_ALREADY_EXISTS` | 400 | لقد قمت بتقييم هذه الرحلة سابقاً |
-| `ALREADY_BOOKED` | 400 | لديك حجز قيد الانتظار أو مقبول في هذه الرحلة بالفعل |
-| `NOT_ENOUGH_SEATS` | 400 | لا توجد مقاعد كافية متبقية بالرحلة |
-| `TRIP_NOT_AVAILABLE_FOR_BOOKING` | 400 | هذه الرحلة غير متاح حجزها الآن |
-| `INVALID_OR_EXPIRED_OTP` | 400 | كود التحقق غير صحيح أو انتهت صلاحيته |
-| `TOKEN_EXPIRED` | 401 | انتهت صلاحية الجلسة، يلزم عمل Refresh Token |
+* **الرابط**: `GET /api/v1/admin/company-customers`
+* **Query Params**: `page`, `limit`, `search`
+* **Response**:
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "code": "COMPANY_CUSTOMERS_FETCHED",
+  "data": {
+    "customers": [
+      {
+        "_id": "66ba11122233344455566677",
+        "fullName": "محمد علي",
+        "email": "mohamed@gmail.com",
+        "phone": "+201099998888",
+        "totalBookings": 4,
+        "totalSpent": 12000,
+        "lastBookingDate": "2026-08-10T14:00:00.000Z",
+        "previousTrips": [
+          { "title": "رحلة دهب" },
+          { "title": "رحلة شرم الشيخ" }
+        ]
+      }
+    ],
+    "pagination": { "total": 1, "page": 1, "limit": 20, "totalPages": 1 }
+  }
+}
+```
+
+---
+
+## 💰 9. الإدارة المالية والمصروفات (Financials & Expenses)
+
+تسجيل ومتابعة مصروفات رحلات الشركة وحساب **صافي الربح**.
+
+### أ) إضافة مصروف جديد (`POST /api/v1/expenses`)
+* **Content-Type**: `multipart/form-data` (في حال إرفاق فاتورة)
+* **Fields**:
+  * `title`: "حجز فندق سويس إن دهب" (مطلوب)
+  * `amount`: "45000" (مطلوب)
+  * `category`: `"hotel"` (خيارات: `transportation`, `hotel`, `food`, `activities`, `staff`, `other`)
+  * `tripId`: `<TRIP_ID>` (اختياري - لربط المصروف برحلة معينة)
+  * `expenseDate`: "2026-08-15"
+  * `notes`: "تسكين 30 فرد شامل الإفطار"
+  * `receiptImage`: صورة الفاتورة/الإيصال (File - optional)
+
+### ب) عرض مصروفات الشركة (`GET /api/v1/expenses`)
+* **Query Params**: `tripId`, `category`, `startDate`, `endDate`, `page`, `limit`
+
+### ج) تقرير الأرباح والمبيعات المالي المفصل (`GET /api/v1/admin/company-financial-report`)
+* **Query Params**: `startDate`, `endDate`, `month`, `year`
+* **Response**:
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "code": "COMPANY_FINANCIAL_REPORT_FETCHED",
+  "data": {
+    "financials": {
+      "totalGrossRevenue": 150000,
+      "totalExpenses": 90000,
+      "totalAdminCommissionPaid": 15000,
+      "netProfit": 45000,                    // 💵 صافي الربح الحقيقي
+      "totalBookings": 50,
+      "totalSeats": 110,
+      "averageBookingValue": 3000
+    },
+    "expensesByCategory": [
+      { "_id": "hotel", "totalAmount": 50000, "count": 2 },
+      { "_id": "transportation", "totalAmount": 25000, "count": 3 },
+      { "_id": "food", "totalAmount": 15000, "count": 4 }
+    ],
+    "perTripPerformance": [
+      {
+        "_id": "66bc987654321fedcba00222",
+        "title": "رحلة دهب وسانت كاترين",
+        "totalRevenue": 75000,
+        "totalCommission": 7500,
+        "totalBookings": 25,
+        "totalSeats": 55
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 💬 10. نظام المحادثات المباشرة والشات الحي (Live Real-time WebSockets & Chat)
+
+يدعم النظام محادثات حية ومباشرة بين العميل والشركة عبر **WebSockets (Socket.io)** مع وجود REST APIs احتياطية.
+
+### 🔌 1. الاتصال بالسيرفر عبر WebSockets
+* **URL Connection**: `ws://localhost:3000` (أو رابط الدومين الرئيسي)
+* **Auth Credentials**: إرسال `token` عبر `auth`:
+```javascript
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:3000", {
+  auth: {
+    token: "<USER_OR_COMPANY_ADMIN_ACCESS_TOKEN>"
+  },
+  transports: ["websocket", "polling"]
+});
+```
+
+---
+
+### 📡 2. أحداث المحادثة الحية (Socket Events)
+
+#### أ) الانضمام لغرفة محادثة (`join_chat`)
+عند فتح الشات، يرسل العميل أو أدمن الشركة:
+```javascript
+socket.emit("join_chat", { chatId: "66bd99887766554433221100" });
+```
+
+#### ب) إرسال رسالة حية في التو واللحظة (`send_message`)
+```javascript
+socket.emit("send_message", {
+  chatId: "66bd99887766554433221100",
+  text: "أهلاً بك، هل يمكن تعديل نقطة التجمع؟",
+  image: "" // اختياري
+}, (response) => {
+  console.log("تم تسليم الرسالة:", response.data);
+});
+```
+
+#### ج) الاستماع للرسائل الجديدة المفاجئة (`new_message`)
+يستمع الطرفان (العميل وأدمن الشركة) لاستقبال الرسالة فوراً:
+```javascript
+socket.on("new_message", (message) => {
+  console.log("رسالة جديدة:", message.text, message.sender);
+});
+```
+
+#### د) مؤشر الكتابة الحية (`typing` & `user_typing`)
+```javascript
+// عند البدء في الكتابة
+socket.emit("typing", { chatId: "66bd99887766554433221100", isTyping: true });
+
+// الاستماع لمؤشر كتابة الطرف الآخر
+socket.on("user_typing", (data) => {
+  console.log(`${data.fullName} يكتب الآن...`, data.isTyping);
+});
+```
+
+#### هـ) تحديث قائمة المحادثات النشطة (`chat_updated`)
+يستمع أدمن الشركة لهذا الحدث لتحديث قائمة الشات والرسائل غير المقروءة فور وصول رسالة من أي عميل:
+```javascript
+socket.on("chat_updated", (data) => {
+  console.log("تم تحديث الشات:", data.chatId, data.lastMessage);
+});
+```
+
+---
+
+### 🌐 3. واجهات HTTP الاحتياطية (REST APIs)
+* **البدء أو الحصول على غرفة محادثة**: `POST /api/v1/chats` (`{"companyId": "...", "tripId": "..."}`)
+* **عرض المحادثات النشطة**: `GET /api/v1/chats`
+* **عرض رسائل المحادثة**: `GET /api/v1/chats/:id/messages`
+* **إرسال رسالة نصية أو صورة عبر REST API**: `POST /api/v1/chats/:id/messages` (مع `multipart/form-data` لارسال الصور).
+
+---
+
+## ⭐ 11. التقييمات (Company & Trip Reviews)
+
+* **تقييمات الشركة**: `GET /api/v1/companies/:id/reviews`
+* **تقييمات الرحلة**: `GET /api/v1/trips/:id/reviews`
+
+---
+
+## 🎁 12. العروض والكوبونات (Offers & Coupons)
+
+* **إنشاء عرض ترويجي للشركة**: `POST /api/v1/offers` (مع رفع صورة العرض)
+* **إنشاء كوبون خصم للرحلات**: `POST /api/v1/coupons`
+
+---

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 
@@ -33,7 +34,7 @@ class AdminRejectionReasonDialog extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSizes.r16),
       ),
       title: Text(
-        'رفض طلب الحجز',
+        AppStrings.adminRejectDialogTitle,
         style: AppTextStyles.titleMedium.copyWith(
           fontWeight: FontWeight.bold,
         ),
@@ -42,7 +43,7 @@ class AdminRejectionReasonDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'يرجى كتابة سبب رفض الطلب للتوضيح للعميل:',
+            AppStrings.adminRejectDialogSubtitle,
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.textSecondary,
             ),
@@ -52,7 +53,7 @@ class AdminRejectionReasonDialog extends StatelessWidget {
             controller: reasonController,
             maxLines: 3,
             decoration: InputDecoration(
-              hintText: 'مثال: عذراً، اكتمل عدد المقاعد المتاحة لهذه الرحلة',
+              hintText: AppStrings.adminRejectDialogHint,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSizes.r8),
               ),
@@ -63,7 +64,7 @@ class AdminRejectionReasonDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('إلغاء'),
+          child: Text(AppStrings.cancel),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -74,9 +75,9 @@ class AdminRejectionReasonDialog extends StatelessWidget {
             Navigator.pop(context);
             onConfirmRejection(reason.isNotEmpty ? reason : null);
           },
-          child: const Text(
-            'تأكيد الرفض',
-            style: TextStyle(color: Colors.white),
+          child: Text(
+            AppStrings.adminRejectDialogConfirm,
+            style: const TextStyle(color: AppColors.surface),
           ),
         ),
       ],

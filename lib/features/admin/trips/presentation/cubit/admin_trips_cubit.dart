@@ -74,4 +74,12 @@ class AdminTripsCubit extends Cubit<AdminTripsState> {
     if (_currentStatus == status && state is AdminTripsSuccess) return;
     fetchTrips(status: status);
   }
+
+  Future<void> duplicateTrip(String tripId) async {
+    final result = await repo.duplicateTrip(tripId);
+    result.fold(
+      (failure) => emit(AdminTripsFailure(failure.message)),
+      (_) => fetchTrips(status: _currentStatus),
+    );
+  }
 }

@@ -35,11 +35,7 @@ class BookingSuccessPage extends StatelessWidget {
                   color: Colors.green,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.check,
-                  color: Colors.white,
-                  size: 48.r,
-                ),
+                child: Icon(Icons.check, color: Colors.white, size: 48.r),
               ),
               AppSizes.p16.verticalSpace,
               Text(
@@ -194,7 +190,9 @@ class BookingSuccessPage extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+                  border: Border.all(
+                    color: Colors.green.withValues(alpha: 0.3),
+                  ),
                 ),
                 child: Row(
                   children: [
@@ -317,7 +315,11 @@ class BookingSuccessPage extends StatelessWidget {
                 ),
               ],
             ),
-            Icon(Icons.arrow_forward_ios, size: 14.r, color: AppColors.textHint),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 14.r,
+              color: AppColors.textHint,
+            ),
           ],
         ),
       ),

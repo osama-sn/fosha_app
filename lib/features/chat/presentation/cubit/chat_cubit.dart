@@ -61,10 +61,54 @@ class ChatCubit extends Cubit<ChatState> {
 
   Future<void> initChat({
     required String companyId,
+    String? chatId,
+    String? tripId,
+    String? bookingId,
+    ChatModel? initialChat,
+  }) async {
+    emit(ChatLoading());
+
+    if (initialChat != null) {
+      final msgResult = await repository.getMessages(chatId: initialChat.id);
+      msgResult.fold(
+        (f) => emit(ChatSuccess(chat: initialChat, messages: initialChat.messages)),
+        (msgs) => emit(ChatSuccess(chat: initialChat, messages: msgs)),
+      );
+      return;
+    }
+
+    if (chatId != null && chatId.isNotEmpty) {
+      final msgResult = await repository.getMessages(chatId: chatId);
+      await msgResult.fold(
+        (failure) async {
+          _startOrGetChat(companyId: companyId, tripId: tripId, bookingId: bookingId);
+        },
+        (msgs) async {
+          final dummyChat = ChatModel(
+            id: chatId,
+            type: 'booking_related',
+            userId: '',
+            companyId: companyId,
+            messages: msgs,
+          );
+          emit(ChatSuccess(chat: dummyChat, messages: msgs));
+        },
+      );
+      return;
+    }
+
+    await _startOrGetChat(
+      companyId: companyId,
+      tripId: tripId,
+      bookingId: bookingId,
+    );
+  }
+
+  Future<void> _startOrGetChat({
+    required String companyId,
     String? tripId,
     String? bookingId,
   }) async {
-    emit(ChatLoading());
     final chatResult = await repository.startOrGetChat(
       companyId: companyId,
       tripId: tripId,

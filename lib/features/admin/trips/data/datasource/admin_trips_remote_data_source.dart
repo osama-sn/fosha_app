@@ -8,6 +8,8 @@ abstract class AdminTripsRemoteDataSource {
     int limit = 10,
     String? status,
   });
+
+  Future<void> duplicateTrip(String tripId);
 }
 
 class AdminTripsRemoteDataSourceImpl implements AdminTripsRemoteDataSource {
@@ -36,5 +38,10 @@ class AdminTripsRemoteDataSourceImpl implements AdminTripsRemoteDataSource {
     } catch (e) {
       rethrow;
     }
+  }
+
+  @override
+  Future<void> duplicateTrip(String tripId) async {
+    await _dioClient.dio.post(ApiEndpoints.duplicateTrip(tripId));
   }
 }

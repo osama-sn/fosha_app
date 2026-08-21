@@ -9,20 +9,18 @@ abstract class AdminDashboardRemoteDataSource {
 class AdminDashboardRemoteDataSourceImpl
     implements AdminDashboardRemoteDataSource {
   final DioClient _dioClient;
+
   AdminDashboardRemoteDataSourceImpl({required DioClient dioClient})
     : _dioClient = dioClient;
+
   @override
   Future<AdminDashboardStatsModel> getStats() async {
     try {
       final response = await _dioClient.dio.get(ApiEndpoints.adminCompanyStats);
-      return AdminDashboardStatsModel.fromJson(
-        response.data as Map<String, dynamic>,
-      );
+      return AdminDashboardStatsModel.fromJson(response.data);
     } catch (_) {
       final response = await _dioClient.dio.get(ApiEndpoints.adminStats);
-      return AdminDashboardStatsModel.fromJson(
-        response.data as Map<String, dynamic>,
-      );
+      return AdminDashboardStatsModel.fromJson(response.data);
     }
   }
 }

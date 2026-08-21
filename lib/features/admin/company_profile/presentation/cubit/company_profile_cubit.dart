@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/features/admin/company_profile/data/models/company_profile_model.dart';
 import 'package:fosha_app/features/admin/company_profile/data/repositories/company_profile_repository.dart';
 import 'company_profile_state.dart';
@@ -11,12 +12,12 @@ class CompanyProfileCubit extends Cubit<CompanyProfileState> {
 
   Future<void> loadCompanyProfile(String companyId) async {
     emit(CompanyProfileLoading());
-    try {
-      final profile = await repository.getCompanyProfile(companyId);
-      emit(CompanyProfileLoaded(profile: profile));
-    } catch (e) {
-      emit(CompanyProfileFailure(error: e.toString().replaceAll('Exception: ', '')));
-    }
+    final result = await repository.getCompanyProfile(companyId);
+
+    result.fold(
+      (failure) => emit(CompanyProfileFailure(error: failure.message)),
+      (profile) => emit(CompanyProfileLoaded(profile: profile)),
+    );
   }
 
   Future<void> updateCompanyProfile({
@@ -42,37 +43,38 @@ class CompanyProfileCubit extends Cubit<CompanyProfileState> {
       emit(CompanyProfileLoading());
     }
 
-    try {
-      final updatedModel = currentModel != null
-          ? currentModel.copyWith(
-              name: name,
-              description: description,
-              contactPhone: contactPhone,
-              contactEmail: contactEmail,
-              address: address,
-              governorate: governorate,
-            )
-          : CompanyProfileModel(
-              id: companyId,
-              name: name,
-              description: description,
-              contactPhone: contactPhone,
-              contactEmail: contactEmail,
-              address: address,
-              governorate: governorate,
-            );
+    final updatedModel = currentModel != null
+        ? currentModel.copyWith(
+            name: name,
+            description: description,
+            contactPhone: contactPhone,
+            contactEmail: contactEmail,
+            address: address,
+            governorate: governorate,
+          )
+        : CompanyProfileModel(
+            id: companyId,
+            name: name,
+            description: description,
+            contactPhone: contactPhone,
+            contactEmail: contactEmail,
+            address: address,
+            governorate: governorate,
+          );
 
-      final result = await repository.updateCompanyProfile(
-        companyId,
-        updatedModel,
-      );
+    final result = await repository.updateCompanyProfile(
+      companyId,
+      updatedModel,
+    );
 
-      emit(CompanyProfileUpdateSuccess(
-        profile: result,
-        message: 'تم تحديث بيانات الشركة بنجاح',
-      ));
-    } catch (e) {
-      emit(CompanyProfileFailure(error: e.toString().replaceAll('Exception: ', '')));
-    }
+    result.fold(
+      (failure) => emit(CompanyProfileFailure(error: failure.message)),
+      (profile) => emit(
+        CompanyProfileUpdateSuccess(
+          profile: profile,
+          message: AppStrings.companyProfileUpdateSuccess,
+        ),
+      ),
+    );
   }
 }

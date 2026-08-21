@@ -1,4 +1,6 @@
-import 'package:dio/dio.dart';
+import 'package:dartz/dartz.dart';
+import 'package:fosha_app/core/errors/api_error_handler.dart';
+import 'package:fosha_app/core/errors/failures.dart';
 import 'package:fosha_app/features/admin/coupons/data/datasources/coupons_remote_data_source.dart';
 import 'package:fosha_app/features/admin/coupons/data/models/coupon_model.dart';
 
@@ -7,20 +9,16 @@ class CouponsRepository {
 
   CouponsRepository({required this.dataSource});
 
-  Future<List<CouponModel>> getCompanyCoupons() async {
+  Future<Either<Failure, List<CouponModel>>> getCompanyCoupons() async {
     try {
-      return await dataSource.getCompanyCoupons();
-    } on DioException catch (e) {
-      final msg = e.response?.data is Map && e.response?.data['message'] != null
-          ? e.response?.data['message'].toString()
-          : 'فشل في جلب كروت الكوبونات';
-      throw Exception(msg);
+      final response = await dataSource.getCompanyCoupons();
+      return Right(response);
     } catch (e) {
-      throw Exception(e.toString().replaceAll('Exception: ', ''));
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
     }
   }
 
-  Future<CouponModel> createCoupon({
+  Future<Either<Failure, CouponModel>> createCoupon({
     required String code,
     required double discountPercentage,
     required double maxDiscountAmount,
@@ -29,7 +27,7 @@ class CouponsRepository {
     required int usageLimit,
   }) async {
     try {
-      return await dataSource.createCoupon(
+      final response = await dataSource.createCoupon(
         code: code,
         discountPercentage: discountPercentage,
         maxDiscountAmount: maxDiscountAmount,
@@ -37,26 +35,18 @@ class CouponsRepository {
         validUntil: validUntil,
         usageLimit: usageLimit,
       );
-    } on DioException catch (e) {
-      final msg = e.response?.data is Map && e.response?.data['message'] != null
-          ? e.response?.data['message'].toString()
-          : 'فشل في إنشاء كود الخصم';
-      throw Exception(msg);
+      return Right(response);
     } catch (e) {
-      throw Exception(e.toString().replaceAll('Exception: ', ''));
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
     }
   }
 
-  Future<void> deleteCoupon(String couponId) async {
+  Future<Either<Failure, void>> deleteCoupon(String couponId) async {
     try {
       await dataSource.deleteCoupon(couponId);
-    } on DioException catch (e) {
-      final msg = e.response?.data is Map && e.response?.data['message'] != null
-          ? e.response?.data['message'].toString()
-          : 'فشل في حذف الكوبون';
-      throw Exception(msg);
+      return const Right(null);
     } catch (e) {
-      throw Exception(e.toString().replaceAll('Exception: ', ''));
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
     }
   }
 }

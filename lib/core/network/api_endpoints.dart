@@ -62,8 +62,19 @@ class ApiEndpoints {
   /// admin
   static const String adminStats = '/admin/stats';
   static const String adminCompanyStats = '/admin/company-stats';
+  static const String adminFinancialReport = '/admin/company-financial-report';
+  static const String adminCompanyCustomers = '/admin/company-customers';
   static const String adminTrips = '/trips';
   static const String trips = '/trips';
   static const String bookings = '/bookings';
   static const String chats = '/chats';
+  static const String expenses = '/expenses';
+  static const String expensesSummary = '/expenses/summary';
+  static const String coupons = '/coupons';
+
+  static String tripPassengers(String tripId) => '/trips/$tripId/passengers';
+  static String tripAnnouncements(String tripId) => '/trips/$tripId/announcements';
+  static String duplicateTrip(String tripId) => '/trips/$tripId/duplicate';
+  static String companyReviews(String companyId) => '/companies/$companyId/reviews';
+  static String tripReviews(String tripId) => '/trips/$tripId/reviews';
 }

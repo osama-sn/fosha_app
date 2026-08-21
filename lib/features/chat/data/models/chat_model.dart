@@ -4,6 +4,8 @@ class ChatModel {
   final String id;
   final String type;
   final String userId;
+  final String? userName;
+  final String? userPhone;
   final String companyId;
   final String? companyName;
   final String? companyLogo;
@@ -17,6 +19,8 @@ class ChatModel {
     required this.id,
     required this.type,
     required this.userId,
+    this.userName,
+    this.userPhone,
     required this.companyId,
     this.companyName,
     this.companyLogo,
@@ -29,13 +33,54 @@ class ChatModel {
 
   factory ChatModel.fromJson(Map<String, dynamic> json) {
     String userIdVal = '';
-    if (json['user'] != null) {
-      if (json['user'] is Map) {
-        userIdVal = (json['user']['_id'] ?? json['user']['id'] ?? '').toString();
-      } else {
-        userIdVal = json['user'].toString();
+    String? uName;
+    String? uPhone;
+
+    void extractUserFrom(Map<String, dynamic> uMap) {
+      final id = (uMap['_id'] ?? uMap['id'] ?? '').toString();
+      if (id.isNotEmpty && userIdVal.isEmpty) {
+        userIdVal = id;
+      }
+      final name = uMap['fullName'] as String? ?? uMap['name'] as String?;
+      if (name != null && name.isNotEmpty) {
+        if (uName == null || uName == 'الادمن') {
+          uName = name;
+        }
+      }
+      final phone = uMap['phone'] as String?;
+      if (phone != null && phone.isNotEmpty) {
+        if (uPhone == null || uPhone == '01099999991') {
+          uPhone = phone;
+        }
       }
     }
+
+    if (json['customer'] is Map) {
+      extractUserFrom(Map<String, dynamic>.from(json['customer'] as Map));
+    }
+    if (json['client'] is Map) {
+      extractUserFrom(Map<String, dynamic>.from(json['client'] as Map));
+    }
+    if (json['participants'] is List) {
+      for (var p in json['participants'] as List) {
+        if (p is Map) {
+          final pMap = Map<String, dynamic>.from(p);
+          final pName = pMap['fullName'] as String? ?? pMap['name'] as String? ?? '';
+          if (pName.isNotEmpty && pName != 'الادمن' && pMap['role'] != 'admin') {
+            extractUserFrom(pMap);
+            break;
+          }
+        }
+      }
+    }
+    if (json['user'] is Map) {
+      extractUserFrom(Map<String, dynamic>.from(json['user'] as Map));
+    } else if (json['user'] != null && userIdVal.isEmpty) {
+      userIdVal = json['user'].toString();
+    }
+
+    uName ??= json['userName'] as String? ?? json['customerName'] as String?;
+    uPhone ??= json['userPhone'] as String? ?? json['customerPhone'] as String?;
 
     String companyIdVal = '';
     String? compName;
@@ -62,6 +107,8 @@ class ChatModel {
       id: (json['_id'] ?? json['id'] ?? '').toString(),
       type: json['type'] as String? ?? 'booking_related',
       userId: userIdVal,
+      userName: uName,
+      userPhone: uPhone,
       companyId: companyIdVal,
       companyName: compName,
       companyLogo: compLogo,

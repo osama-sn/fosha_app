@@ -11,6 +11,7 @@ import 'package:fosha_app/core/shared/widgets/app_loading.dart';
 import 'package:fosha_app/core/shared/widgets/app_text_field.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
+import 'package:fosha_app/features/user/auth/presentation/cubit/auth_cubit.dart';
 import 'package:fosha_app/features/user/home/presentation/cubit/home_cubit.dart';
 import 'package:fosha_app/features/user/home/presentation/cubit/home_state.dart';
 import 'package:fosha_app/features/user/home/presentation/widgets/home_categories_widget.dart';
@@ -25,8 +26,16 @@ class HomeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<HomeCubit>(
-      create: (context) => getIt<HomeCubit>()..fetchHomeData(governorate: 'المنيا'),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<HomeCubit>(
+          create: (context) =>
+              getIt<HomeCubit>()..fetchHomeData(governorate: 'المنيا'),
+        ),
+        BlocProvider<AuthCubit>(
+          create: (context) => getIt<AuthCubit>()..checkAuthStatus(),
+        ),
+      ],
       child: BlocBuilder<HomeCubit, HomeState>(
         builder: (context, state) {
           final cubit = context.read<HomeCubit>();

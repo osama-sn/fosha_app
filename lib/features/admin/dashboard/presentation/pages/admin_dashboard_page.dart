@@ -17,6 +17,7 @@ import 'package:fosha_app/features/admin/dashboard/presentation/cubit/admin_stat
 import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_bookings_grid.dart';
 import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_bottom_nav_bar.dart';
 import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_dashboard_header.dart';
+import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_features_grid.dart';
 import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_financials_section.dart';
 import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_net_profit_card.dart';
 import 'package:fosha_app/features/admin/dashboard/presentation/widgets/admin_quick_promotions_section.dart';
@@ -104,6 +105,8 @@ class AdminDashboardPage extends StatelessWidget {
                             publishedTrips: stats.trips.publishedTrips,
                             draftTrips: stats.trips.draftTrips,
                           ),
+                          AppSizes.p24.verticalSpace,
+                          const AdminFeaturesGrid(),
                           AppSizes.p24.verticalSpace,
                           const AdminQuickPromotionsSection(),
                           AppSizes.p24.verticalSpace,

@@ -1,4 +1,5 @@
 class CompanyInfoModel {
+  final String id;
   final String name;
   final String commissionType;
   final double commissionValue;
@@ -6,6 +7,7 @@ class CompanyInfoModel {
   final String subscriptionStatus;
 
   const CompanyInfoModel({
+    required this.id,
     required this.name,
     required this.commissionType,
     required this.commissionValue,
@@ -15,6 +17,7 @@ class CompanyInfoModel {
 
   factory CompanyInfoModel.fromJson(Map<String, dynamic> json) {
     return CompanyInfoModel(
+      id: json['_id'] as String? ?? json['id'] as String? ?? '',
       name: json['name'] as String? ?? '',
       commissionType: json['commissionType'] as String? ?? 'percentage',
       commissionValue: (json['commissionValue'] as num?)?.toDouble() ?? 0.0,
@@ -26,6 +29,7 @@ class CompanyInfoModel {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'name': name,
       'commissionType': commissionType,
       'commissionValue': commissionValue,
@@ -110,12 +114,18 @@ class FinancialsStatsModel {
   });
 
   factory FinancialsStatsModel.fromJson(Map<String, dynamic> json) {
-    final net = (json['totalCompanyNetRevenue'] as num?)?.toDouble();
+    final net = (json['totalCompanyNetRevenue'] as num?)?.toDouble() ??
+        (json['totalCompanyNetPayouts'] as num?)?.toDouble() ??
+        (json['companyNetRevenue'] as num?)?.toDouble();
+
     final gross = (json['totalGrossRevenue'] as num?)?.toDouble() ??
         (json['totalRevenue'] as num?)?.toDouble() ??
         0.0;
+
     final commission =
-        (json['totalAdminCommissionPaid'] as num?)?.toDouble() ?? 0.0;
+        (json['totalAdminCommissions'] as num?)?.toDouble() ??
+        (json['totalAdminCommissionPaid'] as num?)?.toDouble() ??
+        0.0;
 
     return FinancialsStatsModel(
       totalGrossRevenue: gross,

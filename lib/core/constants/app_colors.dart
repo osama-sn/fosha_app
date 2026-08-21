@@ -33,6 +33,7 @@ class AppColors {
   static const Color textHint = Color(0xFF9CA3AF);
 
   // Other
+  static const Color whatsApp = Color(0xFF25D366);
   static const Color disabled = Color(0xFFD1D5DB);
   static const Color shadow = Color(0xFF000000);
   static const Color transparent = Colors.transparent;

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
 import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/di/service_locator.dart';
-import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
+import 'package:fosha_app/features/admin/bookings/data/constants/admin_bookings_constants.dart';
 import 'package:fosha_app/features/admin/bookings/data/models/booking_model.dart';
 import 'package:fosha_app/features/admin/bookings/presentation/cubit/admin_bookings_cubit.dart';
 import 'package:fosha_app/features/admin/bookings/presentation/cubit/admin_bookings_state.dart';
+import 'package:fosha_app/features/admin/bookings/presentation/widgets/admin_bookings_error_widget.dart';
 import 'package:fosha_app/features/admin/bookings/presentation/widgets/admin_bookings_filter_tabs.dart';
 import 'package:fosha_app/features/admin/bookings/presentation/widgets/admin_bookings_list.dart';
 import 'package:fosha_app/features/admin/bookings/presentation/widgets/admin_bookings_trip_filter_header.dart';
@@ -51,11 +51,11 @@ class _AdminBookingsViewState extends State<_AdminBookingsView> {
   String? _getStatusParam(int index) {
     switch (index) {
       case 1:
-        return 'pending';
+        return AdminBookingsConstants.statusPending;
       case 2:
-        return 'approved';
+        return AdminBookingsConstants.statusApproved;
       case 3:
-        return 'rejected';
+        return AdminBookingsConstants.statusRejected;
       case 0:
       default:
         return null;
@@ -103,31 +103,26 @@ class _AdminBookingsViewState extends State<_AdminBookingsView> {
             }
 
             if (state is AdminBookingsError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(state.message, style: AppTextStyles.bodyMedium),
-                    AppSizes.p16.verticalSpace,
-                    ElevatedButton(
-                      onPressed: () =>
-                          context.read<AdminBookingsCubit>().fetchBookings(),
-                      child: Text(AppStrings.retry),
-                    ),
-                  ],
-                ),
+              return AdminBookingsErrorWidget(
+                errorMessage: state.message,
+                onRetry: () => context.read<AdminBookingsCubit>().fetchBookings(),
               );
             }
 
             final bookings =
                 state is AdminBookingsLoaded ? state.bookings : <BookingModel>[];
 
-            final pendingCount =
-                bookings.where((b) => b.status == 'pending').length;
-            final approvedCount =
-                bookings.where((b) => b.status == 'approved' || b.status == 'accepted').length;
-            final rejectedCount =
-                bookings.where((b) => b.status == 'rejected').length;
+            final pendingCount = bookings
+                .where((b) => b.status == AdminBookingsConstants.statusPending)
+                .length;
+            final approvedCount = bookings
+                .where((b) =>
+                    b.status == AdminBookingsConstants.statusApproved ||
+                    b.status == AdminBookingsConstants.statusAccepted)
+                .length;
+            final rejectedCount = bookings
+                .where((b) => b.status == AdminBookingsConstants.statusRejected)
+                .length;
 
             final filterTabs = [
               '${AppStrings.bookingsFilterAll} (${bookings.length})',
@@ -149,13 +144,14 @@ class _AdminBookingsViewState extends State<_AdminBookingsView> {
               bool matchesStatus = true;
               switch (_selectedFilterIndex) {
                 case 1:
-                  matchesStatus = b.status == 'pending';
+                  matchesStatus = b.status == AdminBookingsConstants.statusPending;
                   break;
                 case 2:
-                  matchesStatus = b.status == 'approved' || b.status == 'accepted';
+                  matchesStatus = b.status == AdminBookingsConstants.statusApproved ||
+                      b.status == AdminBookingsConstants.statusAccepted;
                   break;
                 case 3:
-                  matchesStatus = b.status == 'rejected';
+                  matchesStatus = b.status == AdminBookingsConstants.statusRejected;
                   break;
                 case 0:
                 default:
@@ -196,7 +192,7 @@ class _AdminBookingsViewState extends State<_AdminBookingsView> {
                   onAcceptBooking: (bookingId) {
                     context.read<AdminBookingsCubit>().updateStatus(
                           bookingId: bookingId,
-                          newStatus: 'approved',
+                          newStatus: AdminBookingsConstants.statusApproved,
                         );
                   },
                   onRejectBooking: (bookingId) {
@@ -205,7 +201,7 @@ class _AdminBookingsViewState extends State<_AdminBookingsView> {
                       onConfirmRejection: (reason) {
                         context.read<AdminBookingsCubit>().updateStatus(
                               bookingId: bookingId,
-                              newStatus: 'rejected',
+                              newStatus: AdminBookingsConstants.statusRejected,
                               rejectionReason: reason,
                             );
                       },
@@ -220,5 +216,3 @@ class _AdminBookingsViewState extends State<_AdminBookingsView> {
     );
   }
 }
-
-

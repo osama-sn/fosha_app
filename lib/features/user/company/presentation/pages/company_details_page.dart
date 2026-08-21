@@ -10,7 +10,10 @@ import 'package:fosha_app/core/shared/widgets/app_loading.dart';
 import 'package:fosha_app/core/shared/widgets/app_network_image.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
+import 'package:dartz/dartz.dart' hide State;
+import 'package:fosha_app/core/errors/failures.dart';
 import 'package:fosha_app/features/admin/company_profile/data/models/company_profile_model.dart';
+import 'package:fosha_app/features/admin/company_profile/data/models/company_review_model.dart';
 import 'package:fosha_app/features/admin/company_profile/data/repositories/company_profile_repository.dart';
 import 'package:fosha_app/features/admin/company_profile/presentation/cubit/company_profile_cubit.dart';
 import 'package:fosha_app/features/admin/company_profile/presentation/cubit/company_profile_state.dart';
@@ -565,7 +568,7 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
       );
     } else if (_selectedTab == 2) {
       // التقييمات - GET /companies/:companyId/reviews
-      return FutureBuilder<List<Map<String, dynamic>>>(
+      return FutureBuilder<Either<Failure, List<CompanyReviewModel>>>(
         future: getIt<CompanyProfileRepository>().getCompanyReviews(
           widget.companyId,
         ),
@@ -573,7 +576,7 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: AppLoading());
           }
-          final reviews = snapshot.data ?? [];
+          final reviews = snapshot.data?.fold((l) => <CompanyReviewModel>[], (r) => r) ?? [];
           if (reviews.isEmpty) {
             return Center(
               child: Padding(
@@ -600,15 +603,10 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
 
           return Column(
             children: reviews.map((rev) {
-              final userName = rev['user'] is Map
-                  ? (rev['user']['fullName'] ?? rev['user']['name'] ?? 'مستخدم')
-                  : (rev['userName'] ?? 'مستخدم');
-              final ratingNum = (rev['rating'] as num?)?.toDouble() ?? 5.0;
-              final comment =
-                  rev['comment']?.toString() ??
-                  rev['review']?.toString() ??
-                  'خدمة ممتازة ورحلة منظمة جداً';
-              final createdAt = rev['createdAt']?.toString() ?? 'مؤخراً';
+              final userName = rev.user.fullName;
+              final ratingNum = rev.rating;
+              final comment = rev.comment;
+              final createdAt = rev.createdAt;
 
               return Container(
                 margin: EdgeInsets.only(bottom: 12.h),

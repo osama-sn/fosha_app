@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fosha_app/core/constants/app_colors.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/extensions/extensions.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
-import 'package:fosha_app/core/theme/app_text_styles.dart';
+import 'package:fosha_app/features/admin/bookings/data/constants/admin_bookings_constants.dart';
 import 'package:fosha_app/features/admin/bookings/data/models/booking_model.dart';
 import 'package:fosha_app/features/admin/bookings/presentation/widgets/admin_booking_card.dart';
+import 'package:fosha_app/features/admin/bookings/presentation/widgets/admin_bookings_empty_widget.dart';
 
 class AdminBookingsList extends StatelessWidget {
   final List<BookingModel> bookings;
@@ -22,17 +23,7 @@ class AdminBookingsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (bookings.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: EdgeInsets.all(AppSizes.p32),
-          child: Text(
-            'لا توجد طلبات حجز حالياً',
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
-            ),
-          ),
-        ),
-      ).expanded();
+      return const AdminBookingsEmptyWidget().expanded();
     }
 
     return ListView.separated(
@@ -41,16 +32,23 @@ class AdminBookingsList extends StatelessWidget {
       separatorBuilder: (context, index) => AppSizes.p16.verticalSpace,
       itemBuilder: (context, index) {
         final booking = bookings[index];
+        final status = booking.status == AdminBookingsConstants.statusApproved
+            ? AdminBookingsConstants.statusAccepted
+            : booking.status;
+
         return AdminBookingCard(
+          booking: booking,
           customerName: booking.customerName,
           customerEmail: booking.customerEmail,
           customerPhone: booking.customerPhone,
           tripTitle: booking.tripTitle,
           tripDates: booking.tripDates,
-          totalAmount: '${booking.totalAmount.toStringAsFixed(0)} ج.م',
-          passengersCount: '${booking.passengersCount} شخص',
+          totalAmount:
+              '${booking.totalAmount.toStringAsFixed(0)} ${AppStrings.adminCurrencyEGP}',
+          passengersCount:
+              '${booking.passengersCount} ${AppStrings.adminPersonUnit}',
           tripImage: booking.trip?.coverImage ?? '',
-          status: booking.status == 'approved' ? 'accepted' : booking.status,
+          status: status,
           onAccept: () => onAcceptBooking(booking.id),
           onReject: () => onRejectBooking(booking.id),
         );

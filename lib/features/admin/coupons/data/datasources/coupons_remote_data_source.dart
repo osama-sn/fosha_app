@@ -1,3 +1,4 @@
+import 'package:fosha_app/core/network/api_endpoints.dart';
 import 'package:fosha_app/core/network/dio_client.dart';
 import 'package:fosha_app/features/admin/coupons/data/models/coupon_model.dart';
 
@@ -22,24 +23,8 @@ class CouponsRemoteDataSourceImpl implements CouponsRemoteDataSource {
 
   @override
   Future<List<CouponModel>> getCompanyCoupons() async {
-    final response = await _dioClient.dio.get('/coupons');
-    final responseData = response.data;
-    List dynamicList = [];
-
-    if (responseData is Map<String, dynamic>) {
-      if (responseData['data'] is List) {
-        dynamicList = responseData['data'] as List;
-      } else if (responseData['data'] is Map &&
-          responseData['data']['coupons'] is List) {
-        dynamicList = responseData['data']['coupons'] as List;
-      }
-    } else if (responseData is List) {
-      dynamicList = responseData;
-    }
-
-    return dynamicList
-        .map((e) => CouponModel.fromJson(e as Map<String, dynamic>))
-        .toList();
+    final response = await _dioClient.dio.get(ApiEndpoints.coupons);
+    return _extractCouponsList(response.data);
   }
 
   @override
@@ -52,7 +37,7 @@ class CouponsRemoteDataSourceImpl implements CouponsRemoteDataSource {
     required int usageLimit,
   }) async {
     final response = await _dioClient.dio.post(
-      '/coupons',
+      ApiEndpoints.coupons,
       data: {
         'code': code.toUpperCase(),
         'discountPercentage': discountPercentage,
@@ -63,21 +48,24 @@ class CouponsRemoteDataSourceImpl implements CouponsRemoteDataSource {
       },
     );
 
-    final responseData = response.data;
-    Map<String, dynamic> couponJson;
-    if (responseData is Map<String, dynamic> && responseData['data'] != null) {
-      couponJson = responseData['data'] is Map
-          ? responseData['data'] as Map<String, dynamic>
-          : responseData;
-    } else {
-      couponJson = responseData as Map<String, dynamic>;
-    }
-
-    return CouponModel.fromJson(couponJson);
+    return CouponModel.fromJson(_extractCouponMap(response.data));
   }
 
   @override
   Future<void> deleteCoupon(String couponId) async {
-    await _dioClient.dio.delete('/coupons/$couponId');
+    await _dioClient.dio.delete('${ApiEndpoints.coupons}/$couponId');
+  }
+
+  List<CouponModel> _extractCouponsList(dynamic res) {
+    final data = res?['data'];
+    final list = (data is Map ? data['coupons'] : data) as List? ?? (res is List ? res : []);
+    return list
+        .map((e) => CouponModel.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  Map<String, dynamic> _extractCouponMap(dynamic res) {
+    final data = res?['data'];
+    return (data?['coupon'] ?? data ?? res ?? {}) as Map<String, dynamic>;
   }
 }

@@ -9,6 +9,7 @@ import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 import 'package:fosha_app/features/admin/company_profile/data/models/company_profile_model.dart';
 import 'package:fosha_app/features/admin/company_profile/presentation/cubit/company_profile_cubit.dart';
+import 'package:fosha_app/features/admin/company_profile/presentation/widgets/company_profile_form_field.dart';
 import 'package:fosha_app/features/admin/company_profile/presentation/widgets/company_profile_governorate_picker.dart';
 
 class CompanyProfileForm extends StatefulWidget {
@@ -96,10 +97,10 @@ class _CompanyProfileFormState extends State<CompanyProfileForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Name field
-          _buildSectionTitle(AppStrings.companyNameLabel),
-          AppSizes.p8.verticalSpace,
-          TextFormField(
+          CompanyProfileFormField(
+            label: AppStrings.companyNameLabel,
+            hintText: AppStrings.companyNameHint,
+            prefixIcon: Icons.business_outlined,
             controller: _nameController,
             validator: (val) {
               if (val == null || val.trim().isEmpty) {
@@ -107,31 +108,23 @@ class _CompanyProfileFormState extends State<CompanyProfileForm> {
               }
               return null;
             },
-            decoration: _buildInputDecoration(
-              hintText: AppStrings.companyNameHint,
-              prefixIcon: Icons.business_outlined,
-            ),
           ),
           AppSizes.p16.verticalSpace,
 
-          // Description field
-          _buildSectionTitle(AppStrings.companyDescLabel),
-          AppSizes.p8.verticalSpace,
-          TextFormField(
+          CompanyProfileFormField(
+            label: AppStrings.companyDescLabel,
+            hintText: AppStrings.companyDescHint,
+            prefixIcon: Icons.description_outlined,
             controller: _descriptionController,
             maxLines: 3,
             minLines: 2,
-            decoration: _buildInputDecoration(
-              hintText: AppStrings.companyDescHint,
-              prefixIcon: Icons.description_outlined,
-            ),
           ),
           AppSizes.p16.verticalSpace,
 
-          // Phone field
-          _buildSectionTitle(AppStrings.companyPhoneLabel),
-          AppSizes.p8.verticalSpace,
-          TextFormField(
+          CompanyProfileFormField(
+            label: AppStrings.companyPhoneLabel,
+            hintText: AppStrings.phoneHint,
+            prefixIcon: Icons.phone_outlined,
             controller: _phoneController,
             keyboardType: TextInputType.phone,
             validator: (val) {
@@ -140,17 +133,13 @@ class _CompanyProfileFormState extends State<CompanyProfileForm> {
               }
               return null;
             },
-            decoration: _buildInputDecoration(
-              hintText: AppStrings.phoneHint,
-              prefixIcon: Icons.phone_outlined,
-            ),
           ),
           AppSizes.p16.verticalSpace,
 
-          // Email field
-          _buildSectionTitle(AppStrings.companyEmailLabel),
-          AppSizes.p8.verticalSpace,
-          TextFormField(
+          CompanyProfileFormField(
+            label: AppStrings.companyEmailLabel,
+            hintText: AppStrings.emailHint,
+            prefixIcon: Icons.email_outlined,
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
             validator: (val) {
@@ -162,27 +151,24 @@ class _CompanyProfileFormState extends State<CompanyProfileForm> {
               }
               return null;
             },
-            decoration: _buildInputDecoration(
-              hintText: AppStrings.emailHint,
-              prefixIcon: Icons.email_outlined,
-            ),
           ),
           AppSizes.p16.verticalSpace,
 
-          // Address field
-          _buildSectionTitle(AppStrings.companyAddressLabel),
-          AppSizes.p8.verticalSpace,
-          TextFormField(
+          CompanyProfileFormField(
+            label: AppStrings.companyAddressLabel,
+            hintText: AppStrings.companyAddressHint,
+            prefixIcon: Icons.location_on_outlined,
             controller: _addressController,
-            decoration: _buildInputDecoration(
-              hintText: AppStrings.companyAddressHint,
-              prefixIcon: Icons.location_on_outlined,
-            ),
           ),
           AppSizes.p16.verticalSpace,
 
-          // Governorate field
-          _buildSectionTitle(AppStrings.companyGovernorateLabel),
+          Text(
+            AppStrings.companyGovernorateLabel,
+            style: AppTextStyles.labelLarge.copyWith(
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
           AppSizes.p8.verticalSpace,
           CompanyProfileGovernoratePicker(
             selectedGovernorate: _selectedGovernorate,
@@ -195,7 +181,6 @@ class _CompanyProfileFormState extends State<CompanyProfileForm> {
           ),
           28.h.verticalSpace,
 
-          // Save Button
           AppButton(
             text: widget.isUpdating ? AppStrings.savingChanges : AppStrings.saveChanges,
             isLoading: widget.isUpdating,
@@ -215,45 +200,6 @@ class _CompanyProfileFormState extends State<CompanyProfileForm> {
           ),
           AppSizes.p20.verticalSpace,
         ],
-      ),
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: AppTextStyles.labelLarge.copyWith(
-        fontWeight: FontWeight.bold,
-        color: AppColors.textPrimary,
-      ),
-    );
-  }
-
-  InputDecoration _buildInputDecoration({
-    required String hintText,
-    required IconData prefixIcon,
-  }) {
-    return InputDecoration(
-      hintText: hintText,
-      hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint),
-      prefixIcon: Icon(prefixIcon, color: AppColors.primaryDark, size: 20.r),
-      filled: true,
-      fillColor: AppColors.surface,
-      contentPadding: EdgeInsets.symmetric(
-        horizontal: AppSizes.p16,
-        vertical: AppSizes.p12,
-      ),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: const BorderSide(color: AppColors.border),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: const BorderSide(color: AppColors.border),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: const BorderSide(color: AppColors.primaryDark, width: 1.5),
       ),
     );
   }

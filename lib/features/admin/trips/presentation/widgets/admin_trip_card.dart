@@ -16,6 +16,7 @@ class AdminTripCard extends StatelessWidget {
   final VoidCallback? onDelete;
   final VoidCallback? onRepublish;
   final VoidCallback? onView;
+  final VoidCallback? onDuplicate;
 
   const AdminTripCard({
     super.key,
@@ -28,6 +29,7 @@ class AdminTripCard extends StatelessWidget {
     this.onDelete,
     this.onRepublish,
     this.onView,
+    this.onDuplicate,
   });
 
   @override
@@ -136,7 +138,7 @@ class AdminTripCard extends StatelessWidget {
           // Divider
           const Divider(height: 1, color: AppColors.divider),
 
-          // Bottom Actions Row (تعديل - حذف - إعادة نشر - عرض)
+          // Bottom Actions Row (تعديل - حذف - تكرار - عرض)
           Row(
             children: [
               _buildActionButton(
@@ -152,10 +154,10 @@ class AdminTripCard extends StatelessWidget {
                 onTap: onDelete,
               ),
               _buildActionButton(
-                label: AppStrings.adminRepublishTrip,
-                icon: Icons.refresh_outlined,
-                color: AppColors.textSecondary,
-                onTap: onRepublish,
+                label: 'تكرار',
+                icon: Icons.copy_outlined,
+                color: AppColors.secondary,
+                onTap: onDuplicate,
               ),
               _buildActionButton(
                 label: AppStrings.adminViewTrip,

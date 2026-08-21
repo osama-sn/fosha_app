@@ -26,4 +26,13 @@ class AdminTripsRepository {
       return Left(ServerFailure(ApiErrorHandler.handle(e)));
     }
   }
+
+  Future<Either<Failure, void>> duplicateTrip(String tripId) async {
+    try {
+      await _dataSource.duplicateTrip(tripId);
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
+    }
+  }
 }

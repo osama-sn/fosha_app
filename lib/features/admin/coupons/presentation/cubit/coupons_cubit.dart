@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/features/admin/coupons/data/models/coupon_model.dart';
 import 'package:fosha_app/features/admin/coupons/data/repositories/coupons_repository.dart';
 import 'coupons_state.dart';
@@ -12,13 +13,15 @@ class CouponsCubit extends Cubit<CouponsState> {
 
   Future<void> fetchCompanyCoupons() async {
     emit(CouponsLoading());
-    try {
-      final coupons = await repository.getCompanyCoupons();
-      _currentCoupons = coupons;
-      emit(CouponsLoaded(coupons: coupons));
-    } catch (e) {
-      emit(CouponsFailure(error: e.toString().replaceAll('Exception: ', '')));
-    }
+    final result = await repository.getCompanyCoupons();
+
+    result.fold(
+      (failure) => emit(CouponsFailure(error: failure.message)),
+      (coupons) {
+        _currentCoupons = coupons;
+        emit(CouponsLoaded(coupons: coupons));
+      },
+    );
   }
 
   Future<void> createCoupon({
@@ -30,38 +33,52 @@ class CouponsCubit extends Cubit<CouponsState> {
     required int usageLimit,
   }) async {
     emit(CouponsSubmitting(currentCoupons: _currentCoupons));
-    try {
-      await repository.createCoupon(
-        code: code,
-        discountPercentage: discountPercentage,
-        maxDiscountAmount: maxDiscountAmount,
-        minTripPrice: minTripPrice,
-        validUntil: validUntil,
-        usageLimit: usageLimit,
-      );
-      final updatedList = await repository.getCompanyCoupons();
-      _currentCoupons = updatedList;
-      emit(CouponsActionSuccess(
-        coupons: updatedList,
-        message: 'تم إضاف الكوبون بنجاح',
-      ));
-    } catch (e) {
-      emit(CouponsFailure(error: e.toString().replaceAll('Exception: ', '')));
-    }
+    final createResult = await repository.createCoupon(
+      code: code,
+      discountPercentage: discountPercentage,
+      maxDiscountAmount: maxDiscountAmount,
+      minTripPrice: minTripPrice,
+      validUntil: validUntil,
+      usageLimit: usageLimit,
+    );
+
+    await createResult.fold(
+      (failure) async => emit(CouponsFailure(error: failure.message)),
+      (newCoupon) async {
+        final fetchResult = await repository.getCompanyCoupons();
+        fetchResult.fold(
+          (failure) => emit(CouponsFailure(error: failure.message)),
+          (updatedList) {
+            _currentCoupons = updatedList;
+            emit(CouponsActionSuccess(
+              coupons: updatedList,
+              message: AppStrings.couponCreatedSuccess,
+            ));
+          },
+        );
+      },
+    );
   }
 
   Future<void> deleteCoupon(String couponId) async {
     emit(CouponsSubmitting(currentCoupons: _currentCoupons));
-    try {
-      await repository.deleteCoupon(couponId);
-      final updatedList = await repository.getCompanyCoupons();
-      _currentCoupons = updatedList;
-      emit(CouponsActionSuccess(
-        coupons: updatedList,
-        message: 'تم حذف الكوبون بنجاح',
-      ));
-    } catch (e) {
-      emit(CouponsFailure(error: e.toString().replaceAll('Exception: ', '')));
-    }
+    final deleteResult = await repository.deleteCoupon(couponId);
+
+    await deleteResult.fold(
+      (failure) async => emit(CouponsFailure(error: failure.message)),
+      (_) async {
+        final fetchResult = await repository.getCompanyCoupons();
+        fetchResult.fold(
+          (failure) => emit(CouponsFailure(error: failure.message)),
+          (updatedList) {
+            _currentCoupons = updatedList;
+            emit(CouponsActionSuccess(
+              coupons: updatedList,
+              message: AppStrings.couponDeletedSuccess,
+            ));
+          },
+        );
+      },
+    );
   }
 }

@@ -61,13 +61,20 @@ class _TripCompanyCardState extends State<TripCompanyCard> {
       setState(() => _isLoading = true);
       try {
         final repository = getIt<CompanyProfileRepository>();
-        final fetched = await repository.getCompanyProfile(effectiveId);
-        if (mounted) {
-          setState(() {
-            _fetchedCompany = fetched;
-            _isLoading = false;
-          });
-        }
+        final result = await repository.getCompanyProfile(effectiveId);
+        result.fold(
+          (_) {
+            if (mounted) setState(() => _isLoading = false);
+          },
+          (fetched) {
+            if (mounted) {
+              setState(() {
+                _fetchedCompany = fetched;
+                _isLoading = false;
+              });
+            }
+          },
+        );
       } catch (_) {
         if (mounted) setState(() => _isLoading = false);
       }

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:fosha_app/features/admin/bookings/data/constants/admin_bookings_constants.dart';
 import 'package:fosha_app/features/admin/bookings/data/models/booking_model.dart';
 
 abstract class AdminBookingsState extends Equatable {
@@ -21,7 +22,7 @@ class AdminBookingsLoaded extends AdminBookingsState {
 
   const AdminBookingsLoaded({
     required this.bookings,
-    this.activeStatusFilter = 'all',
+    this.activeStatusFilter = AdminBookingsConstants.statusAll,
     this.selectedTripTitle,
     this.isUpdatingStatus = false,
     this.actionSuccessMessage,

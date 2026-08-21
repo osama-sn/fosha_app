@@ -1,5 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:fosha_app/core/network/api_endpoints.dart';
 import 'package:fosha_app/core/network/dio_client.dart';
+import 'package:fosha_app/features/admin/bookings/data/constants/admin_bookings_constants.dart';
 import 'package:fosha_app/features/admin/bookings/data/models/booking_model.dart';
 
 abstract class AdminBookingsDataSource {
@@ -27,37 +29,28 @@ class AdminBookingsDataSourceImpl implements AdminBookingsDataSource {
     int? page,
     int? limit,
   }) async {
-    try {
-      final queryParameters = <String, dynamic>{};
-      if (status != null && status.isNotEmpty && status != 'all') {
-        queryParameters['status'] = status;
-      }
-      if (page != null) queryParameters['page'] = page;
-      if (limit != null) queryParameters['limit'] = limit;
-
-      final response = await _dioClient.dio.get(
-        ApiEndpoints.bookings,
-        queryParameters: queryParameters,
-      );
-
-      final dynamic data = response.data;
-      List<dynamic> list = [];
-      if (data is Map<String, dynamic>) {
-        if (data['data'] is List) {
-          list = data['data'] as List<dynamic>;
-        } else if (data['data'] is Map && data['data']['bookings'] is List) {
-          list = data['data']['bookings'] as List<dynamic>;
-        }
-      } else if (data is List) {
-        list = data;
-      }
-
-      return list
-          .map((e) => BookingModel.fromJson(e as Map<String, dynamic>))
-          .toList();
-    } catch (e) {
-      rethrow;
+    final queryParameters = <String, dynamic>{};
+    if (status != null &&
+        status.isNotEmpty &&
+        status != AdminBookingsConstants.statusAll) {
+      queryParameters[AdminBookingsConstants.paramStatus] = status;
     }
+    if (page != null) {
+      queryParameters[AdminBookingsConstants.paramPage] = page;
+    }
+    if (limit != null) {
+      queryParameters[AdminBookingsConstants.paramLimit] = limit;
+    }
+
+    final response = await _dioClient.dio.get(
+      ApiEndpoints.bookings,
+      queryParameters: queryParameters,
+    );
+
+    final rawList = _extractBookingsList(response.data);
+    return rawList
+        .map((e) => BookingModel.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   @override
@@ -66,31 +59,83 @@ class AdminBookingsDataSourceImpl implements AdminBookingsDataSource {
     required String status,
     String? rejectionReason,
   }) async {
-    try {
+    final response = await _executeStatusUpdate(
+      bookingId,
+      status: status,
+      rejectionReason: rejectionReason,
+    );
+
+    final bookingJson = _extractBookingMap(response.data);
+    return BookingModel.fromJson(bookingJson);
+  }
+
+  Future<Response> _executeStatusUpdate(
+    String bookingId, {
+    required String status,
+    String? rejectionReason,
+  }) async {
+    final baseUrl = '${ApiEndpoints.bookings}/$bookingId';
+
+    if (status == AdminBookingsConstants.statusApproved ||
+        status == AdminBookingsConstants.statusAccepted) {
+      return _patchWithFallback('$baseUrl/approve', {
+        AdminBookingsConstants.paramStatus:
+            AdminBookingsConstants.statusApproved,
+      });
+    }
+
+    if (status == AdminBookingsConstants.statusRejected ||
+        status == AdminBookingsConstants.statusCancelled) {
+      final isRejected = status == AdminBookingsConstants.statusRejected;
+      final reasonKey = isRejected
+          ? AdminBookingsConstants.paramRejectionReason
+          : AdminBookingsConstants.paramCancellationReason;
+      final actionPath = isRejected ? 'reject' : 'cancel';
+
       final body = <String, dynamic>{
-        'status': status,
         if (rejectionReason != null && rejectionReason.isNotEmpty)
-          'rejectionReason': rejectionReason,
+          reasonKey: rejectionReason,
       };
 
-      final response = await _dioClient.dio.patch(
-        '${ApiEndpoints.bookings}/$bookingId/status',
-        data: body,
-      );
+      return _patchWithFallback('$baseUrl/$actionPath', {
+        AdminBookingsConstants.paramStatus: status,
+        ...body,
+      });
+    }
 
-      final dynamic data = response.data;
-      Map<String, dynamic> bookingJson = {};
-      if (data is Map<String, dynamic>) {
-        if (data['data'] is Map) {
-          bookingJson = data['data'] as Map<String, dynamic>;
-        } else {
-          bookingJson = data;
-        }
-      }
+    throw ArgumentError.value(status, 'status', 'Unsupported booking status');
+  }
 
-      return BookingModel.fromJson(bookingJson);
-    } catch (e) {
+  Future<Response> _patchWithFallback(
+    String primaryUrl,
+    Map<String, dynamic> data,
+  ) async {
+    try {
+      return await _dioClient.dio.patch(primaryUrl, data: data);
+    } catch (_) {
       rethrow;
     }
+  }
+
+  List<dynamic> _extractBookingsList(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      final res =
+          data[AdminBookingsConstants.keyData] ??
+          data[AdminBookingsConstants.keyBookings];
+      if (res is List) return res;
+      if (res is Map && res[AdminBookingsConstants.keyBookings] is List) {
+        return res[AdminBookingsConstants.keyBookings] as List;
+      }
+    }
+    return data is List ? data : const [];
+  }
+
+  Map<String, dynamic> _extractBookingMap(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      final nested = data[AdminBookingsConstants.keyData];
+      if (nested is Map<String, dynamic>) return nested;
+      return data;
+    }
+    return const {};
   }
 }

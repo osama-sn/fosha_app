@@ -5,9 +5,11 @@ import 'package:fosha_app/core/constants/app_colors.dart';
 import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/router/route_names.dart';
 import 'package:fosha_app/core/shared/widgets/app_network_image.dart';
-import 'package:fosha_app/features/admin/bookings/data/models/booking_model.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
+import 'package:fosha_app/features/admin/bookings/data/models/booking_model.dart';
+import 'package:fosha_app/features/admin/bookings/presentation/widgets/admin_booking_card_actions.dart';
+import 'package:fosha_app/features/admin/bookings/presentation/widgets/admin_booking_status_badge.dart';
 
 class AdminBookingCard extends StatelessWidget {
   final BookingModel? booking;
@@ -19,7 +21,7 @@ class AdminBookingCard extends StatelessWidget {
   final String totalAmount;
   final String passengersCount;
   final String tripImage;
-  final String status; // 'pending', 'accepted', 'rejected'
+  final String status;
   final VoidCallback? onAccept;
   final VoidCallback? onReject;
   final VoidCallback? onTap;
@@ -67,12 +69,11 @@ class AdminBookingCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Row: Status Badge & Customer Info
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildStatusBadge(),
+                AdminBookingStatusBadge(status: status),
                 Row(
                   children: [
                     Column(
@@ -124,8 +125,6 @@ class AdminBookingCard extends StatelessWidget {
             SizedBox(height: AppSizes.p16),
             const Divider(height: 1, color: AppColors.divider),
             SizedBox(height: AppSizes.p16),
-
-            // Trip Info & Image Row
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -235,139 +234,14 @@ class AdminBookingCard extends StatelessWidget {
               ],
             ),
             SizedBox(height: AppSizes.p16),
-            _buildBottomSection(),
+            AdminBookingCardActions(
+              status: status,
+              onAccept: onAccept,
+              onReject: onReject,
+            ),
           ],
         ),
       ),
     );
-  }
-
-  Widget _buildStatusBadge() {
-    Color bg;
-    Color text;
-    String label;
-
-    switch (status) {
-      case 'accepted':
-      case 'approved':
-        bg = AppColors.success.withValues(alpha: 0.12);
-        text = AppColors.success;
-        label = AppStrings.adminFilterAccepted;
-        break;
-      case 'rejected':
-        bg = AppColors.error.withValues(alpha: 0.12);
-        text = AppColors.error;
-        label = AppStrings.adminFilterRejected;
-        break;
-      case 'pending':
-      default:
-        bg = AppColors.warning.withValues(alpha: 0.15);
-        text = AppColors.warning;
-        label = AppStrings.adminFilterPending;
-        break;
-    }
-
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: AppSizes.p12, vertical: 4.h),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(AppSizes.r16),
-      ),
-      child: Text(
-        label,
-        style: AppTextStyles.labelSmall.copyWith(
-          color: text,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomSection() {
-    if (status == 'pending') {
-      return Row(
-        children: [
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: onReject,
-              icon: const Icon(Icons.close, color: AppColors.error),
-              label: Text(
-                AppStrings.adminRejectRequest,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.error,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: AppColors.error),
-                padding: EdgeInsets.symmetric(vertical: AppSizes.p8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSizes.r8),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(width: AppSizes.p12),
-          Expanded(
-            child: ElevatedButton.icon(
-              onPressed: onAccept,
-              icon: const Icon(Icons.check, color: Colors.white),
-              label: Text(
-                AppStrings.adminAcceptRequest,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                padding: EdgeInsets.symmetric(vertical: AppSizes.p8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSizes.r8),
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-    } else if (status == 'accepted' || status == 'approved') {
-      return Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: AppSizes.p8),
-        decoration: BoxDecoration(
-          color: AppColors.success.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(AppSizes.r8),
-          border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
-        ),
-        child: Center(
-          child: Text(
-            AppStrings.adminAcceptedBanner,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.success,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      );
-    } else {
-      return Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: AppSizes.p8),
-        decoration: BoxDecoration(
-          color: AppColors.error.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(AppSizes.r8),
-          border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
-        ),
-        child: Center(
-          child: Text(
-            AppStrings.adminRejectedBanner,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.error,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      );
-    }
   }
 }

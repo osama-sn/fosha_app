@@ -18,6 +18,12 @@ class RouteNames {
   static const String companyProfile = '/company-profile';
   static const String companyOffers = '/company-offers';
   static const String companyCoupons = '/company-coupons';
+  static const String adminPassengers = '/admin-passengers';
+  static const String adminExpenses = '/admin-expenses';
+  static const String adminFinancialReport = '/admin-financial-report';
+  static const String adminChats = '/admin-chats';
+  static const String adminReviews = '/admin-reviews';
+  static const String adminCustomers = '/admin-customers';
   static const String search = '/search';
   static const String searchResults = '/search-results';
   static const String companyDetails = '/company-details';

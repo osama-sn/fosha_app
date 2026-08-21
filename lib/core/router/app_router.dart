@@ -24,6 +24,19 @@ import 'package:fosha_app/features/user/search/presentation/pages/search_page.da
 import 'package:fosha_app/features/user/company/presentation/pages/company_details_page.dart';
 import 'package:fosha_app/features/user/home/presentation/pages/category_trips_page.dart';
 import 'package:fosha_app/features/categories/data/models/category_model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fosha_app/core/di/service_locator.dart';
+import 'package:fosha_app/features/admin/passengers/presentation/pages/admin_passengers_page.dart';
+import 'package:fosha_app/features/admin/passengers/presentation/cubit/admin_passengers_cubit.dart';
+import 'package:fosha_app/features/admin/expenses/presentation/pages/admin_expenses_page.dart';
+import 'package:fosha_app/features/admin/expenses/presentation/cubit/admin_expenses_cubit.dart';
+import 'package:fosha_app/features/admin/financial_report/presentation/pages/admin_financial_report_page.dart';
+import 'package:fosha_app/features/admin/financial_report/presentation/cubit/admin_financial_report_cubit.dart';
+import 'package:fosha_app/features/admin/chat/presentation/pages/admin_chats_page.dart';
+import 'package:fosha_app/features/admin/reviews/presentation/pages/admin_reviews_page.dart';
+import 'package:fosha_app/features/admin/reviews/presentation/cubit/admin_reviews_cubit.dart';
+import 'package:fosha_app/features/admin/customers/presentation/pages/admin_customers_page.dart';
+import 'package:fosha_app/features/admin/customers/presentation/cubit/admin_customers_cubit.dart';
 import 'route_names.dart';
 
 class AppRouter {
@@ -125,6 +138,51 @@ class AppRouter {
       GoRoute(
         path: RouteNames.companyCoupons,
         builder: (context, state) => const CompanyCouponsPage(),
+      ),
+      GoRoute(
+        path: RouteNames.adminPassengers,
+        builder: (context, state) {
+          final tripId = state.extra as String?;
+          return BlocProvider<AdminPassengersCubit>(
+            create: (context) => getIt<AdminPassengersCubit>(),
+            child: AdminPassengersPage(initialTripId: tripId),
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteNames.adminExpenses,
+        builder: (context, state) => BlocProvider<AdminExpensesCubit>(
+          create: (context) => getIt<AdminExpensesCubit>(),
+          child: const AdminExpensesPage(),
+        ),
+      ),
+      GoRoute(
+        path: RouteNames.adminFinancialReport,
+        builder: (context, state) => BlocProvider<AdminFinancialReportCubit>(
+          create: (context) => getIt<AdminFinancialReportCubit>(),
+          child: const AdminFinancialReportPage(),
+        ),
+      ),
+      GoRoute(
+        path: RouteNames.adminChats,
+        builder: (context, state) => const AdminChatsPage(),
+      ),
+      GoRoute(
+        path: RouteNames.adminReviews,
+        builder: (context, state) {
+          final companyId = state.extra as String?;
+          return BlocProvider<AdminReviewsCubit>(
+            create: (context) => getIt<AdminReviewsCubit>(),
+            child: AdminReviewsPage(companyId: companyId),
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteNames.adminCustomers,
+        builder: (context, state) => BlocProvider<AdminCustomersCubit>(
+          create: (context) => getIt<AdminCustomersCubit>(),
+          child: const AdminCustomersPage(),
+        ),
       ),
       GoRoute(
         path: RouteNames.search,

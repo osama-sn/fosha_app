@@ -1,3 +1,6 @@
+import 'package:fosha_app/core/constants/app_strings.dart';
+import 'package:fosha_app/features/admin/bookings/data/constants/admin_bookings_constants.dart';
+
 class BookingCustomerModel {
   final String id;
   final String fullName;
@@ -62,6 +65,8 @@ class BookingModel {
   final BookingTripInfoModel? trip;
   final String tripTitle;
   final String tripDates;
+  final String tripDuration;
+  final String tripImage;
   final double totalAmount;
   final int passengersCount;
   final String status;
@@ -70,6 +75,9 @@ class BookingModel {
   final String companyId;
   final String companyName;
   final String tripId;
+  final String bookingNumber;
+  final String paymentMethod;
+  final String customerNotes;
 
   const BookingModel({
     required this.id,
@@ -80,6 +88,8 @@ class BookingModel {
     this.trip,
     required this.tripTitle,
     required this.tripDates,
+    this.tripDuration = '',
+    this.tripImage = '',
     required this.totalAmount,
     required this.passengersCount,
     required this.status,
@@ -88,13 +98,24 @@ class BookingModel {
     this.companyId = '',
     this.companyName = '',
     this.tripId = '',
+    this.bookingNumber = '',
+    this.paymentMethod = '',
+    this.customerNotes = '',
   });
 
   int get numberOfSeats => passengersCount;
   double get totalPrice => totalAmount;
-  String get tripCoverImage => trip?.coverImage ?? '';
+  String get tripCoverImage =>
+      tripImage.isNotEmpty ? tripImage : (trip?.coverImage ?? '');
   String get origin => trip?.origin ?? '';
   String get destination => trip?.destination ?? '';
+  String get formattedRequestDate => createdAt != null
+      ? '${createdAt!.day}/${createdAt!.month}/${createdAt!.year}'
+      : AppStrings.adminDefaultToday;
+  String get formattedPassengersCount =>
+      '$passengersCount ${AppStrings.adminPersonUnit}';
+  String get formattedTotalAmount =>
+      '${totalAmount.toStringAsFixed(0)} ${AppStrings.adminCurrencyEGP}';
 
   factory BookingModel.fromJson(Map<String, dynamic> json) {
     BookingCustomerModel? userObj;
@@ -111,20 +132,41 @@ class BookingModel {
       );
     }
 
+    final idStr = (json['_id'] ?? json['id'] ?? '').toString();
+    final rawBookingNumber = json['bookingNumber']?.toString();
+    final formattedNum =
+        (rawBookingNumber != null && rawBookingNumber.isNotEmpty)
+            ? rawBookingNumber
+            : (idStr.isNotEmpty
+                ? '#TRP-${idStr.length > 6 ? idStr.substring(0, 6).toUpperCase() : idStr}'
+                : '#TRP-000000');
+
+    final startDate = tripObj?.startDate ?? json['startDate']?.toString() ?? '';
+    final endDate = tripObj?.endDate ?? json['endDate']?.toString() ?? '';
+    final datesStr = json['tripDates'] as String? ??
+        (startDate.isNotEmpty && endDate.isNotEmpty
+            ? '$startDate - $endDate'
+            : '');
+
     return BookingModel(
-      id: (json['_id'] ?? json['id'] ?? '').toString(),
+      id: idStr,
       user: userObj,
-      customerName:
-          json['customerName'] as String? ??
-          (userObj?.fullName.isNotEmpty == true ? userObj!.fullName : 'عميل'),
+      customerName: json['customerName'] as String? ??
+          (userObj?.fullName.isNotEmpty == true
+              ? userObj!.fullName
+              : AppStrings.adminDefaultCustomerName),
       customerEmail:
           json['customerEmail'] as String? ?? userObj?.email ?? '',
       customerPhone:
           json['customerPhone'] as String? ?? userObj?.phone ?? '',
       trip: tripObj,
-      tripTitle: json['tripTitle'] as String? ?? tripObj?.title ?? 'رحلة',
-      tripDates: json['tripDates'] as String? ??
-          (tripObj != null ? '${tripObj.startDate} - ${tripObj.endDate}' : ''),
+      tripTitle: json['tripTitle'] as String? ??
+          tripObj?.title ??
+          AppStrings.adminDefaultTripTitle,
+      tripDates: datesStr,
+      tripDuration:
+          json['tripDuration'] as String? ?? AppStrings.adminDefaultDuration,
+      tripImage: json['tripImage'] as String? ?? tripObj?.coverImage ?? '',
       totalAmount: (json['totalPrice'] as num?)?.toDouble() ??
           (json['totalAmount'] as num?)?.toDouble() ??
           (json['price'] as num?)?.toDouble() ??
@@ -133,7 +175,7 @@ class BookingModel {
           (json['passengersCount'] as num?)?.toInt() ??
           (json['seats'] as num?)?.toInt() ??
           1,
-      status: json['status'] as String? ?? 'pending',
+      status: json['status'] as String? ?? AdminBookingsConstants.statusPending,
       rejectionReason: json['rejectionReason'] as String?,
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'].toString())
@@ -144,9 +186,17 @@ class BookingModel {
               : json['company'].toString())
           : (json['companyId']?.toString() ?? ''),
       companyName: (json['company'] != null && json['company'] is Map)
-          ? (json['company']['name'] as String? ?? json['company']['fullName'] as String? ?? '')
+          ? (json['company']['name'] as String? ??
+              json['company']['fullName'] as String? ??
+              '')
           : (json['companyName'] as String? ?? ''),
       tripId: tripObj?.id ?? (json['tripId']?.toString() ?? ''),
+      bookingNumber: formattedNum,
+      paymentMethod:
+          json['paymentMethod'] as String? ?? AppStrings.adminDefaultBankCard,
+      customerNotes: json['customerNotes'] as String? ??
+          json['notes'] as String? ??
+          AppStrings.adminNoCustomerNotes,
     );
   }
 }

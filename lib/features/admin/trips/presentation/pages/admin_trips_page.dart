@@ -238,6 +238,17 @@ class _AdminTripsPageState extends State<AdminTripsPage> {
                               status: _filters[_selectedFilterIndex],
                             );
                           },
+                          onDuplicate: () async {
+                            await context
+                                .read<AdminTripsCubit>()
+                                .duplicateTrip(trip.id);
+                            if (context.mounted) {
+                              AppSnackbar.showSuccess(
+                                context: context,
+                                message: 'تم تكرار الرحلة كمسودة جديدة بنجاح',
+                              );
+                            }
+                          },
                           onView: () {},
                         );
                       },

@@ -56,6 +56,26 @@ import 'package:fosha_app/features/chat/data/datasources/chat_remote_data_source
 import 'package:fosha_app/features/chat/data/repositories/chat_repository.dart';
 import 'package:fosha_app/features/chat/presentation/cubit/chat_cubit.dart';
 
+import 'package:fosha_app/features/admin/passengers/data/datasources/admin_passengers_remote_data_source.dart';
+import 'package:fosha_app/features/admin/passengers/data/repositories/admin_passengers_repository.dart';
+import 'package:fosha_app/features/admin/passengers/presentation/cubit/admin_passengers_cubit.dart';
+
+import 'package:fosha_app/features/admin/expenses/data/datasources/admin_expenses_remote_data_source.dart';
+import 'package:fosha_app/features/admin/expenses/data/repositories/admin_expenses_repository.dart';
+import 'package:fosha_app/features/admin/expenses/presentation/cubit/admin_expenses_cubit.dart';
+
+import 'package:fosha_app/features/admin/financial_report/data/datasources/admin_financial_report_remote_data_source.dart';
+import 'package:fosha_app/features/admin/financial_report/data/repositories/admin_financial_report_repository.dart';
+import 'package:fosha_app/features/admin/financial_report/presentation/cubit/admin_financial_report_cubit.dart';
+
+import 'package:fosha_app/features/admin/reviews/data/datasources/admin_reviews_remote_data_source.dart';
+import 'package:fosha_app/features/admin/reviews/data/repositories/admin_reviews_repository.dart';
+import 'package:fosha_app/features/admin/reviews/presentation/cubit/admin_reviews_cubit.dart';
+
+import 'package:fosha_app/features/admin/customers/data/datasources/admin_customers_remote_data_source.dart';
+import 'package:fosha_app/features/admin/customers/data/repositories/admin_customers_repository.dart';
+import 'package:fosha_app/features/admin/customers/presentation/cubit/admin_customers_cubit.dart';
+
 final GetIt getIt = GetIt.instance;
 
 Future<void> initServiceLocator() async {
@@ -107,6 +127,21 @@ Future<void> initServiceLocator() async {
   getIt.registerLazySingleton<ChatRemoteDataSource>(
     () => ChatRemoteDataSourceImpl(dioClient: getIt()),
   );
+  getIt.registerLazySingleton<AdminPassengersRemoteDataSource>(
+    () => AdminPassengersRemoteDataSourceImpl(getIt()),
+  );
+  getIt.registerLazySingleton<AdminExpensesRemoteDataSource>(
+    () => AdminExpensesRemoteDataSourceImpl(getIt()),
+  );
+  getIt.registerLazySingleton<AdminFinancialReportRemoteDataSource>(
+    () => AdminFinancialReportRemoteDataSourceImpl(getIt()),
+  );
+  getIt.registerLazySingleton<AdminReviewsRemoteDataSource>(
+    () => AdminReviewsRemoteDataSourceImpl(getIt()),
+  );
+  getIt.registerLazySingleton<AdminCustomersRemoteDataSource>(
+    () => AdminCustomersRemoteDataSourceImpl(getIt()),
+  );
 
   // repositories
   getIt.registerLazySingleton<AuthRepository>(
@@ -154,6 +189,21 @@ Future<void> initServiceLocator() async {
   getIt.registerLazySingleton<ChatRepository>(
     () => ChatRepository(dataSource: getIt()),
   );
+  getIt.registerLazySingleton<AdminPassengersRepository>(
+    () => AdminPassengersRepository(getIt()),
+  );
+  getIt.registerLazySingleton<AdminExpensesRepository>(
+    () => AdminExpensesRepository(getIt()),
+  );
+  getIt.registerLazySingleton<AdminFinancialReportRepository>(
+    () => AdminFinancialReportRepository(getIt()),
+  );
+  getIt.registerLazySingleton<AdminReviewsRepository>(
+    () => AdminReviewsRepository(getIt()),
+  );
+  getIt.registerLazySingleton<AdminCustomersRepository>(
+    () => AdminCustomersRepository(getIt()),
+  );
 
   // cubits
   getIt.registerFactory<AuthCubit>(() => AuthCubit(authRepository: getIt()));
@@ -166,7 +216,11 @@ Future<void> initServiceLocator() async {
     () => AdminManageTripsCubit(getIt()),
   );
   getIt.registerFactory<AdminBookingsCubit>(
-    () => AdminBookingsCubit(repository: getIt()),
+    () => AdminBookingsCubit(
+      repository: getIt(),
+      chatRepository: getIt(),
+      statsRepository: getIt(),
+    ),
   );
   getIt.registerFactory<CompanyProfileCubit>(
     () => CompanyProfileCubit(repository: getIt()),
@@ -197,5 +251,20 @@ Future<void> initServiceLocator() async {
   );
   getIt.registerFactory<ChatCubit>(
     () => ChatCubit(repository: getIt()),
+  );
+  getIt.registerFactory<AdminPassengersCubit>(
+    () => AdminPassengersCubit(getIt()),
+  );
+  getIt.registerFactory<AdminExpensesCubit>(
+    () => AdminExpensesCubit(getIt()),
+  );
+  getIt.registerFactory<AdminFinancialReportCubit>(
+    () => AdminFinancialReportCubit(getIt()),
+  );
+  getIt.registerFactory<AdminReviewsCubit>(
+    () => AdminReviewsCubit(getIt()),
+  );
+  getIt.registerFactory<AdminCustomersCubit>(
+    () => AdminCustomersCubit(getIt()),
   );
 }

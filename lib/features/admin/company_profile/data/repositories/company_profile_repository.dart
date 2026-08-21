@@ -1,45 +1,49 @@
-import 'package:dio/dio.dart';
+import 'package:dartz/dartz.dart';
+import 'package:fosha_app/core/errors/api_error_handler.dart';
+import 'package:fosha_app/core/errors/failures.dart';
 import 'package:fosha_app/features/admin/company_profile/data/datasources/company_profile_remote_data_source.dart';
 import 'package:fosha_app/features/admin/company_profile/data/models/company_profile_model.dart';
+import 'package:fosha_app/features/admin/company_profile/data/models/company_review_model.dart';
 
 class CompanyProfileRepository {
   final CompanyProfileRemoteDataSource dataSource;
 
   CompanyProfileRepository({required this.dataSource});
 
-  Future<CompanyProfileModel> getCompanyProfile(String companyId) async {
+  Future<Either<Failure, CompanyProfileModel>> getCompanyProfile(
+    String companyId,
+  ) async {
     try {
-      return await dataSource.getCompanyProfile(companyId);
-    } on DioException catch (e) {
-      final msg = e.response?.data is Map && e.response?.data['message'] != null
-          ? e.response?.data['message'].toString()
-          : 'فشل في جلب بيانات الشركة';
-      throw Exception(msg);
+      final response = await dataSource.getCompanyProfile(companyId);
+      return Right(response);
     } catch (e) {
-      throw Exception(e.toString().replaceAll('Exception: ', ''));
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
     }
   }
 
-  Future<CompanyProfileModel> updateCompanyProfile(
+  Future<Either<Failure, CompanyProfileModel>> updateCompanyProfile(
     String companyId,
     CompanyProfileModel profile,
   ) async {
     try {
-      return await dataSource.updateCompanyProfile(
+      final response = await dataSource.updateCompanyProfile(
         companyId,
         profile.toUpdateJson(),
       );
-    } on DioException catch (e) {
-      final msg = e.response?.data is Map && e.response?.data['message'] != null
-          ? e.response?.data['message'].toString()
-          : 'فشل في تحديث بيانات الشركة';
-      throw Exception(msg);
+      return Right(response);
     } catch (e) {
-      throw Exception(e.toString().replaceAll('Exception: ', ''));
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
     }
   }
 
-  Future<List<Map<String, dynamic>>> getCompanyReviews(String companyId) async {
-    return await dataSource.getCompanyReviews(companyId);
+  Future<Either<Failure, List<CompanyReviewModel>>> getCompanyReviews(
+    String companyId,
+  ) async {
+    try {
+      final response = await dataSource.getCompanyReviews(companyId);
+      return Right(response);
+    } catch (e) {
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
+    }
   }
 }

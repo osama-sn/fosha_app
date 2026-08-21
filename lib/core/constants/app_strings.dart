@@ -290,6 +290,38 @@ class AppStrings {
       'admin.bookingDetailsTitle'.tr();
   static String get adminCustomerDataSection =>
       'admin.customerDataSection'.tr();
+  static String get adminCustomersTitle {
+    final res = 'admin.customersTitle'.tr();
+    return res == 'admin.customersTitle' ? 'سجل وقائمة العملاء' : res;
+  }
+  static String get adminCustomersDatabase {
+    final res = 'admin.customersDatabase'.tr();
+    return res == 'admin.customersDatabase' ? 'قاعدة بيانات العملاء' : res;
+  }
+  static String get adminCustomersRegistered {
+    final res = 'admin.customersRegistered'.tr();
+    return res == 'admin.customersRegistered' ? 'عميل مسجل' : res;
+  }
+  static String get adminCustomersTotalSales {
+    final res = 'admin.customersTotalSales'.tr();
+    return res == 'admin.customersTotalSales' ? 'إجمالي مبيعات العملاء المعروضين:' : res;
+  }
+  static String get adminCustomersSearchHint {
+    final res = 'admin.customersSearchHint'.tr();
+    return res == 'admin.customersSearchHint'
+        ? 'بحث باسم العميل، البريد، أو رقم الهاتف...'
+        : res;
+  }
+  static String get adminCustomersClearSearch {
+    final res = 'admin.customersClearSearch'.tr();
+    return res == 'admin.customersClearSearch' ? 'مسح البحث' : res;
+  }
+  static String get adminCustomersNoResults {
+    final res = 'admin.customersNoResults'.tr();
+    return res == 'admin.customersNoResults'
+        ? 'لم يتم العثور على أي عملاء مطبقين للبحث'
+        : res;
+  }
   static String get adminTripDataSection => 'admin.tripDataSection'.tr();
   static String get adminBookingDetailsSection =>
       'admin.bookingDetailsSection'.tr();
@@ -308,9 +340,104 @@ class AppStrings {
       'admin.bookingRejectedTitle'.tr();
   static String get adminBookingRejectedDesc =>
       'admin.bookingRejectedDesc'.tr();
+  static String get adminCompanyTools {
+    final res = 'admin.companyTools'.tr();
+    return res == 'admin.companyTools' ? 'أدوات وإدارة الشركة' : res;
+  }
   static String get adminBookingPendingTitle =>
       'admin.bookingPendingTitle'.tr();
   static String get adminBookingPendingDesc => 'admin.bookingPendingDesc'.tr();
+  static String get adminDefaultCustomerName {
+    final res = 'admin.defaultCustomerName'.tr();
+    return res == 'admin.defaultCustomerName' ? 'عميل' : res;
+  }
+  static String get adminDefaultTripTitle {
+    final res = 'admin.defaultTripTitle'.tr();
+    return res == 'admin.defaultTripTitle' ? 'رحلة' : res;
+  }
+  static String get adminDefaultDuration {
+    final res = 'admin.defaultDuration'.tr();
+    return res == 'admin.defaultDuration' ? 'حسب البرنامج' : res;
+  }
+  static String get adminDefaultToday {
+    final res = 'admin.defaultToday'.tr();
+    return res == 'admin.defaultToday' ? 'اليوم' : res;
+  }
+  static String get adminDefaultBookingNumberPrefix {
+    final res = 'admin.defaultBookingNumberPrefix'.tr();
+    return res == 'admin.defaultBookingNumberPrefix' ? '#TRP-' : res;
+  }
+  static String get adminDefaultBankCard {
+    final res = 'admin.defaultBankCard'.tr();
+    return res == 'admin.defaultBankCard' ? 'بطاقة بنكية' : res;
+  }
+  static String get adminNoCustomerNotes {
+    final res = 'admin.noCustomerNotes'.tr();
+    return res == 'admin.noCustomerNotes' ? 'لا توجد ملاحظات إضافية من العميل.' : res;
+  }
+  static String get adminNoBookingsFound {
+    final res = 'admin.noBookingsFound'.tr();
+    return res == 'admin.noBookingsFound' ? 'لا توجد طلبات حجز حالياً' : res;
+  }
+  static String get adminFilterByTripHeader {
+    final res = 'admin.filterByTripHeader'.tr();
+    return res == 'admin.filterByTripHeader' ? 'تصفية حسب الرحلة:' : res;
+  }
+  static String get adminRejectDialogTitle {
+    final res = 'admin.rejectDialogTitle'.tr();
+    return res == 'admin.rejectDialogTitle' ? 'رفض طلب الحجز' : res;
+  }
+  static String get adminRejectDialogSubtitle {
+    final res = 'admin.rejectDialogSubtitle'.tr();
+    return res == 'admin.rejectDialogSubtitle' ? 'يرجى كتابة سبب رفض الطلب للتوضيح للعميل:' : res;
+  }
+  static String get adminRejectDialogHint {
+    final res = 'admin.rejectDialogHint'.tr();
+    return res == 'admin.rejectDialogHint' ? 'مثال: عذراً، اكتمل عدد المقاعد المتاحة لهذه الرحلة' : res;
+  }
+  static String get adminRejectDialogConfirm {
+    final res = 'admin.rejectDialogConfirm'.tr();
+    return res == 'admin.rejectDialogConfirm' ? 'تأكيد الرفض' : res;
+  }
+  static String get adminContactInAppChat {
+    final res = 'admin.contactInAppChat'.tr();
+    return res == 'admin.contactInAppChat' ? 'محادثة شات داخل التطبيق' : res;
+  }
+  static String get adminContactInAppChatSubtitle {
+    final res = 'admin.contactInAppChatSubtitle'.tr();
+    return res == 'admin.contactInAppChatSubtitle' ? 'فتح غرفة المحادثة والرسائل الخاصة بالحجز' : res;
+  }
+  static String get adminContactWhatsApp {
+    final res = 'admin.contactWhatsApp'.tr();
+    return res == 'admin.contactWhatsApp' ? 'تواصل عبر WhatsApp' : res;
+  }
+  static String adminContactWhatsAppMessage(String name) {
+    return 'أهلاً بك أستاذ $name، نتواصل معك بخصوص طلب حجزك في تطبيق فسحة.';
+  }
+  static String get adminContactPhoneCall {
+    final res = 'admin.contactPhoneCall'.tr();
+    return res == 'admin.contactPhoneCall' ? 'إجراء اتصال هاتفي' : res;
+  }
+  static String get adminChatOpenError {
+    final res = 'admin.chatOpenError'.tr();
+    return res == 'admin.chatOpenError' ? 'تعذر فتح المحادثة' : res;
+  }
+  static String get adminStatusUpdateSuccessApprove {
+    final res = 'admin.statusUpdateSuccessApprove'.tr();
+    return res == 'admin.statusUpdateSuccessApprove' ? 'تم قبول طلب الحجز بنجاح' : res;
+  }
+  static String get adminStatusUpdateSuccessReject {
+    final res = 'admin.statusUpdateSuccessReject'.tr();
+    return res == 'admin.statusUpdateSuccessReject' ? 'تم رفض طلب الحجز' : res;
+  }
+  static String get adminPersonUnit {
+    final res = 'admin.personUnit'.tr();
+    return res == 'admin.personUnit' ? 'شخص' : res;
+  }
+  static String get adminCurrencyEGP {
+    final res = 'admin.currencyEGP'.tr();
+    return res == 'admin.currencyEGP' ? 'ج.م' : res;
+  }
 
   // General & Missing
   static String get currencyEGP => 'currencyEGP'.tr();
@@ -357,6 +484,30 @@ class AppStrings {
     final res = 'admin.companyProfileIdNotFound'.tr();
     return res == 'admin.companyProfileIdNotFound'
         ? 'لم يتم العثور على معرف الشركة الحالي'
+        : res;
+  }
+  static String get companyProfileFetchError {
+    final res = 'admin.companyProfileFetchError'.tr();
+    return res == 'admin.companyProfileFetchError'
+        ? 'فشل في جلب بيانات الشركة'
+        : res;
+  }
+  static String get companyProfileUpdateSuccess {
+    final res = 'admin.companyProfileUpdateSuccess'.tr();
+    return res == 'admin.companyProfileUpdateSuccess'
+        ? 'تم تحديث بيانات الشركة بنجاح'
+        : res;
+  }
+  static String get companyProfileUpdateError {
+    final res = 'admin.companyProfileUpdateError'.tr();
+    return res == 'admin.companyProfileUpdateError'
+        ? 'فشل في تحديث بيانات الشركة'
+        : res;
+  }
+  static String get companyProfileInvalidResponse {
+    final res = 'admin.companyProfileInvalidResponse'.tr();
+    return res == 'admin.companyProfileInvalidResponse'
+        ? 'نطاق الاستجابة غير صحيح'
         : res;
   }
   static String get companyNameLabel {
@@ -504,8 +655,16 @@ class AppStrings {
   static String get noCouponsSubtitle {
     final res = 'admin.noCouponsSubtitle'.tr();
     return res == 'admin.noCouponsSubtitle'
-        ? 'يمكنك إنشاء أكواد تخفيض خاصة بشركتك فقط وتوزيعها على المسافرين'
+        ? 'قم بإضافة كوبونات خصم لترويج رحلات شركتك'
         : res;
+  }
+  static String get couponCreatedSuccess {
+    final res = 'admin.couponCreatedSuccess'.tr();
+    return res == 'admin.couponCreatedSuccess' ? 'تم إضافة الكوبون بنجاح' : res;
+  }
+  static String get couponDeletedSuccess {
+    final res = 'admin.couponDeletedSuccess'.tr();
+    return res == 'admin.couponDeletedSuccess' ? 'تم حذف الكوبون بنجاح' : res;
   }
   static String get copiedToClipboard {
     final res = 'admin.copiedToClipboard'.tr();

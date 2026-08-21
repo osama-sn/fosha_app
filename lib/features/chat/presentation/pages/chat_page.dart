@@ -12,20 +12,26 @@ import 'package:fosha_app/core/utils/url_launcher_helper.dart';
 import 'package:fosha_app/core/utils/chat_time_formatter.dart';
 import 'package:fosha_app/features/chat/presentation/cubit/chat_cubit.dart';
 
+import 'package:fosha_app/features/chat/data/models/chat_model.dart';
+
 class ChatPage extends StatelessWidget {
+  final String? chatId;
   final String companyId;
   final String? companyName;
   final String? companyPhone;
   final String? tripId;
   final String? bookingId;
+  final ChatModel? initialChat;
 
   const ChatPage({
     super.key,
+    this.chatId,
     required this.companyId,
     this.companyName,
     this.companyPhone,
     this.tripId,
     this.bookingId,
+    this.initialChat,
   });
 
   @override
@@ -34,11 +40,13 @@ class ChatPage extends StatelessWidget {
       create: (context) => getIt<ChatCubit>()
         ..initChat(
           companyId: companyId,
+          chatId: chatId,
           tripId: tripId,
           bookingId: bookingId,
+          initialChat: initialChat,
         ),
       child: _ChatPageBody(
-        companyName: companyName ?? 'محادثة الشركة',
+        companyName: companyName ?? 'محادثة',
         companyPhone: companyPhone ?? '+201011111111',
       ),
     );

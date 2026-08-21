@@ -278,7 +278,14 @@
     "tripDeletedSuccess": "تم حذف الرحلة بنجاح",
     "tripRepublishedSuccess": "تم إعادة نشر الرحلة بنجاح",
     "selectCity": "اختر المدينة من القائمة",
-    "customCityHint": "أو أدخل اسم مدينة أخرى"
+    "customCityHint": "أو أدخل اسم مدينة أخرى",
+    "welcomeBack": "أهلاً بك مجدداً",
+    "companyPerformanceSummary": "ملخص أداء الشركة",
+    "marketingAndOffers": "التسويق والعروض",
+    "promotionalOffers": "العروض الترويجية",
+    "managePromotionsSubtitle": "إدارة وإنشاء العروض الخاصة",
+    "discountCoupons": "كوبونات الخصم",
+    "companyCouponsSubtitle": "إدارة وإنشاء أكواد الخصم"
   },
   "currencyEGP": "ج.م",
   "settingsTitle": "الإعدادات",
