@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/di/service_locator.dart';
+import 'package:fosha_app/core/shared/widgets/app_button.dart';
 import 'package:fosha_app/core/shared/widgets/app_loading.dart';
 import 'package:fosha_app/core/shared/widgets/app_network_image.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
@@ -22,7 +24,7 @@ class UserChatsListPage extends StatelessWidget {
           backgroundColor: AppColors.surface,
           elevation: 0.5,
           title: Text(
-            'محادثاتي',
+            AppStrings.userChatsTitle,
             style: AppTextStyles.titleLarge.copyWith(
               color: AppColors.textPrimary,
               fontWeight: FontWeight.bold,
@@ -41,16 +43,22 @@ class UserChatsListPage extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.chat_bubble_outline, size: 64.r, color: Colors.grey),
+                    Icon(
+                      Icons.chat_bubble_outline,
+                      size: 64.r,
+                      color: Colors.grey,
+                    ),
                     SizedBox(height: 12.h),
                     Text(
                       state.error,
-                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                      style: AppTextStyles.bodyMedium
+                          .copyWith(color: AppColors.textSecondary),
                     ),
                     SizedBox(height: 16.h),
-                    ElevatedButton(
-                      onPressed: () => context.read<ChatCubit>().loadUserChats(),
-                      child: const Text('إعادة المحاولة'),
+                    AppButton(
+                      text: AppStrings.retry,
+                      onPressed: () =>
+                          context.read<ChatCubit>().loadUserChats(),
                     ),
                   ],
                 ),
@@ -64,10 +72,14 @@ class UserChatsListPage extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.forum_outlined, size: 72.r, color: AppColors.primary.withValues(alpha: 0.4)),
+                      Icon(
+                        Icons.forum_outlined,
+                        size: 72.r,
+                        color: AppColors.primary.withValues(alpha: 0.4),
+                      ),
                       SizedBox(height: 16.h),
                       Text(
-                        'لا توجد محادثات جارية حالياً',
+                        AppStrings.userNoChatsYet,
                         style: AppTextStyles.titleMedium.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
@@ -75,7 +87,7 @@ class UserChatsListPage extends StatelessWidget {
                       ),
                       SizedBox(height: 8.h),
                       Text(
-                        'يمكنك التواصل مع شركات الرحلات من صفحة تفاصيل الشركة أو تفاصيل الحجز',
+                        AppStrings.userNoChatsYetSub,
                         textAlign: TextAlign.center,
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.textSecondary,
@@ -91,9 +103,12 @@ class UserChatsListPage extends StatelessWidget {
                   await context.read<ChatCubit>().loadUserChats();
                 },
                 child: ListView.separated(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 16.h,
+                  ),
                   itemCount: chats.length,
-                  separatorBuilder: (context, index) => SizedBox(height: 12.h),
+                  separatorBuilder: (_, _) => SizedBox(height: 12.h),
                   itemBuilder: (context, index) {
                     final chat = chats[index];
                     return InkWell(
@@ -103,7 +118,8 @@ class UserChatsListPage extends StatelessWidget {
                           MaterialPageRoute(
                             builder: (_) => ChatPage(
                               companyId: chat.companyId,
-                              companyName: chat.companyName ?? 'شركة رحلات',
+                              companyName: chat.companyName ??
+                                  AppStrings.userDefaultCompanyName,
                               tripId: chat.tripId,
                               bookingId: chat.bookingId,
                             ),
@@ -132,7 +148,8 @@ class UserChatsListPage extends StatelessWidget {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(24.r),
-                              child: chat.companyLogo != null && chat.companyLogo!.isNotEmpty
+                              child: chat.companyLogo != null &&
+                                      chat.companyLogo!.isNotEmpty
                                   ? AppNetworkImage(
                                       imageUrl: chat.companyLogo!,
                                       width: 48.r,
@@ -141,7 +158,8 @@ class UserChatsListPage extends StatelessWidget {
                                   : Container(
                                       width: 48.r,
                                       height: 48.r,
-                                      color: AppColors.primary.withValues(alpha: 0.1),
+                                      color: AppColors.primary
+                                          .withValues(alpha: 0.1),
                                       child: Icon(
                                         Icons.business,
                                         color: AppColors.primary,
@@ -155,7 +173,8 @@ class UserChatsListPage extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    chat.companyName ?? 'شركة رحلات',
+                                    chat.companyName ??
+                                        AppStrings.userDefaultCompanyName,
                                     style: AppTextStyles.bodyLarge.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.textPrimary,
@@ -167,7 +186,7 @@ class UserChatsListPage extends StatelessWidget {
                                   Text(
                                     chat.lastMessage.isNotEmpty
                                         ? chat.lastMessage
-                                        : 'اضغط لفتح المحادثة...',
+                                        : AppStrings.userTapToOpenChat,
                                     style: AppTextStyles.bodySmall.copyWith(
                                       color: AppColors.textSecondary,
                                     ),

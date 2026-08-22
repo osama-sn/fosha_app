@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:fosha_app/core/errors/api_error_handler.dart';
 import 'package:fosha_app/core/errors/failures.dart';
 import 'package:fosha_app/features/chat/data/datasources/chat_remote_data_source.dart';
 import 'package:fosha_app/features/chat/data/models/chat_message_model.dart';
@@ -24,7 +25,7 @@ class ChatRepository {
       );
       return Right(chat);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
     }
   }
 
@@ -41,7 +42,7 @@ class ChatRepository {
       );
       return Right(messages);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
     }
   }
 
@@ -58,7 +59,7 @@ class ChatRepository {
       );
       return Right(message);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
     }
   }
 
@@ -67,7 +68,7 @@ class ChatRepository {
       final chats = await dataSource.getUserChats();
       return Right(chats);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
     }
   }
 }

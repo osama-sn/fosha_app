@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fosha_app/features/admin/trips/data/models/trip_model.dart';
 import 'package:fosha_app/features/admin/trips/data/repositories/admin_trips_repository.dart';
 import 'package:fosha_app/features/admin/trips/presentation/cubit/admin_trips_status.dart';
+export 'package:fosha_app/features/admin/trips/presentation/cubit/admin_trips_status.dart';
 
 class AdminTripsCubit extends Cubit<AdminTripsState> {
   final AdminTripsRepository repo;

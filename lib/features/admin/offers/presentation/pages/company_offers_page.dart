@@ -10,7 +10,6 @@ import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 import 'package:fosha_app/features/admin/offers/data/models/offer_model.dart';
 import 'package:fosha_app/features/admin/offers/presentation/cubit/offers_cubit.dart';
-import 'package:fosha_app/features/admin/offers/presentation/cubit/offers_state.dart';
 import 'package:fosha_app/features/admin/offers/presentation/widgets/add_edit_offer_bottom_sheet.dart';
 import 'package:fosha_app/features/admin/offers/presentation/widgets/company_offers_delete_dialog.dart';
 import 'package:fosha_app/features/admin/offers/presentation/widgets/company_offers_empty_view.dart';

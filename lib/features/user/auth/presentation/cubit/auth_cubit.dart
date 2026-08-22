@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fosha_app/features/user/auth/data/models/register_request_model.dart';
 import 'package:fosha_app/features/user/auth/data/repositories/auth_repository.dart';
 import 'package:fosha_app/features/user/auth/presentation/cubit/auth_states.dart';
+export 'package:fosha_app/features/user/auth/presentation/cubit/auth_states.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepository authRepository;

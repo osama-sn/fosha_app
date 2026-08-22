@@ -3,17 +3,37 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/router/route_names.dart';
 import 'package:fosha_app/core/shared/widgets/app_button.dart';
 import 'package:fosha_app/core/shared/widgets/app_network_image.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 import 'package:fosha_app/features/admin/bookings/data/models/booking_model.dart';
+import 'package:fosha_app/features/chat/presentation/pages/chat_page.dart';
 
 class BookingSuccessPage extends StatelessWidget {
   final BookingModel booking;
 
   const BookingSuccessPage({super.key, required this.booking});
+
+  void _openChat(BuildContext context) {
+    final companyName = booking.companyName.isNotEmpty
+        ? booking.companyName
+        : AppStrings.userDefaultCompanyName;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ChatPage(
+          bookingId: booking.id,
+          companyId: booking.companyId,
+          companyName: companyName,
+          tripId: booking.tripId,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +59,8 @@ class BookingSuccessPage extends StatelessWidget {
               ),
               AppSizes.p16.verticalSpace,
               Text(
-                'تم حجز رحلتك بنجاح! 🎉',
+                AppStrings.bookingSentToCompany,
+                textAlign: TextAlign.center,
                 style: AppTextStyles.headlineSmall.copyWith(
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -47,7 +68,8 @@ class BookingSuccessPage extends StatelessWidget {
               ),
               AppSizes.p6.verticalSpace,
               Text(
-                'نتمنى لك رحلة ممتعة وآمنة',
+                'سيقوم أدمن الشركة بمراجعة التحويل وتأكيد الحجز فور الاستلام',
+                textAlign: TextAlign.center,
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.textSecondary,
                 ),
@@ -171,13 +193,13 @@ class BookingSuccessPage extends StatelessWidget {
                     // Info List
                     _buildInfoRow(
                       Icons.groups_outlined,
-                      'عدد الأفراد',
-                      '${booking.numberOfSeats} أفراد',
+                      AppStrings.adminSeatsCount,
+                      '${booking.numberOfSeats} ${AppStrings.adminPersonUnit}',
                     ),
                     _buildInfoRow(
                       Icons.account_balance_wallet_outlined,
-                      'الإجمالي',
-                      '${booking.totalPrice.toStringAsFixed(0)} ج.م',
+                      AppStrings.adminTotalRevenue,
+                      '${booking.totalPrice.toStringAsFixed(0)} ${AppStrings.currencyEGP}',
                     ),
                   ],
                 ),
@@ -200,7 +222,7 @@ class BookingSuccessPage extends StatelessWidget {
                     SizedBox(width: 8.w),
                     Expanded(
                       child: Text(
-                        'تم إرسال تفاصيل الحجز إلى بريدك الإلكتروني ورقم هاتفك بنجاح',
+                        'تم إرسال طلب الحجز وتفاصيل التحويل إلى الشركة بنجاح، وستتلقى إشعاراً فور الاعتماد',
                         style: AppTextStyles.labelSmall.copyWith(
                           color: Colors.green.shade800,
                           fontWeight: FontWeight.w600,
@@ -222,17 +244,17 @@ class BookingSuccessPage extends StatelessWidget {
               ),
               AppSizes.p12.verticalSpace,
 
-              // Actions List Buttons
+              // Chat with company button (Action Tile)
+              _buildActionTile(
+                icon: Icons.chat_bubble_outline,
+                title: AppStrings.contactWithCompany,
+                onTap: () => _openChat(context),
+              ),
+              AppSizes.p8.verticalSpace,
               _buildActionTile(
                 icon: Icons.bookmark_outline,
                 title: 'عرض حجوزاتي',
                 onTap: () => context.go(RouteNames.home),
-              ),
-              AppSizes.p8.verticalSpace,
-              _buildActionTile(
-                icon: Icons.share_outlined,
-                title: 'مشاركة الرحلة',
-                onTap: () {},
               ),
               AppSizes.p8.verticalSpace,
               _buildActionTile(
@@ -242,10 +264,10 @@ class BookingSuccessPage extends StatelessWidget {
               ),
               AppSizes.p24.verticalSpace,
 
-              // Bottom Button
+              // Chat with company primary button
               AppButton(
-                text: 'تحميل التذكرة / الإيصال 📄',
-                onPressed: () => context.go(RouteNames.home),
+                text: AppStrings.contactWithCompany,
+                onPressed: () => _openChat(context),
               ),
             ],
           ),

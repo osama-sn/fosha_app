@@ -6,6 +6,7 @@ import 'package:fosha_app/core/di/service_locator.dart';
 import 'package:fosha_app/features/admin/company_profile/data/models/company_profile_model.dart';
 import 'package:fosha_app/features/user/search/data/repositories/search_repository.dart';
 import 'package:fosha_app/features/user/search/presentation/cubit/search_state.dart';
+export 'package:fosha_app/features/user/search/presentation/cubit/search_state.dart';
 
 class SearchCubit extends Cubit<SearchState> {
   final SearchRepository repository;
@@ -84,29 +85,28 @@ class SearchCubit extends Cubit<SearchState> {
 
   Future<void> performSearch({int page = 1}) async {
     emit(const SearchLoading());
-    try {
-      final res = await repository.searchTrips(
-        page: page,
-        limit: 10,
-        search: searchQuery,
-        origin: selectedGovernorate,
-        destination: selectedDestination,
-        category: selectedCategory,
-        governorate: selectedGovernorate,
-        companyId: selectedCompanyId,
-        myGovernorateOnly: false,
-      );
+    final result = await repository.searchTrips(
+      page: page,
+      limit: 10,
+      search: searchQuery,
+      origin: selectedGovernorate,
+      destination: selectedDestination,
+      category: selectedCategory,
+      governorate: selectedGovernorate,
+      companyId: selectedCompanyId,
+      myGovernorateOnly: false,
+    );
 
-      emit(
+    result.fold(
+      (failure) => emit(SearchFailure(error: failure.message)),
+      (res) => emit(
         SearchSuccess(
           trips: res.trips,
           totalItems: res.totalItems,
           totalPages: res.totalPages,
           currentPage: res.currentPage,
         ),
-      );
-    } catch (e) {
-      emit(SearchFailure(error: e.toString().replaceAll('Exception: ', '')));
-    }
+      ),
+    );
   }
 }

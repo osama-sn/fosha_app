@@ -54,7 +54,7 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: const Icon(Icons.search_outlined),
             activeIcon: const Icon(Icons.search),
-            label: 'بحث',
+            label: AppStrings.searchTripsTitle,
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.bookmark_outline),

@@ -13,7 +13,6 @@ import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 import 'package:fosha_app/features/user/auth/presentation/cubit/auth_cubit.dart';
 import 'package:fosha_app/features/user/home/presentation/cubit/home_cubit.dart';
-import 'package:fosha_app/features/user/home/presentation/cubit/home_state.dart';
 import 'package:fosha_app/features/user/home/presentation/widgets/home_categories_widget.dart';
 import 'package:fosha_app/features/user/home/presentation/widgets/home_featured_banner_widget.dart';
 import 'package:fosha_app/features/user/home/presentation/widgets/home_featured_companies_widget.dart';

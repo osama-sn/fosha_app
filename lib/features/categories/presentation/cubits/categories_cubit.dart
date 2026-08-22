@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fosha_app/features/categories/data/repositories/categories_repository.dart';
 import 'package:fosha_app/features/categories/presentation/cubits/categories_state.dart';
+export 'package:fosha_app/features/categories/presentation/cubits/categories_state.dart';
 
 class CategoriesCubit extends Cubit<CategoriesState> {
   final CategoriesRepository _repository;

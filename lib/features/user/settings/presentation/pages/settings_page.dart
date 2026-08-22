@@ -32,7 +32,8 @@ class SettingsPage extends StatelessWidget {
               ),
               title: Text(
                 AppStrings.settingsTitle,
-                style: AppTextStyles.titleLarge.copyWith(color: AppColors.textPrimary),
+                style: AppTextStyles.titleLarge
+                    .copyWith(color: AppColors.textPrimary),
               ),
             ),
             body: ListView(
@@ -42,9 +43,14 @@ class SettingsPage extends StatelessWidget {
                   leading: const Icon(Icons.logout, color: Colors.red),
                   title: Text(
                     AppStrings.profileLogout,
-                    style: AppTextStyles.titleMedium.copyWith(color: Colors.red),
+                    style:
+                        AppTextStyles.titleMedium.copyWith(color: Colors.red),
                   ),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.red),
+                  trailing: const Icon(
+                    Icons.arrow_forward_ios,
+                    size: 16,
+                    color: Colors.red,
+                  ),
                   onTap: () => _showLogoutDialog(context),
                 ),
               ],
@@ -59,18 +65,18 @@ class SettingsPage extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('تسجيل الخروج'),
-        content: const Text('هل أنت تأكد من رغبتك في تسجيل الخروج؟'),
+        title: Text(AppStrings.logoutConfirmTitle),
+        content: Text(AppStrings.logoutConfirmMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('إلغاء'),
+            child: Text(AppStrings.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text(
-              'تسجيل الخروج',
-              style: TextStyle(color: Colors.red),
+            child: Text(
+              AppStrings.profileLogout,
+              style: const TextStyle(color: Colors.red),
             ),
           ),
         ],
@@ -82,11 +88,10 @@ class SettingsPage extends StatelessWidget {
       if (context.mounted) {
         AppSnackbar.showSuccess(
           context: context,
-          message: 'تم تسجيل الخروج بنجاح',
+          message: AppStrings.logoutSuccessMessage,
         );
         context.go(RouteNames.login);
       }
     }
   }
 }
-

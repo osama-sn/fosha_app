@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:fosha_app/core/errors/api_error_handler.dart';
 import 'package:fosha_app/core/errors/failures.dart';
 import 'package:fosha_app/features/user/auth/data/models/user_model.dart';
 import 'package:fosha_app/features/user/profile/data/datasources/profile_remote_data_source.dart';
@@ -13,7 +14,7 @@ class ProfileRepository {
       final user = await remoteDataSource.getProfile();
       return Right(user);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
     }
   }
 
@@ -32,7 +33,7 @@ class ProfileRepository {
       );
       return Right(user);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
     }
   }
 }

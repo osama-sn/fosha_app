@@ -9,7 +9,6 @@ import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 import 'package:fosha_app/features/user/auth/data/models/user_model.dart';
 import 'package:fosha_app/features/user/auth/presentation/cubit/auth_cubit.dart';
-import 'package:fosha_app/features/user/auth/presentation/cubit/auth_states.dart';
 
 class HomeHeaderWidget extends StatelessWidget {
   final String currentGovernorate;

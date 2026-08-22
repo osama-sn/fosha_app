@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 import 'package:fosha_app/features/admin/trips/data/models/trip_model.dart';
@@ -76,7 +77,7 @@ class TripDetailsFeaturesGrid extends StatelessWidget {
           child: QuickInfoCard(
             icon: Icons.hotel_outlined,
             title: nightsTitle,
-            subtitle: 'الإقامة',
+            subtitle: AppStrings.accommodationLabel,
           ),
         ),
         SizedBox(width: 8.w),
@@ -84,7 +85,7 @@ class TripDetailsFeaturesGrid extends StatelessWidget {
           child: QuickInfoCard(
             icon: Icons.access_time_outlined,
             title: trip.durationText.isNotEmpty ? trip.durationText : '1 يوم',
-            subtitle: 'المدة',
+            subtitle: AppStrings.durationLabel,
           ),
         ),
       ],

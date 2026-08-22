@@ -1,9 +1,12 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
+import 'package:fosha_app/core/constants/app_governorates.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/di/service_locator.dart';
 import 'package:fosha_app/core/network/api_endpoints.dart';
 import 'package:fosha_app/core/shared/widgets/app_button.dart';
@@ -30,45 +33,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
   String? _selectedGovernorate;
   File? _selectedImage;
 
-  static const List<String> _egyptGovernorates = [
-    'القاهرة',
-    'الجيزة',
-    'الإسكندرية',
-    'الدقهلية',
-    'الشرقية',
-    'القليوبية',
-    'كفر الشيخ',
-    'المنوفية',
-    'الغربية',
-    'البحيرة',
-    'الإسماعيلية',
-    'بورسعيد',
-    'السويس',
-    'الفيوم',
-    'بني سويف',
-    'المنيا',
-    'أسيوط',
-    'سوهاج',
-    'قنا',
-    'الأقصر',
-    'أسوان',
-    'البحر الأحمر',
-    'الوادي الجديد',
-    'مطروح',
-    'شمال سيناء',
-    'جنوب سيناء',
-  ];
-
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.user?.fullName ?? '');
     _phoneController = TextEditingController(text: widget.user?.phone ?? '');
     if (widget.user?.governorate != null &&
-        _egyptGovernorates.contains(widget.user!.governorate)) {
+        AppGovernorates.governorates.any((g) => g.nameAr == widget.user!.governorate)) {
       _selectedGovernorate = widget.user!.governorate;
-    } else {
-      _selectedGovernorate = _egyptGovernorates.first;
+    } else if (AppGovernorates.governorates.isNotEmpty) {
+      _selectedGovernorate = AppGovernorates.governorates.first.nameAr;
     }
   }
 
@@ -91,6 +65,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final langCode = context.locale.languageCode;
+
     return BlocProvider<ProfileCubit>(
       create: (context) => getIt<ProfileCubit>(),
       child: Scaffold(
@@ -103,7 +79,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
-            'تعديل الملف الشخصي',
+            AppStrings.editProfileTitle,
             style: AppTextStyles.titleMedium.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
@@ -121,13 +97,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
             } else if (state is ProfileSuccess) {
               AppSnackbar.showSuccess(
                 context: context,
-                message: 'تم تحديث بياناتك الشخصية بنجاح! ✨',
+                message: AppStrings.profileUpdatedSuccess,
               );
               Navigator.pop(context, true);
             }
           },
           builder: (context, state) {
-            final profileImgUrl = ApiEndpoints.getImageUrl(widget.user?.profileImage);
+            final profileImgUrl =
+                ApiEndpoints.getImageUrl(widget.user?.profileImage);
 
             return SafeArea(
               child: SingleChildScrollView(
@@ -152,13 +129,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   : (profileImgUrl.isNotEmpty &&
                                           (profileImgUrl.startsWith('http://') ||
                                               profileImgUrl.startsWith('https://'))
-                                      ? NetworkImage(profileImgUrl) as ImageProvider
+                                      ? NetworkImage(profileImgUrl)
+                                          as ImageProvider
                                       : null),
                               child: (_selectedImage == null &&
                                       (profileImgUrl.isEmpty ||
                                           (!profileImgUrl.startsWith('http://') &&
                                               !profileImgUrl.startsWith('https://'))))
-                                  ? Icon(Icons.person, size: 54.r, color: Colors.grey)
+                                  ? Icon(Icons.person,
+                                      size: 54.r, color: Colors.grey)
                                   : null,
                             ),
                             Container(
@@ -178,7 +157,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       ),
                       AppSizes.p8.verticalSpace,
                       Text(
-                        'تغيير الصورة الشخصية',
+                        AppStrings.changeProfilePhoto,
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.primary,
                           fontWeight: FontWeight.bold,
@@ -188,18 +167,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       // Name field
                       AppTextField(
                         controller: _nameController,
-                        labelText: 'الاسم بالكامل',
-                        hintText: 'أدخل اسمك بالكامل',
+                        labelText: AppStrings.nameLabel,
+                        hintText: AppStrings.nameHint,
                         type: AppTextFieldType.text,
-                        validator: (v) =>
-                            (v == null || v.trim().isEmpty) ? 'الرجاء إدخال الاسم بالكامل' : null,
+                        validator: (v) => (v == null || v.trim().isEmpty)
+                            ? AppStrings.nameRequired
+                            : null,
                       ),
                       AppSizes.p16.verticalSpace,
                       // Phone field
                       AppTextField(
                         controller: _phoneController,
-                        labelText: 'رقم الهاتف',
-                        hintText: 'أدخل رقم الهاتف (مثال: 01012345678)',
+                        labelText: AppStrings.phoneLabel,
+                        hintText: AppStrings.phoneHint,
                         type: AppTextFieldType.phone,
                       ),
                       AppSizes.p16.verticalSpace,
@@ -208,7 +188,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'المحافظة',
+                            AppStrings.governorateLabel,
                             style: AppTextStyles.bodyMedium.copyWith(
                               fontWeight: FontWeight.bold,
                               color: AppColors.textPrimary,
@@ -224,22 +204,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12.r),
-                                borderSide: const BorderSide(color: AppColors.border),
+                                borderSide:
+                                    const BorderSide(color: AppColors.border),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12.r),
-                                borderSide: const BorderSide(color: AppColors.border),
+                                borderSide:
+                                    const BorderSide(color: AppColors.border),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12.r),
-                                borderSide: const BorderSide(color: AppColors.primary),
+                                borderSide:
+                                    const BorderSide(color: AppColors.primary),
                               ),
                             ),
-                            items: _egyptGovernorates
+                            items: AppGovernorates.governorates
                                 .map(
-                                  (gov) => DropdownMenuItem<String>(
-                                    value: gov,
-                                    child: Text(gov),
+                                  (g) => DropdownMenuItem<String>(
+                                    value: g.nameAr,
+                                    child: Text(g.getName(langCode)),
                                   ),
                                 )
                                 .toList(),
@@ -256,7 +239,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       AppSizes.p32.verticalSpace,
                       // Submit button
                       AppButton(
-                        text: 'حفظ التعديلات',
+                        text: AppStrings.saveChanges,
                         isLoading: state is ProfileLoading,
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {

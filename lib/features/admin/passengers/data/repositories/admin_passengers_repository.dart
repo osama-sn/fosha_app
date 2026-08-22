@@ -1,3 +1,6 @@
+import 'package:dartz/dartz.dart';
+import 'package:fosha_app/core/errors/api_error_handler.dart';
+import 'package:fosha_app/core/errors/failures.dart';
 import '../datasources/admin_passengers_remote_data_source.dart';
 import '../models/passenger_model.dart';
 
@@ -6,19 +9,30 @@ class AdminPassengersRepository {
 
   AdminPassengersRepository(this._dataSource);
 
-  Future<PassengerListResponseModel> getTripPassengers(String tripId) {
-    return _dataSource.getTripPassengers(tripId);
+  Future<Either<Failure, PassengerListResponseModel>> getTripPassengers(
+      String tripId) async {
+    try {
+      final response = await _dataSource.getTripPassengers(tripId);
+      return Right(response);
+    } catch (e) {
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
+    }
   }
 
-  Future<void> sendAnnouncement({
+  Future<Either<Failure, void>> sendAnnouncement({
     required String tripId,
     required String title,
     required String message,
-  }) {
-    return _dataSource.sendAnnouncement(
-      tripId: tripId,
-      title: title,
-      message: message,
-    );
+  }) async {
+    try {
+      await _dataSource.sendAnnouncement(
+        tripId: tripId,
+        title: title,
+        message: message,
+      );
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
+    }
   }
 }

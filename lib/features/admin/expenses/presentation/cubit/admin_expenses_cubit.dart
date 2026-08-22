@@ -1,35 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fosha_app/core/errors/api_error_handler.dart';
-import 'package:fosha_app/features/admin/expenses/data/models/expense_model.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/features/admin/expenses/data/repositories/admin_expenses_repository.dart';
-
-abstract class AdminExpensesState {}
-
-class AdminExpensesInitial extends AdminExpensesState {}
-
-class AdminExpensesLoading extends AdminExpensesState {}
-
-class AdminExpensesLoaded extends AdminExpensesState {
-  final List<ExpenseModel> expenses;
-  final List<ExpenseCategorySummaryModel> summary;
-  final double totalAmount;
-
-  AdminExpensesLoaded({
-    required this.expenses,
-    required this.summary,
-    required this.totalAmount,
-  });
-}
-
-class AdminExpensesError extends AdminExpensesState {
-  final String message;
-  AdminExpensesError(this.message);
-}
-
-class AdminExpenseActionSuccess extends AdminExpensesState {
-  final String message;
-  AdminExpenseActionSuccess(this.message);
-}
+import 'admin_expenses_state.dart';
+export 'admin_expenses_state.dart';
 
 class AdminExpensesCubit extends Cubit<AdminExpensesState> {
   final AdminExpensesRepository _repository;
@@ -43,24 +16,36 @@ class AdminExpensesCubit extends Cubit<AdminExpensesState> {
     String? endDate,
   }) async {
     emit(AdminExpensesLoading());
-    try {
-      final expenses = await _repository.getExpenses(
-        tripId: tripId,
-        category: category,
-        startDate: startDate,
-        endDate: endDate,
-      );
-      final summary = await _repository.getExpensesSummary();
-      final total = expenses.fold(0.0, (sum, item) => sum + item.amount);
 
-      emit(AdminExpensesLoaded(
-        expenses: expenses,
-        summary: summary,
-        totalAmount: total,
-      ));
-    } catch (e) {
-      emit(AdminExpensesError(ApiErrorHandler.handle(e)));
-    }
+    final expensesResult = await _repository.getExpenses(
+      tripId: tripId,
+      category: category,
+      startDate: startDate,
+      endDate: endDate,
+    );
+
+    await expensesResult.fold(
+      (failure) async => emit(AdminExpensesError(failure.message)),
+      (expenses) async {
+        final summaryResult = await _repository.getExpensesSummary();
+
+        summaryResult.fold(
+          (failure) => emit(AdminExpensesLoaded(
+            expenses: expenses,
+            summary: const [],
+            totalAmount: expenses.fold(0.0, (sum, item) => sum + item.amount),
+          )),
+          (summary) {
+            final total = expenses.fold(0.0, (sum, item) => sum + item.amount);
+            emit(AdminExpensesLoaded(
+              expenses: expenses,
+              summary: summary,
+              totalAmount: total,
+            ));
+          },
+        );
+      },
+    );
   }
 
   Future<void> addExpense({
@@ -72,30 +57,38 @@ class AdminExpensesCubit extends Cubit<AdminExpensesState> {
     String? notes,
     dynamic receiptImageFile,
   }) async {
-    try {
-      await _repository.addExpense(
-        title: title,
-        amount: amount,
-        category: category,
-        tripId: tripId,
-        expenseDate: expenseDate,
-        notes: notes,
-        receiptImageFile: receiptImageFile,
-      );
-      emit(AdminExpenseActionSuccess('تمت إضافة المصروف بنجاح'));
-      await fetchExpenses(tripId: tripId, category: category);
-    } catch (e) {
-      emit(AdminExpensesError(ApiErrorHandler.handle(e)));
-    }
+    final result = await _repository.addExpense(
+      title: title,
+      amount: amount,
+      category: category,
+      tripId: tripId,
+      expenseDate: expenseDate,
+      notes: notes,
+      receiptImageFile: receiptImageFile,
+    );
+
+    await result.fold(
+      (failure) async => emit(AdminExpensesError(failure.message)),
+      (_) async {
+        emit(AdminExpenseActionSuccess(AppStrings.adminExpenseAddSuccess));
+        await fetchExpenses(tripId: tripId, category: category);
+      },
+    );
   }
 
-  Future<void> deleteExpense(String expenseId, {String? tripId, String? category}) async {
-    try {
-      await _repository.deleteExpense(expenseId);
-      emit(AdminExpenseActionSuccess('تم حذف المصروف بنجاح'));
-      await fetchExpenses(tripId: tripId, category: category);
-    } catch (e) {
-      emit(AdminExpensesError(ApiErrorHandler.handle(e)));
-    }
+  Future<void> deleteExpense(
+    String expenseId, {
+    String? tripId,
+    String? category,
+  }) async {
+    final result = await _repository.deleteExpense(expenseId);
+
+    await result.fold(
+      (failure) async => emit(AdminExpensesError(failure.message)),
+      (_) async {
+        emit(AdminExpenseActionSuccess(AppStrings.adminExpenseDeleteSuccess));
+        await fetchExpenses(tripId: tripId, category: category);
+      },
+    );
   }
 }

@@ -10,7 +10,6 @@ import 'package:fosha_app/core/shared/widgets/app_loading.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 import 'package:fosha_app/features/user/search/presentation/cubit/search_cubit.dart';
-import 'package:fosha_app/features/user/search/presentation/cubit/search_state.dart';
 import 'package:fosha_app/features/user/search/presentation/widgets/search_filters_form.dart';
 import 'package:fosha_app/features/user/search/presentation/widgets/search_results_list.dart';
 

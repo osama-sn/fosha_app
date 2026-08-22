@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fosha_app/features/user/favorites/data/repositories/favorites_repository.dart';
 import 'package:fosha_app/features/user/favorites/presentation/cubit/favorites_state.dart';
+export 'package:fosha_app/features/user/favorites/presentation/cubit/favorites_state.dart';
 
 class FavoritesCubit extends Cubit<FavoritesState> {
   final FavoritesRepository repository;
@@ -9,34 +10,34 @@ class FavoritesCubit extends Cubit<FavoritesState> {
 
   Future<void> loadFavorites() async {
     emit(const FavoritesLoading());
-    try {
-      final favorites = await repository.getFavorites();
-      emit(FavoritesLoaded(favorites: favorites));
-    } catch (e) {
-      emit(FavoritesFailure(
-        error: e.toString().replaceAll('Exception: ', ''),
-      ));
-    }
+    final result = await repository.getFavorites();
+
+    result.fold(
+      (failure) => emit(FavoritesFailure(error: failure.message)),
+      (favorites) => emit(FavoritesLoaded(favorites: favorites)),
+    );
   }
 
   Future<void> toggleFavorite(String tripId) async {
-    try {
-      final isFav = await repository.toggleFavorite(tripId);
-      final currentState = state;
-      if (currentState is FavoritesLoaded) {
-        if (isFav) {
-          // Re-fetch to get updated populated trip list
-          await loadFavorites();
+    final result = await repository.toggleFavorite(tripId);
+
+    await result.fold(
+      (failure) async {},
+      (isFav) async {
+        final currentState = state;
+        if (currentState is FavoritesLoaded) {
+          if (isFav) {
+            await loadFavorites();
+          } else {
+            final updatedList = currentState.favorites
+                .where((trip) => trip.id != tripId)
+                .toList();
+            emit(FavoritesLoaded(favorites: updatedList));
+          }
         } else {
-          // Remove locally
-          final updatedList = currentState.favorites
-              .where((trip) => trip.id != tripId)
-              .toList();
-          emit(FavoritesLoaded(favorites: updatedList));
+          await loadFavorites();
         }
-      } else {
-        await loadFavorites();
-      }
-    } catch (_) {}
+      },
+    );
   }
 }

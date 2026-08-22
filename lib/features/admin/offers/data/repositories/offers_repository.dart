@@ -1,5 +1,7 @@
 import 'dart:io';
-import 'package:dio/dio.dart';
+import 'package:dartz/dartz.dart';
+import 'package:fosha_app/core/errors/api_error_handler.dart';
+import 'package:fosha_app/core/errors/failures.dart';
 import 'package:fosha_app/features/admin/offers/data/datasources/offers_remote_data_source.dart';
 import 'package:fosha_app/features/admin/offers/data/models/offer_model.dart';
 
@@ -8,20 +10,16 @@ class OffersRepository {
 
   OffersRepository({required this.dataSource});
 
-  Future<List<OfferModel>> getCompanyOffers() async {
+  Future<Either<Failure, List<OfferModel>>> getCompanyOffers() async {
     try {
-      return await dataSource.getCompanyOffers();
-    } on DioException catch (e) {
-      final msg = e.response?.data is Map && e.response?.data['message'] != null
-          ? e.response?.data['message'].toString()
-          : 'فشل في جلب العروض';
-      throw Exception(msg);
+      final response = await dataSource.getCompanyOffers();
+      return Right(response);
     } catch (e) {
-      throw Exception(e.toString().replaceAll('Exception: ', ''));
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
     }
   }
 
-  Future<OfferModel> createOffer({
+  Future<Either<Failure, OfferModel>> createOffer({
     required String titleAr,
     required String titleEn,
     required String descriptionAr,
@@ -35,7 +33,7 @@ class OffersRepository {
     File? imageFile,
   }) async {
     try {
-      return await dataSource.createOffer(
+      final response = await dataSource.createOffer(
         titleAr: titleAr,
         titleEn: titleEn,
         descriptionAr: descriptionAr,
@@ -48,17 +46,13 @@ class OffersRepository {
         priority: priority,
         imageFile: imageFile,
       );
-    } on DioException catch (e) {
-      final msg = e.response?.data is Map && e.response?.data['message'] != null
-          ? e.response?.data['message'].toString()
-          : 'فشل في إنشاء العرض';
-      throw Exception(msg);
+      return Right(response);
     } catch (e) {
-      throw Exception(e.toString().replaceAll('Exception: ', ''));
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
     }
   }
 
-  Future<OfferModel> updateOffer({
+  Future<Either<Failure, OfferModel>> updateOffer({
     required String offerId,
     required String titleAr,
     required String titleEn,
@@ -73,7 +67,7 @@ class OffersRepository {
     File? imageFile,
   }) async {
     try {
-      return await dataSource.updateOffer(
+      final response = await dataSource.updateOffer(
         offerId: offerId,
         titleAr: titleAr,
         titleEn: titleEn,
@@ -87,26 +81,18 @@ class OffersRepository {
         priority: priority,
         imageFile: imageFile,
       );
-    } on DioException catch (e) {
-      final msg = e.response?.data is Map && e.response?.data['message'] != null
-          ? e.response?.data['message'].toString()
-          : 'فشل في تعديل العرض';
-      throw Exception(msg);
+      return Right(response);
     } catch (e) {
-      throw Exception(e.toString().replaceAll('Exception: ', ''));
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
     }
   }
 
-  Future<void> deleteOffer(String offerId) async {
+  Future<Either<Failure, void>> deleteOffer(String offerId) async {
     try {
       await dataSource.deleteOffer(offerId);
-    } on DioException catch (e) {
-      final msg = e.response?.data is Map && e.response?.data['message'] != null
-          ? e.response?.data['message'].toString()
-          : 'فشل في حذف العرض';
-      throw Exception(msg);
+      return const Right(null);
     } catch (e) {
-      throw Exception(e.toString().replaceAll('Exception: ', ''));
+      return Left(ServerFailure(ApiErrorHandler.handle(e)));
     }
   }
 }

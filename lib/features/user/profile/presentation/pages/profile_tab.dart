@@ -14,7 +14,6 @@ import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 import 'package:fosha_app/features/user/auth/data/models/user_model.dart';
 import 'package:fosha_app/features/user/auth/presentation/cubit/auth_cubit.dart';
-import 'package:fosha_app/features/user/auth/presentation/cubit/auth_states.dart';
 import 'package:fosha_app/core/network/api_endpoints.dart';
 import 'package:fosha_app/features/user/profile/presentation/widgets/profile_menu_item_widget.dart';
 import 'package:fosha_app/features/chat/presentation/pages/user_chats_list_page.dart';
@@ -105,7 +104,9 @@ class ProfileTab extends StatelessWidget {
         ),
         AppSizes.p16.verticalSpace,
         Text(
-          user?.fullName.isNotEmpty == true ? user!.fullName : 'المستخدم',
+          user?.fullName.isNotEmpty == true
+              ? user!.fullName
+              : AppStrings.adminDefaultCustomerName,
           style: AppTextStyles.headlineSmall.copyWith(
             color: AppColors.primaryDark,
             fontWeight: FontWeight.bold,
@@ -211,18 +212,18 @@ class ProfileTab extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('تسجيل الخروج'),
-        content: const Text('هل أنت تأكد من رغبتك في تسجيل الخروج؟'),
+        title: Text(AppStrings.logoutConfirmTitle),
+        content: Text(AppStrings.logoutConfirmMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('إلغاء'),
+            child: Text(AppStrings.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text(
-              'تسجيل الخروج',
-              style: TextStyle(color: Colors.red),
+            child: Text(
+              AppStrings.profileLogout,
+              style: const TextStyle(color: Colors.red),
             ),
           ),
         ],
@@ -234,7 +235,7 @@ class ProfileTab extends StatelessWidget {
       if (context.mounted) {
         AppSnackbar.showSuccess(
           context: context,
-          message: 'تم تسجيل الخروج بنجاح',
+          message: AppStrings.logoutSuccessMessage,
         );
         context.go(RouteNames.login);
       }

@@ -167,21 +167,30 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
             try {
               final repo = getIt<FavoritesRepository>();
               final isFavResult = await repo.toggleFavorite(trip.id);
-              setState(() {
-                _isFavorite = isFavResult;
-              });
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      isFavResult
-                          ? 'تمت إضافة الرحلة للمفضلة ❤️'
-                          : 'تمت إزالة الرحلة من المفضلة',
-                    ),
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
-              }
+              isFavResult.fold(
+                (_) {
+                  setState(() {
+                    _isFavorite = currentFav;
+                  });
+                },
+                (isFav) {
+                  setState(() {
+                    _isFavorite = isFav;
+                  });
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          isFav
+                              ? 'تمت إضافة الرحلة للمفضلة ❤️'
+                              : 'تمت إزالة الرحلة من المفضلة',
+                        ),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                },
+              );
             } catch (_) {}
           },
         ),

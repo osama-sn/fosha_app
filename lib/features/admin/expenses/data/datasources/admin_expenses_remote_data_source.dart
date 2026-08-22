@@ -20,7 +20,7 @@ abstract class AdminExpensesRemoteDataSource {
     String? tripId,
     String? expenseDate,
     String? notes,
-    dynamic receiptImageFile, // String path or File
+    dynamic receiptImageFile,
   });
 
   Future<ExpenseModel> updateExpense({
@@ -94,41 +94,69 @@ class AdminExpensesRemoteDataSourceImpl
     String? notes,
     dynamic receiptImageFile,
   }) async {
-    final formDataMap = <String, dynamic>{
-      'title': title,
-      'amount': amount,
-      'category': category,
-      if (tripId != null && tripId.isNotEmpty) 'tripId': tripId,
-      if (expenseDate != null && expenseDate.isNotEmpty)
-        'expenseDate': expenseDate,
-      if (notes != null && notes.isNotEmpty) 'notes': notes,
-    };
+    final formData = await _buildExpenseFormData(
+      title: title,
+      amount: amount,
+      category: category,
+      tripId: tripId,
+      expenseDate: expenseDate,
+      notes: notes,
+      receiptImageFile: receiptImageFile,
+    );
 
-    if (receiptImageFile != null) {
-      if (receiptImageFile is String && receiptImageFile.isNotEmpty) {
-        formDataMap['receiptImage'] = await MultipartFile.fromFile(
-          receiptImageFile,
-        );
-      }
-    }
-
-    final formData = FormData.fromMap(formDataMap);
     final response = await _dioClient.dio.post(
       ApiEndpoints.expenses,
       data: formData,
     );
 
-    final rawData = response.data;
-    final json = (rawData is Map<String, dynamic> && rawData['data'] != null)
-        ? rawData['data'] as Map<String, dynamic>
-        : rawData as Map<String, dynamic>;
+    final data = response.data;
+    final jsonMap = (data is Map<String, dynamic> && data['data'] != null)
+        ? (data['data']['expense'] ?? data['data']) as Map<String, dynamic>
+        : data as Map<String, dynamic>;
 
-    return ExpenseModel.fromJson(json);
+    return ExpenseModel.fromJson(jsonMap);
   }
 
   @override
   Future<ExpenseModel> updateExpense({
     required String expenseId,
+    required String title,
+    required double amount,
+    required String category,
+    String? tripId,
+    String? expenseDate,
+    String? notes,
+    dynamic receiptImageFile,
+  }) async {
+    final formData = await _buildExpenseFormData(
+      title: title,
+      amount: amount,
+      category: category,
+      tripId: tripId,
+      expenseDate: expenseDate,
+      notes: notes,
+      receiptImageFile: receiptImageFile,
+    );
+
+    final response = await _dioClient.dio.put(
+      '${ApiEndpoints.expenses}/$expenseId',
+      data: formData,
+    );
+
+    final data = response.data;
+    final jsonMap = (data is Map<String, dynamic> && data['data'] != null)
+        ? (data['data']['expense'] ?? data['data']) as Map<String, dynamic>
+        : data as Map<String, dynamic>;
+
+    return ExpenseModel.fromJson(jsonMap);
+  }
+
+  @override
+  Future<void> deleteExpense(String expenseId) async {
+    await _dioClient.dio.delete('${ApiEndpoints.expenses}/$expenseId');
+  }
+
+  Future<FormData> _buildExpenseFormData({
     required String title,
     required double amount,
     required String category,
@@ -147,28 +175,14 @@ class AdminExpensesRemoteDataSourceImpl
       if (notes != null && notes.isNotEmpty) 'notes': notes,
     };
 
-    if (receiptImageFile != null && receiptImageFile is String) {
-      formDataMap['receiptImage'] = await MultipartFile.fromFile(
-        receiptImageFile,
-      );
+    if (receiptImageFile != null) {
+      if (receiptImageFile is String && receiptImageFile.isNotEmpty) {
+        formDataMap['receiptImage'] = await MultipartFile.fromFile(
+          receiptImageFile,
+        );
+      }
     }
 
-    final formData = FormData.fromMap(formDataMap);
-    final response = await _dioClient.dio.put(
-      '${ApiEndpoints.expenses}/$expenseId',
-      data: formData,
-    );
-
-    final rawData = response.data;
-    final json = (rawData is Map<String, dynamic> && rawData['data'] != null)
-        ? rawData['data'] as Map<String, dynamic>
-        : rawData as Map<String, dynamic>;
-
-    return ExpenseModel.fromJson(json);
-  }
-
-  @override
-  Future<void> deleteExpense(String expenseId) async {
-    await _dioClient.dio.delete('${ApiEndpoints.expenses}/$expenseId');
+    return FormData.fromMap(formDataMap);
   }
 }

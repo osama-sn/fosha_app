@@ -17,7 +17,6 @@ import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 import 'package:fosha_app/core/utils/app_validators.dart';
 import 'package:fosha_app/features/user/auth/presentation/cubit/auth_cubit.dart';
-import 'package:fosha_app/features/user/auth/presentation/cubit/auth_states.dart';
 import 'package:fosha_app/features/user/auth/presentation/widgets/social_auth_buttons.dart';
 import 'package:fosha_app/features/user/auth/presentation/pages/forgot_password_page.dart';
 
@@ -51,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
               if (state is AuthSuccess) {
                 AppSnackbar.showSuccess(
                   context: context,
-                  message: 'تم تسجيل الدخول بنجاح',
+                  message: AppStrings.loginSuccessMessage,
                 );
                 if (state.user.isAdmin) {
                   context.go(RouteNames.adminDashboard);

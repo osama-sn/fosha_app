@@ -22,7 +22,6 @@ import 'package:fosha_app/core/theme/app_text_styles.dart';
 import 'package:fosha_app/core/utils/app_validators.dart';
 import 'package:fosha_app/features/user/auth/data/models/register_request_model.dart';
 import 'package:fosha_app/features/user/auth/presentation/cubit/auth_cubit.dart';
-import 'package:fosha_app/features/user/auth/presentation/cubit/auth_states.dart';
 import 'package:fosha_app/features/user/auth/presentation/widgets/profile_avatar_picker.dart';
 
 class RegisterPage extends StatefulWidget {

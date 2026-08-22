@@ -7,7 +7,6 @@ import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/di/service_locator.dart';
 import 'package:fosha_app/core/shared/widgets/app_button.dart';
 import 'package:fosha_app/core/shared/widgets/app_loading.dart';
-import 'package:fosha_app/core/shared/widgets/app_network_image.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 import 'package:dartz/dartz.dart' hide State;
@@ -16,8 +15,11 @@ import 'package:fosha_app/features/admin/company_profile/data/models/company_pro
 import 'package:fosha_app/features/admin/company_profile/data/models/company_review_model.dart';
 import 'package:fosha_app/features/admin/company_profile/data/repositories/company_profile_repository.dart';
 import 'package:fosha_app/features/admin/company_profile/presentation/cubit/company_profile_cubit.dart';
-import 'package:fosha_app/features/admin/company_profile/presentation/cubit/company_profile_state.dart';
 import 'package:fosha_app/features/admin/trips/data/models/paginated_trips_model.dart';
+import 'package:fosha_app/features/admin/trips/data/models/trip_model.dart';
+import 'package:fosha_app/features/user/company/presentation/widgets/company_contact_info_widget.dart';
+import 'package:fosha_app/features/user/company/presentation/widgets/company_header_cover_widget.dart';
+import 'package:fosha_app/features/user/company/presentation/widgets/company_stats_bar_widget.dart';
 import 'package:fosha_app/features/user/search/data/repositories/search_repository.dart';
 import 'package:fosha_app/features/user/search/presentation/widgets/search_results_list.dart';
 import 'package:fosha_app/features/chat/presentation/pages/chat_page.dart';
@@ -62,11 +64,16 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
         companyId: widget.companyId,
         limit: 1,
       );
-      if (mounted) {
-        setState(() {
-          _tripsCount = result.totalItems;
-        });
-      }
+      result.fold(
+        (_) {},
+        (res) {
+          if (mounted) {
+            setState(() {
+              _tripsCount = res.totalItems;
+            });
+          }
+        },
+      );
     } catch (_) {}
   }
 
@@ -88,78 +95,73 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
           },
         ),
         title: Text(
-          'تفاصيل الشركة',
+          AppStrings.companyDetailsTitle,
           style: AppTextStyles.titleMedium.copyWith(
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
           ),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.ios_share, color: AppColors.textPrimary),
-            onPressed: () {},
-          ),
-        ],
       ),
       bottomNavigationBar:
           BlocBuilder<CompanyProfileCubit, CompanyProfileState>(
-            builder: (context, state) {
-              CompanyProfileModel? profile;
-              if (state is CompanyProfileLoaded) {
-                profile = state.profile;
-              }
-              final phone = profile?.contactPhone ?? '+201011111111';
+        builder: (context, state) {
+          CompanyProfileModel? profile;
+          if (state is CompanyProfileLoaded) {
+            profile = state.profile;
+          }
+          final phone = profile?.contactPhone ?? '+201011111111';
 
-              return Container(
-                padding: EdgeInsets.all(AppSizes.p16),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  border: Border(top: BorderSide(color: AppColors.border)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10.r,
-                      offset: Offset(0, -4.h),
-                    ),
-                  ],
+          return Container(
+            padding: EdgeInsets.all(AppSizes.p16),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              border: Border(top: BorderSide(color: AppColors.border)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10.r,
+                  offset: Offset(0, -4.h),
                 ),
-                child: SafeArea(
-                  top: false,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryDark,
-                      foregroundColor: Colors.white,
-                      minimumSize: Size(double.infinity, 48.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14.r),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ChatPage(
-                            companyId: widget.companyId,
-                            companyName: profile?.name ?? 'الشركة',
-                            companyPhone: phone,
-                          ),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.chat_bubble_outline),
-                    label: Text(
-                      'تواصل مع الشركة',
-                      style: AppTextStyles.labelLarge.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+              ],
+            ),
+            child: SafeArea(
+              top: false,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryDark,
+                  foregroundColor: Colors.white,
+                  minimumSize: Size(double.infinity, 48.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14.r),
                   ),
                 ),
-              );
-            },
-          ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ChatPage(
+                        companyId: widget.companyId,
+                        companyName:
+                            profile?.name ?? AppStrings.userDefaultCompanyName,
+                        companyPhone: phone,
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.chat_bubble_outline),
+                label: Text(
+                  AppStrings.contactWithCompany,
+                  style: AppTextStyles.labelLarge.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
       body: BlocBuilder<CompanyProfileCubit, CompanyProfileState>(
         builder: (context, state) {
           if (state is CompanyProfileLoading) {
@@ -205,96 +207,21 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
 
           final companyName = profile?.name.isNotEmpty == true
               ? profile!.name
-              : 'شركه فسحني شكرا';
-          final companyDesc = profile?.description.isNotEmpty == true
-              ? profile!.description
-              : 'شركة رحلات مصر هي إحدى الشركات الرائدة في مجال السياحة والسفر في مصر. نقدم أفضل البرامج السياحية بأسعار تنافسية وخدمة عملاء على أعلى مستوى. نضمن لك رحلة ممتعة وأمنة مع أفضل المرشدين والخدمات.';
+              : AppStrings.userDefaultCompanyName;
+          final companyDesc = profile?.description ?? '';
           final rating =
               (profile?.averageRating != null && profile!.averageRating! > 0)
-              ? profile.averageRating!
-              : 4.7;
-          final reviewsCount = profile?.reviewsCount ?? 320;
+                  ? profile.averageRating!
+                  : 4.7;
+          final reviewsCount = profile?.reviewsCount ?? 0;
 
           return SingleChildScrollView(
             child: Column(
               children: [
-                // Cover Image + Overlapping Logo Header
-                SizedBox(
-                  height: 220.h,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        height: 160.h,
-                        child:
-                            profile?.coverImage != null &&
-                                profile!.coverImage!.isNotEmpty
-                            ? AppNetworkImage(
-                                imageUrl: profile.coverImage!,
-                                fit: BoxFit.cover,
-                              )
-                            : Container(
-                                color: AppColors.primaryDark,
-                                child: const Icon(
-                                  Icons.landscape,
-                                  color: Colors.white24,
-                                  size: 64,
-                                ),
-                              ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        child: Center(
-                          child: Container(
-                            width: 90.r,
-                            height: 90.r,
-                            decoration: BoxDecoration(
-                              color: AppColors.surface,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: AppColors.surface,
-                                width: 4,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.1),
-                                  blurRadius: 10.r,
-                                  offset: Offset(0, 4.h),
-                                ),
-                              ],
-                            ),
-                            child:
-                                profile?.logo != null &&
-                                    profile!.logo!.isNotEmpty
-                                ? ClipOval(
-                                    child: AppNetworkImage(
-                                      imageUrl: profile.logo!,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  )
-                                : CircleAvatar(
-                                    backgroundColor: AppColors.primaryLight
-                                        .withValues(alpha: 0.2),
-                                    child: Icon(
-                                      Icons.storefront,
-                                      color: AppColors.primaryDark,
-                                      size: 40.r,
-                                    ),
-                                  ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                CompanyHeaderCoverWidget(profile: profile),
                 AppSizes.p12.verticalSpace,
 
-                // Company Name, Badge & Rating
+                // Company Name & Rating
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -311,7 +238,7 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
                 ),
                 AppSizes.p4.verticalSpace,
                 Text(
-                  'شركة سياحة',
+                  AppStrings.companyTourismType,
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -331,7 +258,7 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
                     ),
                     SizedBox(width: 4.w),
                     Text(
-                      '($reviewsCount تقييم)',
+                      '($reviewsCount ${AppStrings.adminReviewUnit})',
                       style: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.textHint,
                       ),
@@ -340,47 +267,18 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
                 ),
                 AppSizes.p16.verticalSpace,
 
-                // Stats Grid Cards (3 Columns)
+                // Stats Bar
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: AppSizes.p16),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 14.h),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(16.r),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Row(
-                      children: [
-                        _buildStatColumn(
-                          '${_tripsCount ?? '-'} رحلة',
-                          'الرحلات',
-                        ),
-                        Container(
-                          width: 1,
-                          height: 30.h,
-                          color: AppColors.border,
-                        ),
-                        _buildStatColumn(
-                          '${reviewsCount > 0 ? reviewsCount : '-'} تقييم',
-                          'التقييمات',
-                        ),
-                        Container(
-                          width: 1,
-                          height: 30.h,
-                          color: AppColors.border,
-                        ),
-                        _buildStatColumn(
-                          profile?.governorate ?? '-',
-                          'المحافظة',
-                        ),
-                      ],
-                    ),
+                  child: CompanyStatsBarWidget(
+                    tripsCount: _tripsCount,
+                    reviewsCount: reviewsCount,
+                    governorate: profile?.governorate,
                   ),
                 ),
                 AppSizes.p20.verticalSpace,
 
-                // Tab Bar Selector (نبذة | الرحلات | التقييمات | المعلومات)
+                // Tab Selector
                 Container(
                   decoration: const BoxDecoration(
                     border: Border(bottom: BorderSide(color: AppColors.border)),
@@ -388,10 +286,11 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _buildTabItem(0, 'نبذة'),
-                      _buildTabItem(1, 'الرحلات'),
-                      _buildTabItem(2, 'التقييمات ($reviewsCount)'),
-                      _buildTabItem(3, 'المعلومات'),
+                      _buildTabItem(0, AppStrings.companyTabAbout),
+                      _buildTabItem(1, AppStrings.companyTabTrips),
+                      _buildTabItem(
+                          2, '${AppStrings.companyTabReviews} ($reviewsCount)'),
+                      _buildTabItem(3, AppStrings.companyTabInfo),
                     ],
                   ),
                 ),
@@ -407,30 +306,6 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
             ),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildStatColumn(String val, String label) {
-    return Expanded(
-      child: Column(
-        children: [
-          Text(
-            val,
-            style: AppTextStyles.titleSmall.copyWith(
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryDark,
-            ),
-          ),
-          SizedBox(height: 2.h),
-          Text(
-            label,
-            style: AppTextStyles.labelSmall.copyWith(
-              color: AppColors.textHint,
-              fontSize: 10.sp,
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -453,7 +328,9 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
           title,
           style: AppTextStyles.labelMedium.copyWith(
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            color: isSelected ? AppColors.primaryDark : AppColors.textSecondary,
+            color: isSelected
+                ? AppColors.primaryDark
+                : AppColors.textSecondary,
           ),
         ),
       ),
@@ -462,64 +339,31 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
 
   Widget _buildTabContent(CompanyProfileModel? profile, String companyDesc) {
     if (_selectedTab == 0) {
-      // نبذة
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            companyDesc,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
-              height: 1.6,
+          if (companyDesc.isNotEmpty)
+            Text(
+              companyDesc,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+                height: 1.6,
+              ),
             ),
-          ),
           AppSizes.p20.verticalSpace,
           Text(
-            'معلومات التواصل',
+            AppStrings.companyContactInfo,
             style: AppTextStyles.titleSmall.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
             ),
           ),
           AppSizes.p12.verticalSpace,
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(16.r),
-              border: Border.all(color: AppColors.border),
-            ),
-            child: Column(
-              children: [
-                _buildContactRow(
-                  Icons.phone_outlined,
-                  profile?.contactPhone.isNotEmpty == true
-                      ? profile!.contactPhone
-                      : '+20 100 123 4567',
-                ),
-                const Divider(color: AppColors.border, height: 1),
-                _buildContactRow(
-                  Icons.email_outlined,
-                  profile?.contactEmail.isNotEmpty == true
-                      ? profile!.contactEmail
-                      : 'info@rehlatmasr.com',
-                ),
-                const Divider(color: AppColors.border, height: 1),
-                _buildContactRow(Icons.language_outlined, 'www.rehlatmasr.com'),
-                const Divider(color: AppColors.border, height: 1),
-                _buildContactRow(
-                  Icons.location_on_outlined,
-                  profile?.address.isNotEmpty == true
-                      ? '${profile!.address} - ${profile.governorate}'
-                      : '123 شارع النيل، الزمالك، القاهرة، مصر',
-                ),
-              ],
-            ),
-          ),
+          CompanyContactInfoWidget(profile: profile),
         ],
       );
     } else if (_selectedTab == 1) {
-      // الرحلات الخاصة بالشركة المحددة عبر الـ API
-      return FutureBuilder<PaginatedTripsModel>(
+      return FutureBuilder<Either<Failure, PaginatedTripsModel>>(
         future: getIt<SearchRepository>().searchTrips(
           companyId: widget.companyId,
           limit: 20,
@@ -528,7 +372,8 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: AppLoading());
           }
-          final trips = snapshot.data?.trips ?? [];
+          final trips =
+              snapshot.data?.fold((l) => <TripModel>[], (r) => r.trips) ?? [];
           if (trips.isEmpty) {
             return Center(
               child: Padding(
@@ -542,7 +387,7 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
                     ),
                     AppSizes.p8.verticalSpace,
                     Text(
-                      'لا توجد رحلات متاحة لهذه الشركة حالياً',
+                      AppStrings.noTripsAvailableForCompany,
                       style: AppTextStyles.bodyMedium.copyWith(
                         color: AppColors.textSecondary,
                       ),
@@ -557,17 +402,14 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: trips.length,
-            separatorBuilder: (context, index) =>
-                SizedBox(height: AppSizes.p12),
+            separatorBuilder: (context, index) => SizedBox(height: AppSizes.p12),
             itemBuilder: (context, index) {
-              final trip = trips[index];
-              return SearchTripCard(trip: trip);
+              return SearchTripCard(trip: trips[index]);
             },
           );
         },
       );
     } else if (_selectedTab == 2) {
-      // التقييمات - GET /companies/:companyId/reviews
       return FutureBuilder<Either<Failure, List<CompanyReviewModel>>>(
         future: getIt<CompanyProfileRepository>().getCompanyReviews(
           widget.companyId,
@@ -576,7 +418,8 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: AppLoading());
           }
-          final reviews = snapshot.data?.fold((l) => <CompanyReviewModel>[], (r) => r) ?? [];
+          final reviews =
+              snapshot.data?.fold((l) => <CompanyReviewModel>[], (r) => r) ?? [];
           if (reviews.isEmpty) {
             return Center(
               child: Padding(
@@ -590,7 +433,7 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
                     ),
                     AppSizes.p8.verticalSpace,
                     Text(
-                      'لا توجد تقييمات للشركة حالياً',
+                      AppStrings.noReviewsForCompany,
                       style: AppTextStyles.bodyMedium.copyWith(
                         color: AppColors.textSecondary,
                       ),
@@ -603,11 +446,6 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
 
           return Column(
             children: reviews.map((rev) {
-              final userName = rev.user.fullName;
-              final ratingNum = rev.rating;
-              final comment = rev.comment;
-              final createdAt = rev.createdAt;
-
               return Container(
                 margin: EdgeInsets.only(bottom: 12.h),
                 padding: EdgeInsets.all(AppSizes.p12),
@@ -639,14 +477,14 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  userName,
+                                  rev.user.fullName,
                                   style: AppTextStyles.bodySmall.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: AppColors.textPrimary,
                                   ),
                                 ),
                                 Text(
-                                  createdAt,
+                                  rev.createdAt,
                                   style: AppTextStyles.labelSmall.copyWith(
                                     color: AppColors.textHint,
                                     fontSize: 9.sp,
@@ -661,7 +499,7 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
                             return Icon(
                               Icons.star,
                               size: 14.sp,
-                              color: index < ratingNum
+                              color: index < rev.rating
                                   ? AppColors.secondary
                                   : AppColors.border,
                             );
@@ -671,7 +509,7 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
                     ),
                     AppSizes.p8.verticalSpace,
                     Text(
-                      comment,
+                      rev.comment,
                       style: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.textSecondary,
                         height: 1.4,
@@ -685,7 +523,6 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
         },
       );
     } else {
-      // المعلومات
       return Container(
         padding: EdgeInsets.all(AppSizes.p16),
         decoration: BoxDecoration(
@@ -695,39 +532,10 @@ class _CompanyDetailsBodyState extends State<_CompanyDetailsBody> {
         ),
         child: Column(
           children: [
-            _buildContactRow(
-              Icons.location_city,
-              'المحافظة: ${profile?.governorate ?? "البحيرة"}',
-            ),
-            const Divider(color: AppColors.border, height: 1),
-            _buildContactRow(
-              Icons.storefront,
-              'العنوان: ${profile?.address ?? "المنيا"}',
-            ),
+            CompanyContactInfoWidget(profile: profile),
           ],
         ),
       );
     }
-  }
-
-  Widget _buildContactRow(IconData icon, String text) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
-      child: Row(
-        children: [
-          Icon(icon, size: 20.r, color: AppColors.primaryDark),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Text(
-              text,
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

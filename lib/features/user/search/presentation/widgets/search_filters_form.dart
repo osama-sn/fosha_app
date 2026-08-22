@@ -39,7 +39,7 @@ class SearchFiltersForm extends StatelessWidget {
       children: [
         // 1. المحافظة
         Text(
-          'المحافظة',
+          AppStrings.governorateLabel,
           style: AppTextStyles.labelLarge.copyWith(
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -59,7 +59,7 @@ class SearchFiltersForm extends StatelessWidget {
 
         // 2. الوجهة
         Text(
-          'الوجهة',
+          AppStrings.searchDestinationLabel,
           style: AppTextStyles.labelLarge.copyWith(
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -79,7 +79,7 @@ class SearchFiltersForm extends StatelessWidget {
 
         // 3. الشركة
         Text(
-          'الشركة',
+          AppStrings.tabCompanies,
           style: AppTextStyles.labelLarge.copyWith(
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,

@@ -10,9 +10,9 @@ import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 import 'package:fosha_app/features/admin/company_profile/data/models/company_profile_model.dart';
 import 'package:fosha_app/features/admin/company_profile/presentation/cubit/company_profile_cubit.dart';
-import 'package:fosha_app/features/admin/company_profile/presentation/cubit/company_profile_state.dart';
 import 'package:fosha_app/features/admin/company_profile/presentation/widgets/company_profile_form.dart';
 import 'package:fosha_app/features/admin/company_profile/presentation/widgets/company_profile_header_banner.dart';
+import 'package:fosha_app/features/admin/company_profile/presentation/pages/company_payment_accounts_page.dart';
 import 'package:fosha_app/features/user/auth/data/repositories/auth_repository.dart';
 
 class CompanyProfilePage extends StatefulWidget {
@@ -138,6 +138,37 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         const CompanyProfileHeaderBanner(),
+                        AppSizes.p16.verticalSpace,
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryDark,
+                            padding: EdgeInsets.symmetric(vertical: 14.h),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => CompanyPaymentAccountsPage(
+                                  companyId: _effectiveCompanyId,
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(
+                            Icons.account_balance_wallet_outlined,
+                            color: Colors.white,
+                          ),
+                          label: Text(
+                            AppStrings.companyPaymentAccountsTitle,
+                            style: AppTextStyles.labelLarge.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                         AppSizes.p20.verticalSpace,
                         CompanyProfileForm(
                           companyId: _effectiveCompanyId,

@@ -12,7 +12,6 @@ import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 import 'package:fosha_app/features/admin/manage_trips/presentation/cubit/admin_manage_trips_cubit.dart';
 import 'package:fosha_app/features/admin/trips/presentation/cubit/admin_trips_cubit.dart';
-import 'package:fosha_app/features/admin/trips/presentation/cubit/admin_trips_status.dart';
 import 'package:fosha_app/features/admin/trips/presentation/widgets/admin_trip_card.dart';
 import 'package:fosha_app/features/admin/trips/presentation/widgets/admin_trips_empty_view.dart';
 import 'package:fosha_app/features/admin/trips/presentation/widgets/admin_trips_filter_bar.dart';
@@ -245,7 +244,7 @@ class _AdminTripsPageState extends State<AdminTripsPage> {
                             if (context.mounted) {
                               AppSnackbar.showSuccess(
                                 context: context,
-                                message: 'تم تكرار الرحلة كمسودة جديدة بنجاح',
+                                message: AppStrings.adminTripDuplicatedSuccess,
                               );
                             }
                           },

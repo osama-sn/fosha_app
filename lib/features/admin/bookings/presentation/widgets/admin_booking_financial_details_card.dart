@@ -10,6 +10,11 @@ class AdminBookingFinancialDetailsCard extends StatelessWidget {
   final String requestDate;
   final String passengersCount;
   final String paymentMethod;
+  final String paymentSenderInstaPay;
+  final String paymentSenderNumber;
+  final String paymentNotes;
+  final String pickupPoint;
+  final String pickupTime;
   final String totalAmount;
 
   const AdminBookingFinancialDetailsCard({
@@ -18,6 +23,11 @@ class AdminBookingFinancialDetailsCard extends StatelessWidget {
     required this.requestDate,
     required this.passengersCount,
     required this.paymentMethod,
+    this.paymentSenderInstaPay = '',
+    this.paymentSenderNumber = '',
+    this.paymentNotes = '',
+    this.pickupPoint = '',
+    this.pickupTime = '',
     required this.totalAmount,
   });
 
@@ -54,6 +64,26 @@ class AdminBookingFinancialDetailsCard extends StatelessWidget {
           ),
           AppSizes.p12.verticalSpace,
           _buildDetailRow(AppStrings.adminPaymentMethodLabel, paymentMethod),
+          if (paymentSenderInstaPay.isNotEmpty) ...[
+            AppSizes.p12.verticalSpace,
+            _buildDetailRow('حساب انستا باي', paymentSenderInstaPay),
+          ],
+          if (paymentSenderNumber.isNotEmpty) ...[
+            AppSizes.p12.verticalSpace,
+            _buildDetailRow('رقم المحول منه', paymentSenderNumber),
+          ],
+          if (pickupPoint.isNotEmpty) ...[
+            AppSizes.p12.verticalSpace,
+            _buildDetailRow('نقطة التجمع', pickupPoint),
+          ],
+          if (pickupTime.isNotEmpty) ...[
+            AppSizes.p12.verticalSpace,
+            _buildDetailRow('موعد التجمع', pickupTime),
+          ],
+          if (paymentNotes.isNotEmpty) ...[
+            AppSizes.p12.verticalSpace,
+            _buildDetailRow('ملاحظات الدفع', paymentNotes),
+          ],
           AppSizes.p12.verticalSpace,
           const Divider(color: AppColors.divider),
           AppSizes.p8.verticalSpace,

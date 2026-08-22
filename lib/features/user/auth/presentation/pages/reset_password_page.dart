@@ -12,7 +12,6 @@ import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 import 'package:fosha_app/core/utils/app_validators.dart';
 import 'package:fosha_app/features/user/auth/presentation/cubit/auth_cubit.dart';
-import 'package:fosha_app/features/user/auth/presentation/cubit/auth_states.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   final String email;

@@ -10,7 +10,6 @@ import 'package:fosha_app/core/router/route_names.dart';
 import 'package:fosha_app/core/theme/app_sizes.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
 import 'package:fosha_app/features/user/auth/presentation/cubit/auth_cubit.dart';
-import 'package:fosha_app/features/user/auth/presentation/cubit/auth_states.dart';
 
 class SplashPage extends StatelessWidget {
   const SplashPage({super.key});

@@ -4,7 +4,7 @@ import 'package:fosha_app/features/admin/bookings/data/models/booking_model.dart
 import 'package:fosha_app/features/admin/bookings/presentation/pages/admin_booking_details_page.dart';
 import 'package:fosha_app/features/admin/bookings/presentation/pages/admin_bookings_page.dart';
 import 'package:fosha_app/features/admin/dashboard/presentation/pages/admin_dashboard_page.dart';
-import 'package:fosha_app/features/admin/manage_trips/presentation/pages/mange_trips_page.dart';
+import 'package:fosha_app/features/admin/manage_trips/presentation/pages/manage_trips_page.dart';
 import 'package:fosha_app/features/admin/trips/data/models/trip_model.dart';
 import 'package:fosha_app/features/admin/trips/presentation/pages/admin_trips_page.dart';
 import 'package:fosha_app/features/user/auth/presentation/pages/login_page.dart';
@@ -14,7 +14,7 @@ import 'package:fosha_app/features/user/bookings/presentation/pages/booking_deta
 import 'package:fosha_app/features/user/home/presentation/pages/home_page.dart';
 import 'package:fosha_app/features/user/home/presentation/pages/trip_details_page.dart';
 import 'package:fosha_app/features/user/not_found/presentation/pages/not_found_page.dart';
-import 'package:fosha_app/features/user/profile/presentation/pages/profile_page.dart';
+import 'package:fosha_app/features/user/profile/presentation/pages/profile_tab.dart';
 import 'package:fosha_app/features/user/settings/presentation/pages/settings_page.dart';
 import 'package:fosha_app/features/user/splash/presentation/pages/splash_page.dart';
 import 'package:fosha_app/features/admin/company_profile/presentation/pages/company_profile_page.dart';
@@ -84,7 +84,7 @@ class AppRouter {
       ),
       GoRoute(
         path: RouteNames.profile,
-        builder: (context, state) => const ProfilePage(),
+        builder: (context, state) => const ProfileTab(),
       ),
       GoRoute(
         path: RouteNames.settings,

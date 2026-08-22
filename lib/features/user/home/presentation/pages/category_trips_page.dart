@@ -13,7 +13,6 @@ import 'package:fosha_app/core/theme/app_text_styles.dart';
 import 'package:fosha_app/features/admin/trips/data/models/trip_model.dart';
 import 'package:fosha_app/features/categories/data/models/category_model.dart';
 import 'package:fosha_app/features/user/search/presentation/cubit/search_cubit.dart';
-import 'package:fosha_app/features/user/search/presentation/cubit/search_state.dart';
 
 class CategoryTripsPage extends StatelessWidget {
   final CategoryModel category;

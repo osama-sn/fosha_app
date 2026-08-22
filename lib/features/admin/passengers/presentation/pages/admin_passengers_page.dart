@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fosha_app/core/constants/app_colors.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/core/di/service_locator.dart';
-import 'package:fosha_app/core/shared/widgets/app_button.dart';
 import 'package:fosha_app/core/shared/widgets/app_loading.dart';
 import 'package:fosha_app/core/shared/widgets/app_snackbar.dart';
 import 'package:fosha_app/core/theme/app_text_styles.dart';
-import 'package:fosha_app/features/admin/passengers/data/models/passenger_model.dart';
 import 'package:fosha_app/features/admin/passengers/presentation/cubit/admin_passengers_cubit.dart';
+import 'package:fosha_app/features/admin/passengers/presentation/widgets/admin_announcement_dialog.dart';
+import 'package:fosha_app/features/admin/passengers/presentation/widgets/admin_passenger_card.dart';
+import 'package:fosha_app/features/admin/passengers/presentation/widgets/admin_passengers_empty_view.dart';
+import 'package:fosha_app/features/admin/passengers/presentation/widgets/admin_passengers_summary_bar.dart';
 import 'package:fosha_app/features/admin/trips/data/models/trip_model.dart';
 import 'package:fosha_app/features/admin/trips/data/repositories/admin_trips_repository.dart';
 
@@ -81,7 +84,7 @@ class _AdminPassengersPageState extends State<AdminPassengersPage> {
         backgroundColor: AppColors.surface,
         elevation: 0.5,
         title: Text(
-          'قائمة المسافرين والمانفيست',
+          AppStrings.adminPassengersTitle,
           style: AppTextStyles.titleMedium.copyWith(
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -94,14 +97,14 @@ class _AdminPassengersPageState extends State<AdminPassengersPage> {
           : _trips.isEmpty
               ? Center(
                   child: Text(
-                    'لا توجد رحلات مضافة بعد',
+                    AppStrings.adminNoTripsYet,
                     style: AppTextStyles.bodyMedium
                         .copyWith(color: AppColors.textSecondary),
                   ),
                 )
               : Column(
                   children: [
-                    // Trip Selection Dropdown & Summary
+                    // Trip Selection Dropdown & Search Bar
                     Container(
                       padding: EdgeInsets.all(16.r),
                       color: AppColors.surface,
@@ -109,7 +112,7 @@ class _AdminPassengersPageState extends State<AdminPassengersPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'اختر الرحلة:',
+                            AppStrings.adminSelectTripLabel,
                             style: AppTextStyles.labelLarge.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -149,7 +152,6 @@ class _AdminPassengersPageState extends State<AdminPassengersPage> {
                             ),
                           ),
                           SizedBox(height: 12.h),
-                          // Search field & Announcement button
                           Row(
                             children: [
                               Expanded(
@@ -157,14 +159,18 @@ class _AdminPassengersPageState extends State<AdminPassengersPage> {
                                   onChanged: (val) =>
                                       setState(() => _searchQuery = val),
                                   decoration: InputDecoration(
-                                    hintText: 'بحث باسم المسافر أو الهاتف...',
+                                    hintText:
+                                        AppStrings.adminSearchPassengerHint,
                                     prefixIcon: const Icon(Icons.search),
                                     contentPadding: EdgeInsets.symmetric(
-                                        vertical: 10.h, horizontal: 12.w),
+                                      vertical: 10.h,
+                                      horizontal: 12.w,
+                                    ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10.r),
                                       borderSide: const BorderSide(
-                                          color: AppColors.border),
+                                        color: AppColors.border,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -173,12 +179,27 @@ class _AdminPassengersPageState extends State<AdminPassengersPage> {
                               InkWell(
                                 onTap: _selectedTrip == null
                                     ? null
-                                    : () => _showAnnouncementDialog(
-                                        context, _selectedTrip!.id),
+                                    : () {
+                                        AdminAnnouncementDialog.show(
+                                          context,
+                                          tripId: _selectedTrip!.id,
+                                          onSend: (title, message) {
+                                            context
+                                                .read<AdminPassengersCubit>()
+                                                .sendAnnouncement(
+                                                  tripId: _selectedTrip!.id,
+                                                  title: title,
+                                                  message: message,
+                                                );
+                                          },
+                                        );
+                                      },
                                 borderRadius: BorderRadius.circular(10.r),
                                 child: Container(
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: 12.w, vertical: 12.h),
+                                    horizontal: 12.w,
+                                    vertical: 12.h,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: _selectedTrip == null
                                         ? Colors.grey.shade400
@@ -192,7 +213,7 @@ class _AdminPassengersPageState extends State<AdminPassengersPage> {
                                           color: Colors.white, size: 18),
                                       SizedBox(width: 4.w),
                                       Text(
-                                        'إرسال إشعار',
+                                        AppStrings.adminSendNotification,
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 12.sp,
@@ -210,7 +231,7 @@ class _AdminPassengersPageState extends State<AdminPassengersPage> {
                     ),
                     SizedBox(height: 8.h),
 
-                    // Passenger Content
+                    // Passengers List Area
                     Expanded(
                       child: BlocConsumer<AdminPassengersCubit,
                           AdminPassengersState>(
@@ -258,46 +279,26 @@ class _AdminPassengersPageState extends State<AdminPassengersPage> {
 
                             return ListView(
                               padding: EdgeInsets.symmetric(
-                                  horizontal: 16.w, vertical: 8.h),
+                                horizontal: 16.w,
+                                vertical: 8.h,
+                              ),
                               children: [
-                                // Stats Summary Bar
-                                Container(
-                                  padding: EdgeInsets.all(12.r),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primary.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(12.r),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      _buildStatItem('عدد المسافرين',
-                                          '${data.passengersCount} فرد'),
-                                      _buildStatItem('المقاعد الحالية',
-                                          '${data.totalSeatsBooked} مقعد'),
-                                      _buildStatItem(
-                                        'سعة الرحلة',
-                                        '${data.trip?.capacity ?? _selectedTrip?.capacity ?? 0} مقعد',
-                                      ),
-                                    ],
-                                  ),
+                                AdminPassengersSummaryBar(
+                                  passengersCount: data.passengersCount,
+                                  totalSeatsBooked: data.totalSeatsBooked,
+                                  capacity: data.trip?.capacity ??
+                                      _selectedTrip?.capacity ??
+                                      0,
                                 ),
                                 SizedBox(height: 12.h),
-
                                 if (filteredPassengers.isEmpty)
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 40.h),
-                                    child: Center(
-                                      child: Text(
-                                        'لا يوجد مسافرون مطابقون للبحث',
-                                        style: AppTextStyles.bodyMedium.copyWith(
-                                            color: AppColors.textSecondary),
-                                      ),
-                                    ),
-                                  )
+                                  const AdminPassengersEmptyView()
                                 else
-                                  ...filteredPassengers.map((passenger) =>
-                                      _buildPassengerCard(passenger)),
+                                  ...filteredPassengers.map(
+                                    (passenger) => AdminPassengerCard(
+                                      passenger: passenger,
+                                    ),
+                                  ),
                               ],
                             );
                           }
@@ -307,197 +308,6 @@ class _AdminPassengersPageState extends State<AdminPassengersPage> {
                     ),
                   ],
                 ),
-    );
-  }
-
-  Widget _buildStatItem(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: AppTextStyles.titleMedium.copyWith(
-            fontWeight: FontWeight.bold,
-            color: AppColors.primaryDark,
-          ),
-        ),
-        SizedBox(height: 2.h),
-        Text(
-          label,
-          style: AppTextStyles.labelSmall
-              .copyWith(color: AppColors.textSecondary, fontSize: 10.sp),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPassengerCard(PassengerModel passenger) {
-    return Card(
-      margin: EdgeInsets.only(bottom: 12.h),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-      elevation: 1,
-      child: Padding(
-        padding: EdgeInsets.all(14.r),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.15),
-                  child: Text(
-                    passenger.user.fullName.isNotEmpty
-                        ? passenger.user.fullName[0].toUpperCase()
-                        : 'U',
-                    style: const TextStyle(
-                        color: AppColors.primary, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        passenger.user.fullName,
-                        style: AppTextStyles.bodyLarge
-                            .copyWith(fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 2.h),
-                      Text(
-                        passenger.user.phone,
-                        style: AppTextStyles.bodySmall
-                            .copyWith(color: AppColors.textSecondary),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                  decoration: BoxDecoration(
-                    color: AppColors.secondary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
-                  child: Text(
-                    '${passenger.numberOfSeats} مقاعد',
-                    style: TextStyle(
-                      color: AppColors.secondary,
-                      fontSize: 11.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Divider(height: 20.h),
-            Row(
-              children: [
-                const Icon(Icons.location_on_outlined,
-                    size: 16, color: AppColors.primary),
-                SizedBox(width: 6.w),
-                Expanded(
-                  child: Text(
-                    'نقطة التجمع: ${passenger.pickupPoint.isNotEmpty ? passenger.pickupPoint : "غير محددة"}',
-                    style: AppTextStyles.bodySmall,
-                  ),
-                ),
-                if (passenger.pickupTime.isNotEmpty) ...[
-                  const Icon(Icons.access_time, size: 16, color: Colors.grey),
-                  SizedBox(width: 4.w),
-                  Text(
-                    passenger.pickupTime,
-                    style: AppTextStyles.bodySmall
-                        .copyWith(color: AppColors.textSecondary),
-                  ),
-                ],
-              ],
-            ),
-            if (passenger.notes.isNotEmpty) ...[
-              SizedBox(height: 6.h),
-              Row(
-                children: [
-                  const Icon(Icons.note_alt_outlined,
-                      size: 16, color: Colors.orange),
-                  SizedBox(width: 6.w),
-                  Expanded(
-                    child: Text(
-                      'ملاحظات: ${passenger.notes}',
-                      style: AppTextStyles.bodySmall
-                          .copyWith(color: Colors.orange.shade800),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showAnnouncementDialog(BuildContext context, String tripId) {
-    final titleController = TextEditingController();
-    final messageController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-        title: Row(
-          children: [
-            const Icon(Icons.campaign, color: AppColors.primary),
-            SizedBox(width: 8.w),
-            const Text('إرسال تحديث/إشعار عاجل'),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: titleController,
-              decoration: const InputDecoration(
-                labelText: 'عنوان الإشعار (مثلاً: تغيير موعد التحرك)',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 12.h),
-            TextField(
-              controller: messageController,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'نص الرسالة أو التحديث للمسافرين...',
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('إلغاء'),
-          ),
-          AppButton(
-            text: 'إرسال الآن',
-            onPressed: () {
-              if (titleController.text.trim().isEmpty ||
-                  messageController.text.trim().isEmpty) {
-                AppSnackbar.showError(
-                  context: context,
-                  message: 'يرجى إدخال العنوان ونص الرسالة',
-                );
-                return;
-              }
-              Navigator.pop(dialogContext);
-              context.read<AdminPassengersCubit>().sendAnnouncement(
-                    tripId: tripId,
-                    title: titleController.text.trim(),
-                    message: messageController.text.trim(),
-                  );
-            },
-          ),
-        ],
-      ),
     );
   }
 }

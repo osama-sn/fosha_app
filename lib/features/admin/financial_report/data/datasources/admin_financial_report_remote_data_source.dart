@@ -24,8 +24,23 @@ class AdminFinancialReportRemoteDataSourceImpl
     int? month,
     int? year,
   }) async {
+    final queryParams = <String, dynamic>{};
+    if (startDate != null && startDate.isNotEmpty) {
+      queryParams['startDate'] = startDate;
+    }
+    if (endDate != null && endDate.isNotEmpty) {
+      queryParams['endDate'] = endDate;
+    }
+    if (month != null) {
+      queryParams['month'] = month;
+    }
+    if (year != null) {
+      queryParams['year'] = year;
+    }
+
     final response = await _dioClient.dio.get(
       ApiEndpoints.adminCompanyStats,
+      queryParameters: queryParams,
     );
 
     return FinancialReportModel.fromJson(

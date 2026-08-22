@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:fosha_app/core/network/api_endpoints.dart';
 import 'package:fosha_app/core/network/dio_client.dart';
 import 'package:fosha_app/features/admin/offers/data/models/offer_model.dart';
 
@@ -39,26 +40,18 @@ class OffersRemoteDataSourceImpl implements OffersRemoteDataSource {
   final DioClient _dioClient;
 
   OffersRemoteDataSourceImpl({required DioClient dioClient})
-      : _dioClient = dioClient;
+    : _dioClient = dioClient;
 
   @override
   Future<List<OfferModel>> getCompanyOffers() async {
     final response = await _dioClient.dio.get('/offers/admin/all');
-    final responseData = response.data;
-    List dynamicList = [];
-
-    if (responseData is Map<String, dynamic>) {
-      if (responseData['data'] is List) {
-        dynamicList = responseData['data'] as List;
-      } else if (responseData['data'] is Map &&
-          responseData['data']['offers'] is List) {
-        dynamicList = responseData['data']['offers'] as List;
-      }
-    } else if (responseData is List) {
-      dynamicList = responseData;
-    }
-
-    return dynamicList
+    final data = response.data;
+    final List list =
+        (data is Map
+            ? (data['data'] is List ? data['data'] : data['data']?['offers'])
+            : data) ??
+        [];
+    return list
         .map((e) => OfferModel.fromJson(e as Map<String, dynamic>))
         .toList();
   }
@@ -99,10 +92,7 @@ class OffersRemoteDataSourceImpl implements OffersRemoteDataSource {
 
     final formData = FormData.fromMap(formDataMap);
 
-    final response = await _dioClient.dio.post(
-      '/offers',
-      data: formData,
-    );
+    final response = await _dioClient.dio.post('/offers', data: formData);
 
     final responseData = response.data;
     Map<String, dynamic> offerJson;
@@ -155,7 +145,7 @@ class OffersRemoteDataSourceImpl implements OffersRemoteDataSource {
     final formData = FormData.fromMap(formDataMap);
 
     final response = await _dioClient.dio.put(
-      '/offers/$offerId',
+      '${ApiEndpoints.offers}/$offerId',
       data: formData,
     );
 
@@ -174,6 +164,6 @@ class OffersRemoteDataSourceImpl implements OffersRemoteDataSource {
 
   @override
   Future<void> deleteOffer(String offerId) async {
-    await _dioClient.dio.delete('/offers/$offerId');
+    await _dioClient.dio.delete('${ApiEndpoints.offers}/$offerId');
   }
 }

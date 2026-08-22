@@ -3,6 +3,7 @@ import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/features/admin/company_profile/data/models/company_profile_model.dart';
 import 'package:fosha_app/features/admin/company_profile/data/repositories/company_profile_repository.dart';
 import 'company_profile_state.dart';
+export 'company_profile_state.dart';
 
 class CompanyProfileCubit extends Cubit<CompanyProfileState> {
   final CompanyProfileRepository repository;

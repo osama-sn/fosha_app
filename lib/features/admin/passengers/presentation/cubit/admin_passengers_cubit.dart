@@ -1,35 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fosha_app/core/errors/api_error_handler.dart';
-import 'package:fosha_app/features/admin/passengers/data/models/passenger_model.dart';
 import 'package:fosha_app/features/admin/passengers/data/repositories/admin_passengers_repository.dart';
-
-abstract class AdminPassengersState {}
-
-class AdminPassengersInitial extends AdminPassengersState {}
-
-class AdminPassengersLoading extends AdminPassengersState {}
-
-class AdminPassengersLoaded extends AdminPassengersState {
-  final PassengerListResponseModel data;
-  AdminPassengersLoaded(this.data);
-}
-
-class AdminPassengersError extends AdminPassengersState {
-  final String message;
-  AdminPassengersError(this.message);
-}
-
-class AdminAnnouncementSending extends AdminPassengersState {}
-
-class AdminAnnouncementSentSuccess extends AdminPassengersState {
-  final String message;
-  AdminAnnouncementSentSuccess(this.message);
-}
-
-class AdminAnnouncementError extends AdminPassengersState {
-  final String message;
-  AdminAnnouncementError(this.message);
-}
+import 'admin_passengers_state.dart';
+export 'admin_passengers_state.dart';
 
 class AdminPassengersCubit extends Cubit<AdminPassengersState> {
   final AdminPassengersRepository _repository;
@@ -38,12 +10,12 @@ class AdminPassengersCubit extends Cubit<AdminPassengersState> {
 
   Future<void> fetchPassengers(String tripId) async {
     emit(AdminPassengersLoading());
-    try {
-      final res = await _repository.getTripPassengers(tripId);
-      emit(AdminPassengersLoaded(res));
-    } catch (e) {
-      emit(AdminPassengersError(ApiErrorHandler.handle(e)));
-    }
+    final result = await _repository.getTripPassengers(tripId);
+
+    result.fold(
+      (failure) => emit(AdminPassengersError(failure.message)),
+      (data) => emit(AdminPassengersLoaded(data)),
+    );
   }
 
   Future<void> sendAnnouncement({
@@ -51,15 +23,15 @@ class AdminPassengersCubit extends Cubit<AdminPassengersState> {
     required String title,
     required String message,
   }) async {
-    try {
-      await _repository.sendAnnouncement(
-        tripId: tripId,
-        title: title,
-        message: message,
-      );
-      emit(AdminAnnouncementSentSuccess('تم إرسال الإشعار بنجاح لجميع ركاب الرحلة'));
-    } catch (e) {
-      emit(AdminAnnouncementError(ApiErrorHandler.handle(e)));
-    }
+    final result = await _repository.sendAnnouncement(
+      tripId: tripId,
+      title: title,
+      message: message,
+    );
+
+    result.fold(
+      (failure) => emit(AdminAnnouncementError(failure.message)),
+      (_) => emit(const AdminAnnouncementSentSuccess('تم إرسال الإشعار بنجاح')),
+    );
   }
 }

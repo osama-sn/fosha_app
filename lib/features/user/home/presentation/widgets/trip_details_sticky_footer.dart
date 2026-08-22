@@ -53,7 +53,7 @@ class TripDetailsStickyFooter extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'للشخص',
+                  AppStrings.perPerson,
                   style: AppTextStyles.labelSmall.copyWith(
                     color: AppColors.textHint,
                   ),
@@ -86,22 +86,27 @@ class TripDetailsStickyFooter extends StatelessWidget {
 
                     try {
                       final repo = getIt<UserBookingsRepository>();
-                      final bookings = await repo.getMyBookings();
+                      final bookingsResult = await repo.getMyBookings();
                       if (context.mounted) Navigator.pop(context);
 
                       BookingModel? matchingBooking;
-                      for (final b in bookings) {
-                        if (b.tripId == trip.id ||
-                            (b.trip != null && b.trip!.id == trip.id)) {
-                          matchingBooking = b;
-                          break;
-                        }
-                      }
+                      bookingsResult.fold(
+                        (_) {},
+                        (bookingsList) {
+                          for (final b in bookingsList) {
+                            if (b.tripId == trip.id ||
+                                (b.trip != null && b.trip!.id == trip.id)) {
+                              matchingBooking = b;
+                              break;
+                            }
+                          }
+                        },
+                      );
 
                       matchingBooking ??= BookingModel(
                         id: trip.id,
                         tripId: trip.id,
-                        customerName: 'عميل',
+                        customerName: AppStrings.adminDefaultCustomerName,
                         customerEmail: '',
                         customerPhone: '',
                         tripTitle: trip.title,
@@ -136,7 +141,7 @@ class TripDetailsStickyFooter extends StatelessWidget {
                         final fallbackBooking = BookingModel(
                           id: trip.id,
                           tripId: trip.id,
-                          customerName: 'عميل',
+                          customerName: AppStrings.adminDefaultCustomerName,
                           customerEmail: '',
                           customerPhone: '',
                           tripTitle: trip.title,

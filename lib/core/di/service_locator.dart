@@ -22,6 +22,7 @@ import 'package:fosha_app/features/admin/trips/data/datasource/admin_trips_remot
 import 'package:fosha_app/features/admin/company_profile/data/datasources/company_profile_remote_data_source.dart';
 import 'package:fosha_app/features/admin/company_profile/data/repositories/company_profile_repository.dart';
 import 'package:fosha_app/features/admin/company_profile/presentation/cubit/company_profile_cubit.dart';
+import 'package:fosha_app/features/admin/company_profile/presentation/cubit/company_payment_accounts_cubit.dart';
 
 import 'package:fosha_app/features/admin/offers/data/datasources/offers_remote_data_source.dart';
 import 'package:fosha_app/features/admin/offers/data/repositories/offers_repository.dart';
@@ -224,6 +225,9 @@ Future<void> initServiceLocator() async {
   );
   getIt.registerFactory<CompanyProfileCubit>(
     () => CompanyProfileCubit(repository: getIt()),
+  );
+  getIt.registerFactory<CompanyPaymentAccountsCubit>(
+    () => CompanyPaymentAccountsCubit(repository: getIt()),
   );
   getIt.registerFactory<OffersCubit>(
     () => OffersCubit(repository: getIt()),

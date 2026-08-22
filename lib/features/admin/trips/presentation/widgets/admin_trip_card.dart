@@ -154,7 +154,7 @@ class AdminTripCard extends StatelessWidget {
                 onTap: onDelete,
               ),
               _buildActionButton(
-                label: 'تكرار',
+                label: AppStrings.adminDuplicateTrip,
                 icon: Icons.copy_outlined,
                 color: AppColors.secondary,
                 onTap: onDuplicate,

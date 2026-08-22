@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fosha_app/core/constants/app_strings.dart';
 import 'package:fosha_app/features/admin/offers/data/models/offer_model.dart';
 import 'package:fosha_app/features/admin/offers/data/repositories/offers_repository.dart';
 import 'offers_state.dart';
+export 'offers_state.dart';
 
 class OffersCubit extends Cubit<OffersState> {
   final OffersRepository repository;
@@ -13,13 +15,15 @@ class OffersCubit extends Cubit<OffersState> {
 
   Future<void> fetchCompanyOffers() async {
     emit(OffersLoading());
-    try {
-      final offers = await repository.getCompanyOffers();
-      _currentOffers = offers;
-      emit(OffersLoaded(offers: offers));
-    } catch (e) {
-      emit(OffersFailure(error: e.toString().replaceAll('Exception: ', '')));
-    }
+    final result = await repository.getCompanyOffers();
+
+    result.fold(
+      (failure) => emit(OffersFailure(error: failure.message)),
+      (offers) {
+        _currentOffers = offers;
+        emit(OffersLoaded(offers: offers));
+      },
+    );
   }
 
   Future<void> createOffer({
@@ -36,29 +40,36 @@ class OffersCubit extends Cubit<OffersState> {
     File? imageFile,
   }) async {
     emit(OffersSubmitting(currentOffers: _currentOffers));
-    try {
-      await repository.createOffer(
-        titleAr: titleAr,
-        titleEn: titleEn,
-        descriptionAr: descriptionAr,
-        descriptionEn: descriptionEn,
-        discountPercentage: discountPercentage,
-        promoCode: promoCode,
-        tripId: tripId,
-        startDate: startDate,
-        endDate: endDate,
-        priority: priority,
-        imageFile: imageFile,
-      );
-      final updatedList = await repository.getCompanyOffers();
-      _currentOffers = updatedList;
-      emit(OffersActionSuccess(
-        offers: updatedList,
-        message: 'تم إضافة العرض الترويجي بنجاح',
-      ));
-    } catch (e) {
-      emit(OffersFailure(error: e.toString().replaceAll('Exception: ', '')));
-    }
+    final createResult = await repository.createOffer(
+      titleAr: titleAr,
+      titleEn: titleEn,
+      descriptionAr: descriptionAr,
+      descriptionEn: descriptionEn,
+      discountPercentage: discountPercentage,
+      promoCode: promoCode,
+      tripId: tripId,
+      startDate: startDate,
+      endDate: endDate,
+      priority: priority,
+      imageFile: imageFile,
+    );
+
+    await createResult.fold(
+      (failure) async => emit(OffersFailure(error: failure.message)),
+      (_) async {
+        final fetchResult = await repository.getCompanyOffers();
+        fetchResult.fold(
+          (failure) => emit(OffersFailure(error: failure.message)),
+          (updatedList) {
+            _currentOffers = updatedList;
+            emit(OffersActionSuccess(
+              offers: updatedList,
+              message: AppStrings.adminOfferCreatedSuccess,
+            ));
+          },
+        );
+      },
+    );
   }
 
   Future<void> updateOffer({
@@ -76,44 +87,58 @@ class OffersCubit extends Cubit<OffersState> {
     File? imageFile,
   }) async {
     emit(OffersSubmitting(currentOffers: _currentOffers));
-    try {
-      await repository.updateOffer(
-        offerId: offerId,
-        titleAr: titleAr,
-        titleEn: titleEn,
-        descriptionAr: descriptionAr,
-        descriptionEn: descriptionEn,
-        discountPercentage: discountPercentage,
-        promoCode: promoCode,
-        tripId: tripId,
-        startDate: startDate,
-        endDate: endDate,
-        priority: priority,
-        imageFile: imageFile,
-      );
-      final updatedList = await repository.getCompanyOffers();
-      _currentOffers = updatedList;
-      emit(OffersActionSuccess(
-        offers: updatedList,
-        message: 'تم تعديل العرض بنجاح',
-      ));
-    } catch (e) {
-      emit(OffersFailure(error: e.toString().replaceAll('Exception: ', '')));
-    }
+    final updateResult = await repository.updateOffer(
+      offerId: offerId,
+      titleAr: titleAr,
+      titleEn: titleEn,
+      descriptionAr: descriptionAr,
+      descriptionEn: descriptionEn,
+      discountPercentage: discountPercentage,
+      promoCode: promoCode,
+      tripId: tripId,
+      startDate: startDate,
+      endDate: endDate,
+      priority: priority,
+      imageFile: imageFile,
+    );
+
+    await updateResult.fold(
+      (failure) async => emit(OffersFailure(error: failure.message)),
+      (_) async {
+        final fetchResult = await repository.getCompanyOffers();
+        fetchResult.fold(
+          (failure) => emit(OffersFailure(error: failure.message)),
+          (updatedList) {
+            _currentOffers = updatedList;
+            emit(OffersActionSuccess(
+              offers: updatedList,
+              message: AppStrings.adminOfferUpdatedSuccess,
+            ));
+          },
+        );
+      },
+    );
   }
 
   Future<void> deleteOffer(String offerId) async {
     emit(OffersSubmitting(currentOffers: _currentOffers));
-    try {
-      await repository.deleteOffer(offerId);
-      final updatedList = await repository.getCompanyOffers();
-      _currentOffers = updatedList;
-      emit(OffersActionSuccess(
-        offers: updatedList,
-        message: 'تم حذف العرض بنجاح',
-      ));
-    } catch (e) {
-      emit(OffersFailure(error: e.toString().replaceAll('Exception: ', '')));
-    }
+    final deleteResult = await repository.deleteOffer(offerId);
+
+    await deleteResult.fold(
+      (failure) async => emit(OffersFailure(error: failure.message)),
+      (_) async {
+        final fetchResult = await repository.getCompanyOffers();
+        fetchResult.fold(
+          (failure) => emit(OffersFailure(error: failure.message)),
+          (updatedList) {
+            _currentOffers = updatedList;
+            emit(OffersActionSuccess(
+              offers: updatedList,
+              message: AppStrings.adminOfferDeletedSuccess,
+            ));
+          },
+        );
+      },
+    );
   }
 }

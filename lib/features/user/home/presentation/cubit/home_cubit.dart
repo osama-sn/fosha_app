@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fosha_app/features/user/home/data/repositories/home_repository.dart';
 import 'package:fosha_app/features/user/home/presentation/cubit/home_state.dart';
+export 'package:fosha_app/features/user/home/presentation/cubit/home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
   final HomeRepository repository;
@@ -16,14 +17,14 @@ class HomeCubit extends Cubit<HomeState> {
       _currentGovernorate = governorate;
     }
     emit(const HomeLoading());
-    try {
-      final homeData = await repository.getHomeData(
-        governorate: _currentGovernorate,
-      );
-      emit(HomeSuccess(homeData: homeData));
-    } catch (e) {
-      emit(HomeFailure(error: e.toString().replaceAll('Exception: ', '')));
-    }
+    final result = await repository.getHomeData(
+      governorate: _currentGovernorate,
+    );
+
+    result.fold(
+      (failure) => emit(HomeFailure(error: failure.message)),
+      (homeData) => emit(HomeSuccess(homeData: homeData)),
+    );
   }
 
   void changeGovernorate(String governorate) {

@@ -174,22 +174,27 @@ class _DestinationCardState extends State<DestinationCard> {
                           });
                           try {
                             final repo = getIt<FavoritesRepository>();
-                            final isFav = await repo.toggleFavorite(trip.id);
-                            setState(() {
-                              _isFavorite = isFav;
-                            });
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    isFav
-                                        ? 'تمت إضافة الرحلة للمفضلة ❤️'
-                                        : 'تمت إزالة الرحلة من المفضلة',
-                                  ),
-                                  duration: const Duration(seconds: 2),
-                                ),
-                              );
-                            }
+                            final isFavResult = await repo.toggleFavorite(trip.id);
+                            isFavResult.fold(
+                              (_) {},
+                              (isFav) {
+                                setState(() {
+                                  _isFavorite = isFav;
+                                });
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        isFav
+                                            ? 'تمت إضافة الرحلة للمفضلة ❤️'
+                                            : 'تمت إزالة الرحلة من المفضلة',
+                                      ),
+                                      duration: const Duration(seconds: 2),
+                                    ),
+                                  );
+                                }
+                              },
+                            );
                           } catch (_) {}
                         },
                         child: Icon(

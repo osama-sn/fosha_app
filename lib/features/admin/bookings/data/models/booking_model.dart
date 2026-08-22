@@ -24,6 +24,40 @@ class BookingCustomerModel {
   }
 }
 
+class BookingPassengerModel {
+  final String fullName;
+  final String phone;
+  final int age;
+  final String gender;
+  final String notes;
+
+  const BookingPassengerModel({
+    required this.fullName,
+    required this.phone,
+    required this.age,
+    required this.gender,
+    this.notes = '',
+  });
+
+  factory BookingPassengerModel.fromJson(Map<String, dynamic> json) {
+    return BookingPassengerModel(
+      fullName: json['fullName'] as String? ?? '',
+      phone: json['phone'] as String? ?? '',
+      age: (json['age'] as num?)?.toInt() ?? 0,
+      gender: json['gender'] as String? ?? 'male',
+      notes: json['notes'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'fullName': fullName,
+        'phone': phone,
+        'age': age,
+        'gender': gender,
+        'notes': notes,
+      };
+}
+
 class BookingTripInfoModel {
   final String id;
   final String title;
@@ -77,7 +111,16 @@ class BookingModel {
   final String tripId;
   final String bookingNumber;
   final String paymentMethod;
+  final String paymentSenderInstaPay;
+  final String paymentSenderNumber;
+  final String paymentReceiptImage;
+  final String paymentNotes;
+  final String paymentStatus;
+  final String pickupPoint;
+  final String pickupTime;
+  final String couponCode;
   final String customerNotes;
+  final List<BookingPassengerModel> passengers;
 
   const BookingModel({
     required this.id,
@@ -100,7 +143,16 @@ class BookingModel {
     this.tripId = '',
     this.bookingNumber = '',
     this.paymentMethod = '',
+    this.paymentSenderInstaPay = '',
+    this.paymentSenderNumber = '',
+    this.paymentReceiptImage = '',
+    this.paymentNotes = '',
+    this.paymentStatus = '',
+    this.pickupPoint = '',
+    this.pickupTime = '',
+    this.couponCode = '',
     this.customerNotes = '',
+    this.passengers = const [],
   });
 
   int get numberOfSeats => passengersCount;
@@ -148,6 +200,14 @@ class BookingModel {
             ? '$startDate - $endDate'
             : '');
 
+    List<BookingPassengerModel> passengersList = [];
+    if (json['passengers'] is List) {
+      passengersList = (json['passengers'] as List)
+          .map((p) =>
+              BookingPassengerModel.fromJson(Map<String, dynamic>.from(p as Map)))
+          .toList();
+    }
+
     return BookingModel(
       id: idStr,
       user: userObj,
@@ -194,9 +254,18 @@ class BookingModel {
       bookingNumber: formattedNum,
       paymentMethod:
           json['paymentMethod'] as String? ?? AppStrings.adminDefaultBankCard,
+      paymentSenderInstaPay: json['paymentSenderInstaPay'] as String? ?? '',
+      paymentSenderNumber: json['paymentSenderNumber'] as String? ?? '',
+      paymentReceiptImage: json['paymentReceiptImage'] as String? ?? '',
+      paymentNotes: json['paymentNotes'] as String? ?? '',
+      paymentStatus: json['paymentStatus'] as String? ?? '',
+      pickupPoint: json['pickupPoint'] as String? ?? '',
+      pickupTime: json['pickupTime'] as String? ?? '',
+      couponCode: json['couponCode'] as String? ?? '',
       customerNotes: json['customerNotes'] as String? ??
           json['notes'] as String? ??
           AppStrings.adminNoCustomerNotes,
+      passengers: passengersList,
     );
   }
 }

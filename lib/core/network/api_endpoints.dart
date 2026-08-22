@@ -71,10 +71,13 @@ class ApiEndpoints {
   static const String expenses = '/expenses';
   static const String expensesSummary = '/expenses/summary';
   static const String coupons = '/coupons';
+  static const String offers = '/offers';
 
   static String tripPassengers(String tripId) => '/trips/$tripId/passengers';
-  static String tripAnnouncements(String tripId) => '/trips/$tripId/announcements';
+  static String tripAnnouncements(String tripId) =>
+      '/trips/$tripId/announcements';
   static String duplicateTrip(String tripId) => '/trips/$tripId/duplicate';
-  static String companyReviews(String companyId) => '/companies/$companyId/reviews';
+  static String companyReviews(String companyId) =>
+      '/companies/$companyId/reviews';
   static String tripReviews(String tripId) => '/trips/$tripId/reviews';
 }
